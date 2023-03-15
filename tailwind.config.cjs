@@ -4,7 +4,12 @@ const config = {
   theme: {
     extend: {},
   },
-  plugins: [],
+  plugins: [
+    require("@tailwindcss/forms"),
+    require('@catppuccin/tailwindcss')({
+      prefix: 'ctp',
+    }),
+  ],
 };
 
 module.exports = config;
