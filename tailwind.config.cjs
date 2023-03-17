@@ -5,9 +5,9 @@ const config = {
     extend: {},
   },
   plugins: [
-    require("@tailwindcss/forms"),
     require('@catppuccin/tailwindcss')({
       prefix: 'ctp',
+      defaultFlavour: 'mocha'
     }),
   ],
 };
