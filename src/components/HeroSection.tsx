@@ -68,31 +68,39 @@ const HeroSection: React.FC<Props> = ({ flavorLabel }) => {
           </defs>
         </svg>
       </div>
-      <div className="mx-auto max-w-4xl py-32 flex flex-col">
-        <div className="animate-colorchange bg-gradient-to-r from-ctp-teal via-ctp-lavender bg-clip-text py-2 text-transparent">
-          <span className="text-4xl font-bold tracking-tight" ref={el}></span>
+      <div className="flex">
+        <div className='px-2 pl-12 animate-pulse transition-all'>
+          <img
+            src="https://cdn.discordapp.com/attachments/1012775098840776706/1087180208920084560/1679274347183.png"
+            alt="andrin"
+          />
         </div>
-        <div>
-          <p className="mt-6 text-lg leading-8 text-ctp-subtext0">
-            Anim aute id magna aliqua ad ad non deserunt sunt. Qui irure qui
-            lorem cupidatat commodo. Elit sunt amet fugiat veniam occaecat
-            fugiat aliqua.
-          </p>
-          <div className="mt-10 flex items-center justify-center gap-x-6">
-            <a
-              href="#"
-              className=" animate-colorchange rounded-lg bg-gradient-to-r from-ctp-teal via-ctp-lavender to-ctp-mauve 
+        <div className="mx-auto flex max-w-2xl flex-col py-32">
+          <div className="animate-colorchange bg-gradient-to-r from-ctp-teal via-ctp-lavender bg-clip-text py-2 text-transparent">
+            <span className="text-4xl font-bold tracking-tight" ref={el}></span>
+          </div>
+          <div>
+            <p className="mt-6 text-lg leading-8 text-ctp-subtext0">
+              Anim aute id magna aliqua ad ad non deserunt sunt. Qui irure qui
+              lorem cupidatat commodo. Elit sunt amet fugiat veniam occaecat
+              fugiat aliqua.
+            </p>
+            <div className="mt-10 flex items-center justify-center gap-x-6">
+              <a
+                href="#"
+                className=" animate-colorchange rounded-lg bg-gradient-to-r from-ctp-teal via-ctp-lavender to-ctp-mauve 
               px-3.5 py-2.5 text-center text-sm font-semibold text-ctp-base shadow-sm"
-            >
-              Get started
-            </a>
-            <a
-              href="#"
-              className="animate-colorchange bg-gradient-to-r from-ctp-teal via-ctp-lavender to-ctp-mauve bg-clip-text text-center text-sm 
+              >
+                Get started
+              </a>
+              <a
+                href="#"
+                className="animate-colorchange bg-gradient-to-r from-ctp-teal via-ctp-lavender to-ctp-mauve bg-clip-text text-center text-sm 
           font-semibold leading-6 text-transparent"
-            >
-              Learn more <span aria-hidden="true">→</span>
-            </a>
+              >
+                Learn more <span aria-hidden="true">→</span>
+              </a>
+            </div>
           </div>
         </div>
       </div>
