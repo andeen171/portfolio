@@ -13,7 +13,7 @@ const ProjectList: React.FC = () => {
         incidunt dolores? Officia consectetur optio non totam cum eos soluta
         ipsa et quod.
       </p>
-      <div className="tl:grid-cols-1 grid grid-cols-3 items-center justify-center gap-8 p-10 lg:grid-cols-2  ">
+      <div className="tl:grid-cols-1 grid grid-cols-1 md:grid-cols-3 items-center justify-center gap-8 p-10 lg:grid-cols-2  ">
         {projects.data?.map((item, i) => (
           <ProjectCard key={i} project={item} />
         ))}

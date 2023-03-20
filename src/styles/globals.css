@@ -3,5 +3,5 @@
 @tailwind utilities;
 
 .typed-cursor {
-  @apply text-4xl w-36 font-bold text-transparent
+  @apply text-6xl w-36 font-bold text-transparent
 }

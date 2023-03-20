@@ -8,7 +8,7 @@ type Props = {
 
 const ProjectCard: React.FC<Props> = ({ project }) => {
   return (
-    <div className="img-box lg2:w-auto relative mx-auto flex w-[450px] items-center justify-center overflow-hidden rounded-3xl">
+    <div className="img-box lg:w-auto relative mx-auto w-full flex items-center justify-center overflow-hidden rounded-3xl">
       <Image
         src={project.image}
         alt={project.name}

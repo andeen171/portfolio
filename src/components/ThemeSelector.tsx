@@ -1,7 +1,7 @@
 import { Fragment, useEffect, useState } from 'react'
 import { Listbox, Transition } from '@headlessui/react'
 import { type variants } from '@catppuccin/palette'
-import { Flavor, useCtpStore, flavors } from '../store'
+import { type Flavor, useCtpStore } from '~/store'
 import AnimatedGradientSVG from './AnimatedGradientSVG'
 import PaintBrushSVG from './PaintBrushSVG'
 import CheckCircle from './CheckCircle'
@@ -10,23 +10,20 @@ function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(' ')
 }
 
+const flavors: Flavor[] = ['latte', 'frappe', 'macchiato', 'mocha']
+
 const ThemeSelector: React.FC = () => {
   const activeFlavor = useCtpStore((state) => state.flavor)
-  const [selected, setSelected] = useState(flavors[Flavor.latte])
+  const [selected, setSelected] = useState<Flavor>('latte')
 
   const swapFlavor = useCtpStore((state) => state.swapFlavor)
 
-  const setSelectedFlavor = (flavor: Flavor) => {
-    setSelected(flavors[flavor])
-    swapFlavor(flavor)
-  }
-
   useEffect(() => {
-    setSelected(flavors[activeFlavor])
+    setSelected(activeFlavor)
   }, [activeFlavor])
 
   return (
-    <Listbox value={selected} onChange={setSelectedFlavor}>
+    <Listbox value={activeFlavor} onChange={swapFlavor}>
       {({ open }) => (
         <>
           <div className="relative mt-2">
@@ -53,15 +50,15 @@ const ThemeSelector: React.FC = () => {
               leaveTo="opacity-0"
             >
               <Listbox.Options className="absolute z-10 mt-1 max-h-56 w-full overflow-auto rounded-lg text-base shadow-lg transition-all focus:outline-none sm:text-sm">
-                {Object.entries(flavors).map(([flavor, name]) => (
+                {flavors.map((flavor) => (
                   <Listbox.Option
-                    key={name}
+                    key={flavor}
                     className={({ active }) =>
                       classNames(
                         active
                           ? `bg-ctp-base text-ctp-text`
                           : 'bg-ctp-mantle text-ctp-text',
-                        `${flavor} frist:via-ctp-mauve animate-text relative cursor-default select-none`
+                        `ctp-${flavor} frist:via-ctp-mauve animate-text relative cursor-default select-none`
                       )
                     }
                     value={flavor}
@@ -85,7 +82,7 @@ const ThemeSelector: React.FC = () => {
                         className="animate-colorchange bg-gradient-to-r from-ctp-teal via-ctp-lavender 
                         bg-clip-text font-semibold text-transparent first:rounded-t-lg first:from-ctp-lavender  first:to-ctp-rosewater last:rounded-b-lg"
                       >
-                        {name}
+                        {flavor.charAt(0).toUpperCase() + flavor.slice(1)}
                       </span>
                     </div>
                   </Listbox.Option>

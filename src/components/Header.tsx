@@ -25,7 +25,7 @@ const Header: React.FC = () => {
           first:rounded-t-lg first:from-ctp-lavender first:to-ctp-rosewater 
           last:rounded-b-lg lg:flex  lg:flex-1 lg:gap-x-12"
         >
-          <span className="text-xl font-bold">戦え</span>
+          <span className="text-2xl ml-6 font-extrabold">戦え</span>
         </div>
         <div className="flex lg:hidden">
           <button
@@ -47,7 +47,7 @@ const Header: React.FC = () => {
             </a>
           ))}
         </div>
-        <div className="hidden lg:flex lg:flex-1 lg:justify-end">
+        <div className="hidden lg:flex lg:flex-1 lg:justify-end mr-6">
           <ThemeSelector />
         </div>
       </nav>

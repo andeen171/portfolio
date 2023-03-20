@@ -1,34 +1,32 @@
 import { create } from 'zustand'
 import { devtools, persist } from 'zustand/middleware'
+import { variants } from '@catppuccin/palette'
+import type { Labels, Color, AlphaColor } from '@catppuccin/palette'
 
-export enum Flavor {
-  latte = 'ctp-latte',
-  frappe = 'ctp-frappe',
-  macchiato = 'ctp-macchiato',
-  mocha = 'ctp-mocha',
-}
+export type Flavor = 'latte' | 'frappe' | 'macchiato' | 'mocha'
 
-export const flavors: { [key in Flavor]: string } = {
-  [Flavor.mocha]: 'Mocha',
-  [Flavor.macchiato]: 'Macchiato',
-  [Flavor.frappe]: 'Frappe',
-  [Flavor.latte]: 'Latte'
-}
+export type FlavorLabels = Labels<Color, AlphaColor>
 
 interface CtpState {
   flavor: Flavor
-  swapFlavor: (flavor: Flavor) => void
+  swapFlavor: (flavor: Flavor) => void,
+  getLabels: () => FlavorLabels
+}
+
+function getFlavorLabels(Flavor: Flavor): Labels<Color, AlphaColor> {
+  return variants[Flavor]
 }
 
 export const useCtpStore = create<CtpState>()(
   devtools(
     persist(
-      (set) => ({
-        flavor: Flavor.latte,
-        swapFlavor: (flavor) => set(() => ({ flavor: flavor }))
+      (set, get) => ({
+        flavor: 'latte',
+        swapFlavor: (flavor) => set(() => ({ flavor: flavor })),
+        getLabels: () => getFlavorLabels(get().flavor)
       }),
       {
-        name: 'ctp-flavor'
+        name: 'ctp-store'
       }
     )
   )

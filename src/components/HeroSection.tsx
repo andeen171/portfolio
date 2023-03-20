@@ -1,19 +1,22 @@
 import { useEffect, useRef } from 'react'
-import { variants } from '@catppuccin/palette'
 import Typed from 'typed.js'
+import ProgrammingSVG from './ProgrammingSVG'
+import { useCtpStore } from '../store';
 
-type Props = {
-  flavorLabel: keyof typeof variants
-}
 
-const HeroSection: React.FC<Props> = ({ flavorLabel }) => {
-  const flavor = variants[flavorLabel]
+const HeroSection: React.FC = () => {
+  const labels = useCtpStore((state) => state.getLabels)()
   const el = useRef(null)
 
   useEffect(() => {
     const typed = new Typed(el.current, {
-      strings: ['Ambition without effort is merely greed'],
-      typeSpeed: 50
+      strings: [
+        'Ambition without effort is merely greed',
+        'Make money and stay alive'
+      ],
+      typeSpeed: 50,
+      backSpeed: 50,
+      loop: true
     })
 
     return () => {
@@ -21,8 +24,9 @@ const HeroSection: React.FC<Props> = ({ flavorLabel }) => {
       typed.destroy()
     }
   }, [])
+  
   return (
-    <div className="relative isolate px-6 pt-14 lg:px-8">
+    <div className="relative isolate min-h-screen flex-col items-end px-6 pt-14 lg:px-8">
       <div className="absolute inset-x-0 -top-40 -z-10 transform-gpu overflow-hidden blur-3xl sm:-top-80">
         <svg
           className="relative left-[calc(50%-11rem)] -z-10 h-[21.1875rem] max-w-none -translate-x-1/2 rotate-[30deg] sm:left-[calc(50%-30rem)] sm:h-[42.375rem]"
@@ -41,18 +45,18 @@ const HeroSection: React.FC<Props> = ({ flavorLabel }) => {
               x2="200%"
               y2="0%"
             >
-              <stop offset="0%" stopColor={flavor.teal.hex}>
+              <stop offset="0%" stopColor={labels.teal.hex}>
                 <animate
                   attributeName="stop-color"
-                  values={`${flavor.teal.hex};${flavor.lavender.hex};${flavor.teal.hex}`}
+                  values={`${labels.teal.hex};${labels.lavender.hex};${labels.teal.hex}`}
                   dur="5s"
                   repeatCount="indefinite"
                 />
               </stop>
-              <stop offset="50%" stopColor={flavor.lavender.hex}>
+              <stop offset="50%" stopColor={labels.lavender.hex}>
                 <animate
                   attributeName="stop-color"
-                  values={`${flavor.lavender.hex};${flavor.mauve.hex};${flavor.lavender.hex}`}
+                  values={`${labels.lavender.hex};${labels.mauve.hex};${labels.lavender.hex}`}
                   dur="5s"
                   repeatCount="indefinite"
                 />
@@ -68,24 +72,16 @@ const HeroSection: React.FC<Props> = ({ flavorLabel }) => {
           </defs>
         </svg>
       </div>
-      <div className="flex">
-        <div className='px-2 pl-12 animate-pulse transition-all'>
-          <img
-            src="https://cdn.discordapp.com/attachments/1012775098840776706/1087180208920084560/1679274347183.png"
-            alt="andrin"
-          />
-        </div>
-        <div className="mx-auto flex max-w-2xl flex-col py-32">
+      <div className="flex ml-[50vw] h-[50vh] content-end py-2">
+        <ProgrammingSVG />
+      </div>
+      <div className="flex p-32">
+        <div className="max-w-6xl py-2">
           <div className="animate-colorchange bg-gradient-to-r from-ctp-teal via-ctp-lavender bg-clip-text py-2 text-transparent">
-            <span className="text-4xl font-bold tracking-tight" ref={el}></span>
+            <span className="text-6xl font-bold tracking-tight" ref={el}></span>
           </div>
           <div>
-            <p className="mt-6 text-lg leading-8 text-ctp-subtext0">
-              Anim aute id magna aliqua ad ad non deserunt sunt. Qui irure qui
-              lorem cupidatat commodo. Elit sunt amet fugiat veniam occaecat
-              fugiat aliqua.
-            </p>
-            <div className="mt-10 flex items-center justify-center gap-x-6">
+            <div className="mt-10 flex items-center gap-x-6">
               <a
                 href="#"
                 className=" animate-colorchange rounded-lg bg-gradient-to-r from-ctp-teal via-ctp-lavender to-ctp-mauve 
@@ -122,18 +118,18 @@ const HeroSection: React.FC<Props> = ({ flavorLabel }) => {
               x2="200%"
               y2="0%"
             >
-              <stop offset="0%" stopColor={flavor.teal.hex}>
+              <stop offset="0%" stopColor={labels.teal.hex}>
                 <animate
                   attributeName="stop-color"
-                  values={`${flavor.teal.hex};${flavor.lavender.hex};${flavor.teal.hex}`}
+                  values={`${labels.teal.hex};${labels.lavender.hex};${labels.teal.hex}`}
                   dur="5s"
                   repeatCount="indefinite"
                 />
               </stop>
-              <stop offset="50%" stopColor={flavor.lavender.hex}>
+              <stop offset="50%" stopColor={labels.lavender.hex}>
                 <animate
                   attributeName="stop-color"
-                  values={`${flavor.lavender.hex};${flavor.mauve.hex};${flavor.lavender.hex}`}
+                  values={`${labels.lavender.hex};${labels.mauve.hex};${labels.lavender.hex}`}
                   dur="5s"
                   repeatCount="indefinite"
                 />
