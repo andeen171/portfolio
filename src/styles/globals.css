@@ -1,3 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.typed-cursor {
+  @apply text-4xl w-36 font-bold text-transparent
+}

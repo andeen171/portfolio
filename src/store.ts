@@ -4,8 +4,15 @@ import { devtools, persist } from 'zustand/middleware'
 export enum Flavor {
   latte = 'ctp-latte',
   frappe = 'ctp-frappe',
-  mocchiato = 'ctp=mocchiato',
+  macchiato = 'ctp-macchiato',
   mocha = 'ctp-mocha',
+}
+
+export const flavors: { [key in Flavor]: string } = {
+  [Flavor.mocha]: 'Mocha',
+  [Flavor.macchiato]: 'Macchiato',
+  [Flavor.frappe]: 'Frappe',
+  [Flavor.latte]: 'Latte'
 }
 
 interface CtpState {

@@ -2,13 +2,19 @@ import { type NextPage } from 'next'
 import Head from 'next/head'
 import { signIn, signOut, useSession } from 'next-auth/react'
 import ProjectList from '~/components/projects/ProjectList'
-import { useCtpStore } from '../store'
+import { useState, useEffect } from 'react'
+import { useCtpStore, Flavor, flavors } from '../store'
 import Header from '~/components/Header'
 import HeroSection from '~/components/HeroSection'
+import { type variants } from '@catppuccin/palette'
 
 const Home: NextPage = () => {
-  const flavor = useCtpStore((state) => state.flavor)
-  
+  const activeFlavor = useCtpStore((state) => state.flavor)
+  const [flavor, setFlavor] = useState(Flavor.latte)
+
+  useEffect(() => {
+    setFlavor(activeFlavor)
+  }, [activeFlavor])
 
   return (
     <>
@@ -19,7 +25,9 @@ const Home: NextPage = () => {
       </Head>
       <main className={`${flavor} min-w-screen min-h-screen bg-ctp-base`}>
         <Header />
-        <HeroSection />
+        <HeroSection
+          flavorLabel={flavors[flavor].toLowerCase() as keyof typeof variants}
+        />
         <ProjectList />
       </main>
     </>
