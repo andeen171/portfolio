@@ -1,6 +1,5 @@
 import { Fragment, useEffect, useState } from 'react'
 import { Listbox, Transition } from '@headlessui/react'
-import { type variants } from '@catppuccin/palette'
 import { type Flavor, useCtpStore } from '~/store'
 import AnimatedGradientSVG from './AnimatedGradientSVG'
 import PaintBrushSVG from './PaintBrushSVG'
@@ -29,9 +28,7 @@ const ThemeSelector: React.FC = () => {
           <div className="relative mt-2">
             <Listbox.Button className="relative w-40 cursor-default rounded-md bg-ctp-mantle p-2 text-left text-ctp-text shadow-sm ring-1 ring-inset ring-ctp-mantle focus:outline-none focus:ring-2 focus:ring-ctp-lavender sm:text-sm sm:leading-6">
               <span className="pointer-events-none  flex items-center pr-2">
-                <AnimatedGradientSVG
-                  flavorLabel={selected.toLowerCase() as keyof typeof variants}
-                />
+                <AnimatedGradientSVG />
                 <span
                   className="animate-colorchange bg-gradient-to-r 
             from-ctp-teal via-ctp-lavender  bg-clip-text 
@@ -65,17 +62,9 @@ const ThemeSelector: React.FC = () => {
                   >
                     <div className="flex items-center p-2 pl-3 text-lg">
                       {activeFlavor === flavor ? (
-                        <CheckCircle
-                          flavorLabel={
-                            selected.toLowerCase() as keyof typeof variants
-                          }
-                        />
+                        <CheckCircle />
                       ) : (
-                        <PaintBrushSVG
-                          flavorLabel={
-                            selected.toLowerCase() as keyof typeof variants
-                          }
-                        />
+                        <PaintBrushSVG />
                       )}
 
                       <span

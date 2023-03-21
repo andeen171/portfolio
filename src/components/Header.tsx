@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Dialog } from '@headlessui/react'
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
 import ThemeSelector from './ThemeSelector'
+import { useCtpStore } from '../store';
 
 const navigation = [
   { name: 'About', href: '#' },
@@ -11,6 +12,7 @@ const navigation = [
 ]
 
 const Header: React.FC = () => {
+  const flavor = useCtpStore((state) => state.flavor)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   return (
@@ -25,7 +27,7 @@ const Header: React.FC = () => {
           first:rounded-t-lg first:from-ctp-lavender first:to-ctp-rosewater 
           last:rounded-b-lg lg:flex  lg:flex-1 lg:gap-x-12"
         >
-          <span className="text-2xl ml-6 font-extrabold">戦え</span>
+          <span className="ml-6 text-2xl font-extrabold">戦え</span>
         </div>
         <div className="flex lg:hidden">
           <button
@@ -39,7 +41,7 @@ const Header: React.FC = () => {
         </div>
         <div
           className="hidden animate-colorchange bg-gradient-to-r from-ctp-teal via-ctp-lavender bg-clip-text font-semibold 
-                        text-transparent first:rounded-t-lg first:from-ctp-lavender first:to-ctp-rosewater last:rounded-b-lg  lg:flex lg:gap-x-12"
+          text-transparent first:rounded-t-lg first:from-ctp-lavender first:to-ctp-rosewater last:rounded-b-lg  lg:flex lg:gap-x-12"
         >
           {navigation.map((item) => (
             <a key={item.name} href={item.href}>
@@ -47,18 +49,18 @@ const Header: React.FC = () => {
             </a>
           ))}
         </div>
-        <div className="hidden lg:flex lg:flex-1 lg:justify-end mr-6">
+        <div className="mr-6 hidden lg:flex lg:flex-1 lg:justify-end">
           <ThemeSelector />
         </div>
       </nav>
       <Dialog
         as="div"
-        className="lg:hidden"
+        className={`lg:hidden ctp-${flavor}`}
         open={mobileMenuOpen}
         onClose={setMobileMenuOpen}
       >
         <div className="fixed inset-0 z-50" />
-        <Dialog.Panel className="fixed inset-y-0 right-0 z-50 w-full overflow-y-auto bg-ctp-lavender px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-gray-900/10">
+        <Dialog.Panel className="fixed inset-y-0 right-0 z-50 w-full overflow-y-auto bg-ctp-base px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-gray-900/10">
           <div className="flex items-center justify-between">
             <div
               className="flex animate-colorchange bg-gradient-to-r from-ctp-teal 
@@ -84,14 +86,14 @@ const Header: React.FC = () => {
                   <a
                     key={item.name}
                     href={item.href}
-                    className="-mx-3 block rounded-lg py-2 px-3 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
+                    className="-mx-3 block rounded-lg py-2 px-3 text-base font-semibold leading-7 text-ctp-text hover:bg-gray-50"
                   >
                     {item.name}
                   </a>
                 ))}
-              </div>
-              <div className="">
-                <ThemeSelector />
+                <div className="-mx-3 block rounded-lg py-2 px-3 text-base font-semibold leading-7 text-ctp-text hover:bg-gray-50">
+                  <ThemeSelector />
+                </div>
               </div>
             </div>
           </div>

@@ -1,32 +1,44 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Typed from 'typed.js'
 import ProgrammingSVG from './ProgrammingSVG'
-import { useCtpStore } from '../store';
-
+import { useCtpStore } from '../store'
+import { variants } from '@catppuccin/palette'
 
 const HeroSection: React.FC = () => {
-  const labels = useCtpStore((state) => state.getLabels)()
-  const el = useRef(null)
+  const flavor = useCtpStore((state) => state.flavor)
+  const [labels, setLabels] = useState(variants[flavor])
+  const phraseRef = useRef(null)
+  const nameRef = useRef(null)
 
   useEffect(() => {
-    const typed = new Typed(el.current, {
-      strings: [
-        'Ambition without effort is merely greed',
-        'Make money and stay alive'
-      ],
-      typeSpeed: 50,
-      backSpeed: 50,
-      loop: true
+    setLabels(variants[flavor])
+  }, [flavor])
+
+  useEffect(() => {
+    // const phrase = new Typed(phraseRef.current, {
+    //   strings: [
+    //     'Ambition without effort is merely greed',
+    //     'Make money and stay alive'
+    //   ],
+    //   typeSpeed: 50,
+    //   backSpeed: 50,
+    //   loop: true
+    // })
+
+    const name = new Typed(nameRef.current, {
+      strings: ['Anderson Ribeiro Lopes'],
+      typeSpeed: 50
     })
 
     return () => {
       // Destroy Typed instance during cleanup to stop animation
-      typed.destroy()
+      // phrase.destroy()
+      name.destroy()
     }
   }, [])
-  
+
   return (
-    <div className="relative isolate min-h-screen flex-col items-end px-6 pt-14 lg:px-8">
+    <div className="relative isolate min-h-screen px-6 pt-14 lg:px-8">
       <div className="absolute inset-x-0 -top-40 -z-10 transform-gpu overflow-hidden blur-3xl sm:-top-80">
         <svg
           className="relative left-[calc(50%-11rem)] -z-10 h-[21.1875rem] max-w-none -translate-x-1/2 rotate-[30deg] sm:left-[calc(50%-30rem)] sm:h-[42.375rem]"
@@ -72,13 +84,24 @@ const HeroSection: React.FC = () => {
           </defs>
         </svg>
       </div>
-      <div className="flex ml-[50vw] h-[50vh] content-end py-2">
-        <ProgrammingSVG />
+      <div className="min-w-screen flex flex-col p-12 md:flex-row">
+        <div className="min-w-96 animate-colorchange bg-gradient-to-r from-ctp-teal via-ctp-lavender bg-clip-text py-2 pt-12 text-transparent">
+          <span
+            className="text-left text-6xl font-bold tracking-tight"
+            ref={nameRef}
+          ></span>
+        </div>
+        <div className="flex">
+          <ProgrammingSVG />
+        </div>
       </div>
-      <div className="flex p-32">
+      {/* <div className="flex pl-8 pb-8">
         <div className="max-w-6xl py-2">
           <div className="animate-colorchange bg-gradient-to-r from-ctp-teal via-ctp-lavender bg-clip-text py-2 text-transparent">
-            <span className="text-6xl font-bold tracking-tight" ref={el}></span>
+            <span
+              className="text-6xl font-bold tracking-tight"
+              ref={phraseRef}
+            ></span>
           </div>
           <div>
             <div className="mt-10 flex items-center gap-x-6">
@@ -99,7 +122,7 @@ const HeroSection: React.FC = () => {
             </div>
           </div>
         </div>
-      </div>
+      </div> */}
       <div className="absolute inset-x-0 top-[calc(100%-13rem)] -z-10 transform-gpu overflow-hidden blur-3xl sm:top-[calc(100%-30rem)]">
         <svg
           className="relative left-[calc(50%+3rem)] h-[21.1875rem] max-w-none -translate-x-1/2 sm:left-[calc(50%+36rem)] sm:h-[42.375rem]"
