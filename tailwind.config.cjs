@@ -1,3 +1,5 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
 const colors = [
   'rosewater',
   'flamingo',
@@ -20,10 +22,10 @@ const colors = [
   'surface1'
 ]
 
-const colorSafeList = ['ctp-mocha', 'ctp-macchiato', 'ctp-frappe', 'ctp-latte', 'animate-colorchange']
+const safeList = ['ctp-mocha', 'ctp-macchiato', 'ctp-frappe', 'ctp-latte', 'animate-colorchange']
 colors.map((color) => {
-  colorSafeList.push(`bg-ctp-${color}`)
-  colorSafeList.push(`text-ctp-${color}`)
+  safeList.push(`bg-ctp-${color}`)
+  safeList.push(`text-ctp-${color}`)
 })
 
 /** @type {import('tailwindcss').Config} */
@@ -48,8 +50,9 @@ const config = {
       }
     }
   },
-  safelist: colorSafeList,
+  safelist: safeList,
   plugins: [
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
     require('@catppuccin/tailwindcss')({
       prefix: 'ctp'
     })
