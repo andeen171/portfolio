@@ -9,7 +9,7 @@ export type FlavorLabels = Labels<Color, AlphaColor>
 
 interface CtpState {
   flavor: Flavor
-  swapFlavor: (flavor: Flavor) => void,
+  swapFlavor: (flavor: Flavor) => void
   getLabels: () => FlavorLabels
 }
 
