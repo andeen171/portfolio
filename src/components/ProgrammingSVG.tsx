@@ -1,18 +1,17 @@
 import { useEffect, useState } from 'react'
 import { useCtpStore } from '~/store'
 import { variants } from '@catppuccin/palette'
+import CatppuccinGradient from './CatppuccinGradient'
 
 const ProgrammingSVG: React.FC = () => {
+  const gradientId = Math.random().toString(36).substring(2, 15)
   const flavor = useCtpStore((state) => state.flavor)
-  const [labels, setLabels] = useState(variants[flavor])
-  const [gradientId, setGradientId] = useState(
-    Math.random().toString(36).substring(2, 15)
-  )
+  const [labels, setLabels] = useState(variants.mocha)
 
   useEffect(() => {
     setLabels(variants[flavor])
-    setGradientId(Math.random().toString(36).substring(2, 15))
   }, [flavor])
+
   return (
     <svg
       data-name="Layer 1"
@@ -21,33 +20,10 @@ const ProgrammingSVG: React.FC = () => {
       height="572.25773"
       viewBox="0 0 786.81995 572.25773"
       xmlnsXlink="http://www.w3.org/1999/xlink"
+      className="h-fit w-fit"
     >
       <defs>
-        <linearGradient id={gradientId} x1="0%" y1="0%" x2="200%" y2="0%">
-          <stop offset="0%" stopColor={labels.teal.hex}>
-            <animate
-              attributeName="stop-color"
-              values={`${labels.teal.hex};${labels.lavender.hex};${labels.teal.hex}`}
-              dur="5s"
-              repeatCount="indefinite"
-            />
-          </stop>
-          <stop offset="50%" stopColor={labels.lavender.hex}>
-            <animate
-              attributeName="stop-color"
-              values={`${labels.lavender.hex};${labels.mauve.hex};${labels.lavender.hex}`}
-              dur="5s"
-              repeatCount="indefinite"
-            />
-          </stop>
-          <animate
-            attributeName="x2"
-            from="200%"
-            to="0%"
-            dur="5s"
-            repeatCount="indefinite"
-          />
-        </linearGradient>
+        <CatppuccinGradient id={gradientId} />
       </defs>
       <circle
         cx="458.32136"

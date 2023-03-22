@@ -27,7 +27,7 @@ const Header: React.FC = () => {
           first:rounded-t-lg first:from-ctp-lavender first:to-ctp-rosewater 
           last:rounded-b-lg lg:flex  lg:flex-1 lg:gap-x-12"
         >
-          <span className="ml-6 text-2xl font-extrabold">戦え</span>
+          <span className="text-2xl font-extrabold">戦え</span>
         </div>
         <div className="flex lg:hidden">
           <button

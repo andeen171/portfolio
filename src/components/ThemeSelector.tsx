@@ -1,7 +1,7 @@
 import { Fragment, useEffect, useState } from 'react'
 import { Listbox, Transition } from '@headlessui/react'
 import { type Flavor, useCtpStore } from '~/store'
-import AnimatedGradientSVG from './AnimatedGradientSVG'
+import AnimatedGradientSVG from './PaletteSVG'
 import PaintBrushSVG from './PaintBrushSVG'
 import CheckCircle from './CheckCircle'
 
@@ -25,7 +25,7 @@ const ThemeSelector: React.FC = () => {
     <Listbox value={activeFlavor} onChange={swapFlavor}>
       {({ open }) => (
         <>
-          <div className="relative mt-2">
+          <div className="relative">
             <Listbox.Button className="relative w-40 cursor-default rounded-md bg-ctp-mantle p-2 text-left text-ctp-text shadow-sm ring-1 ring-inset ring-ctp-mantle focus:outline-none focus:ring-2 focus:ring-ctp-lavender sm:text-sm sm:leading-6">
               <span className="pointer-events-none  flex items-center pr-2">
                 <AnimatedGradientSVG />
@@ -34,7 +34,7 @@ const ThemeSelector: React.FC = () => {
             from-ctp-teal via-ctp-lavender  bg-clip-text 
             text-lg font-semibold text-transparent"
                 >
-                  {selected}
+                  {selected.charAt(0).toUpperCase() + selected.slice(1)}
                 </span>
               </span>
             </Listbox.Button>
@@ -46,7 +46,7 @@ const ThemeSelector: React.FC = () => {
               leaveFrom="opacity-100"
               leaveTo="opacity-0"
             >
-              <Listbox.Options className="absolute z-10 mt-1 max-h-56 w-full overflow-auto rounded-lg text-base shadow-lg transition-all focus:outline-none sm:text-sm">
+              <Listbox.Options className="absolute z-10 mt-2 max-h-56 w-full overflow-auto rounded-lg text-base shadow-lg transition-all focus:outline-none sm:text-sm">
                 {flavors.map((flavor) => (
                   <Listbox.Option
                     key={flavor}

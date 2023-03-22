@@ -2,15 +2,19 @@ import { useEffect, useState } from 'react'
 import { useCtpStore } from '~/store'
 import { variants } from '@catppuccin/palette'
 
-const CatppuccinGradient: React.FC = () => {
+type Props = {
+  id: string
+}
+
+const CatppuccinGradient: React.FC<Props> = ({ id }) => {
   const flavor = useCtpStore((state) => state.flavor)
-  const [labels, setLabels] = useState(variants[flavor])
+  const [labels, setLabels] = useState(variants.mocha)
 
   useEffect(() => {
     setLabels(variants[flavor])
   }, [flavor])
   return (
-    <linearGradient x1="0%" y1="0%" x2="200%" y2="0%">
+    <linearGradient id={id} x1="0%" y1="0%" x2="200%" y2="0%">
       <stop offset="0%" stopColor={labels.teal.hex}>
         <animate
           attributeName="stop-color"
