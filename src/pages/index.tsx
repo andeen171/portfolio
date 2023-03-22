@@ -1,15 +1,42 @@
 import { type NextPage } from 'next'
 import Head from 'next/head'
-import { signIn, signOut, useSession } from 'next-auth/react'
-import ProjectList from '~/components/projects/ProjectList'
-import { useState, useEffect } from 'react'
+
+import { useState, useEffect, useRef } from 'react'
 import { useCtpStore, type Flavor } from '~/store'
 import Header from '~/components/Header'
-import HeroSection from '~/components/HeroSection'
+import BackgroundBlurSVG from '~/components/BackgroundBlurSVG'
+import ProgrammingSVG from '~/components/ProgrammingSVG'
+import Typed from 'typed.js'
 
 const Home: NextPage = () => {
   const activeFlavor = useCtpStore((state) => state.flavor)
   const [flavor, setFlavor] = useState<Flavor>('mocha')
+
+  const phraseRef = useRef(null)
+  const nameRef = useRef(null)
+
+  useEffect(() => {
+    // const phrase = new Typed(phraseRef.current, {
+    //   strings: [
+    //     'Ambition without effort is merely greed',
+    //     'Make money and stay alive'
+    //   ],
+    //   typeSpeed: 50,
+    //   backSpeed: 50,
+    //   loop: true
+    // })
+
+    const name = new Typed(nameRef.current, {
+      strings: ['Anderson Ribeiro Lopes'],
+      typeSpeed: 50
+    })
+
+    return () => {
+      // Destroy Typed instance during cleanup to stop animation
+      // phrase.destroy()
+      name.destroy()
+    }
+  }, [])
 
   useEffect(() => {
     setFlavor(activeFlavor)
@@ -24,8 +51,23 @@ const Home: NextPage = () => {
       </Head>
       <main className={`ctp-${flavor} min-w-screen min-h-screen bg-ctp-base`}>
         <Header />
-        <HeroSection />
-        <ProjectList />
+        <div className="relative isolate min-h-screen px-6 pt-14 lg:px-8">
+          <div className="min-w-screen flex min-h-[80vh] flex-col justify-between p-2 md:flex-row md:p-12">
+            <div className="animate-colorchange bg-gradient-to-r from-ctp-teal via-ctp-lavender bg-clip-text py-2 pt-12 text-transparent">
+              <span
+                className="text-left text-6xl font-bold tracking-tight"
+                ref={nameRef}
+              ></span>
+              <p className="text-left text-lg font-semibold">
+                Desenvolvedor Full Stack
+              </p>
+            </div>
+            <div className="flex">
+              <ProgrammingSVG />
+            </div>
+          </div>
+        </div>
+        <BackgroundBlurSVG />
       </main>
     </>
   )
@@ -33,20 +75,4 @@ const Home: NextPage = () => {
 
 export default Home
 
-const AuthShowcase: React.FC = () => {
-  const { data: sessionData } = useSession()
 
-  return (
-    <div className="flex flex-col items-center justify-center gap-4">
-      <p className="text-center text-2xl text-white">
-        {sessionData && <span>Logged in as {sessionData.user?.name}</span>}
-      </p>
-      <button
-        className="rounded-full bg-white/10 px-10 py-3 font-semibold text-white no-underline transition hover:bg-white/20"
-        onClick={sessionData ? () => void signOut() : () => void signIn()}
-      >
-        {sessionData ? 'Sign out' : 'Sign in'}
-      </button>
-    </div>
-  )
-}
