@@ -1,0 +1,68 @@
+import { z } from 'zod'
+
+import {
+  createTRPCRouter,
+  publicProcedure,
+  protectedProcedure
+} from '~/server/api/trpc'
+
+export const projectRouter = createTRPCRouter({
+  hello: publicProcedure
+    .input(z.object({ text: z.string() }))
+    .query(({ input }) => {
+      return {
+        greeting: `Hello ${input.text}`
+      }
+    }),
+
+  getAll: publicProcedure.query(({ ctx }) => {
+    return ctx.prisma.project.findMany()
+  }),
+
+  getOne: publicProcedure
+    .input(z.object({ id: z.string() }))
+    .query(({ ctx, input }) => {
+      return ctx.prisma.project.findUnique({
+        where: {
+          id: input.id
+        }
+      })
+    }),
+
+  create: protectedProcedure
+    .input(
+      z.object({
+        name: z.string(),
+        description: z.string(),
+        image: z.string(),
+        url: z.string(),
+        repo: z.string()
+      })
+    )
+    .mutation(({ ctx, input }) => {
+      return ctx.prisma.project.create({ data: { ...input } })
+    }),
+
+  update: protectedProcedure
+    .input(z.object({ id: z.string(), name: z.string() }))
+    .mutation(({ ctx, input }) => {
+      return ctx.prisma.project.update({
+        where: {
+          id: input.id
+        },
+        data: {
+          name: input.name
+        }
+      })
+    }),
+
+  delete: protectedProcedure
+    .input(z.object({ id: z.string() }))
+    .mutation(({ ctx, input }) => {
+      return ctx.prisma.project.delete({
+        where: {
+          id: input.id
+        }
+      })
+    })
+})
