@@ -3,5 +3,9 @@
 @tailwind utilities;
 
 .typed-cursor {
-  @apply text-6xl w-36 font-bold text-transparent
+  @apply w-36 font-bold text-transparent
+}
+
+.animated-gradient-text {
+  @apply animate-colorchange bg-gradient-to-r from-ctp-teal via-ctp-lavender bg-clip-text text-transparent
 }

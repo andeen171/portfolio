@@ -55,7 +55,8 @@ const config = {
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     require('@catppuccin/tailwindcss')({
       prefix: 'ctp'
-    })
+    }),
+    require('@tailwindcss/line-clamp')
   ]
 }
 
