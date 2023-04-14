@@ -1,79 +1,19 @@
 import { type NextPage } from 'next'
 import Head from 'next/head'
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { useCtpStore, type Flavor } from '~/store'
 import Header from '~/components/Header'
 import BackgroundBlurSVG from '~/components/BackgroundBlurSVG'
-import ProgrammingSVG from '~/components/ProgrammingSVG'
-import Typed from 'typed.js'
-import {
-  ArrowPathIcon,
-  CloudArrowUpIcon,
-  FingerPrintIcon,
-  LockClosedIcon
-} from '@heroicons/react/24/outline'
 import SkillsSection from '~/components/skills/SkillsSection'
 import AboutSection from '~/components/about/AboutSection'
 import ProjectsSection from '~/components/projects/ProjectsSection'
 import ExperiencesSection from '~/components/experiences/ExperiencesSection'
 import Footer from '~/components/Footer'
-
-const features = [
-  {
-    name: 'Push to deploy',
-    description:
-      'Morbi viverra dui mi arcu sed. Tellus semper adipiscing suspendisse semper morbi. Odio urna massa nunc massa.',
-    icon: CloudArrowUpIcon
-  },
-  {
-    name: 'SSL certificates',
-    description:
-      'Sit quis amet rutrum tellus ullamcorper ultricies libero dolor eget. Sem sodales gravida quam turpis enim lacus amet.',
-    icon: LockClosedIcon
-  },
-  {
-    name: 'Simple queues',
-    description:
-      'Quisque est vel vulputate cursus. Risus proin diam nunc commodo. Lobortis auctor congue commodo diam neque.',
-    icon: ArrowPathIcon
-  },
-  {
-    name: 'Advanced security',
-    description:
-      'Arcu egestas dolor vel iaculis in ipsum mauris. Tincidunt mattis aliquet hac quis. Id hac maecenas ac donec pharetra eget.',
-    icon: FingerPrintIcon
-  }
-]
+import HeroSection from '~/components/HeroSection'
 
 const Home: NextPage = () => {
   const activeFlavor = useCtpStore((state) => state.flavor)
   const [flavor, setFlavor] = useState<Flavor>('mocha')
-
-  const phraseRef = useRef(null)
-  const nameRef = useRef(null)
-
-  useEffect(() => {
-    // const phrase = new Typed(phraseRef.current, {
-    //   strings: [
-    //     'Ambition without effort is merely greed',
-    //     'Make money and stay alive'
-    //   ],
-    //   typeSpeed: 50,
-    //   backSpeed: 50,
-    //   loop: true
-    // })
-
-    const name = new Typed(nameRef.current, {
-      strings: ['Anderson Ribeiro Lopes'],
-      typeSpeed: 50
-    })
-
-    return () => {
-      // Destroy Typed instance during cleanup to stop animation
-      // phrase.destroy()
-      name.destroy()
-    }
-  }, [])
 
   useEffect(() => {
     setFlavor(activeFlavor)
@@ -88,22 +28,7 @@ const Home: NextPage = () => {
       </Head>
       <main className={`ctp-${flavor} min-w-screen min-h-screen bg-ctp-base`}>
         <Header />
-        <div className="relative isolate min-h-screen px-6 pt-14 lg:px-8">
-          <div className="min-w-screen flex min-h-[80vh] flex-col justify-between p-2 md:flex-row md:p-12">
-            <div className="animated-gradient-text w-full py-2 pt-12 text-6xl">
-              <span
-                className="text-left text-6xl font-bold tracking-tight"
-                ref={nameRef}
-              ></span>
-              <p className="text-left text-lg font-semibold">
-                Full Stack Developer
-              </p>
-            </div>
-            <div className="flex">
-              <ProgrammingSVG />
-            </div>
-          </div>
-        </div>
+        <HeroSection />
         <AboutSection />
         <SkillsSection />
         <ProjectsSection />
