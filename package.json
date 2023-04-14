@@ -11,6 +11,10 @@
   },
   "dependencies": {
     "@catppuccin/palette": "^0.1.7",
+    "@fortawesome/fontawesome-svg-core": "^6.4.0",
+    "@fortawesome/free-brands-svg-icons": "^6.4.0",
+    "@fortawesome/free-solid-svg-icons": "^6.4.0",
+    "@fortawesome/react-fontawesome": "^0.2.0",
     "@next-auth/prisma-adapter": "^1.0.5",
     "@prisma/client": "^4.9.0",
     "@tailwindcss/line-clamp": "^0.4.4",
@@ -19,6 +23,7 @@
     "@trpc/next": "^10.9.0",
     "@trpc/react-query": "^10.9.0",
     "@trpc/server": "^10.9.0",
+    "install": "^0.13.0",
     "next": "^13.2.1",
     "next-auth": "^4.19.0",
     "react": "18.2.0",
