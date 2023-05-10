@@ -7,9 +7,15 @@ const HeroSection: React.FC = () => {
 
   useEffect(() => {
     const name = new Typed(nameRef.current, {
-      strings: ['Anderson Ribeiro Lopes', 'Anderson Ribeiro', 'Anderson Lopes'],
+      strings: [
+        'Anderson Ribeiro Lopes',
+        'Anderson Ribeiro',
+        'Anderson',
+        'Anderson Lopes'
+      ],
       typeSpeed: 50,
-      backSpeed: 50
+      backSpeed: 50,
+      loop: true
     })
 
     return () => {
@@ -19,7 +25,7 @@ const HeroSection: React.FC = () => {
 
   return (
     <div className="min-w-screen relative isolate flex min-h-screen flex-col items-center p-2 px-6 pt-14 md:flex-row md:p-12 lg:px-8">
-      <div className="animated-gradient-text min-h-7xl w-full py-2 pt-12 text-6xl sm:min-h-full">
+      <div className="animated-gradient-text h-[35vh] lg:h-full pl-12 w-full lg:w-[50vw] py-2 pt-12 text-6xl sm:min-h-full">
         <span
           className="text-left text-6xl font-bold tracking-tight"
           ref={nameRef}
