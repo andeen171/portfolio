@@ -1,11 +1,16 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+@import 'https://www.nerdfonts.com/assets/css/webfont.css';
 
 .typed-cursor {
-  @apply w-36 font-bold text-transparent
+  @apply w-36 font-bold text-transparent;
 }
 
 .animated-gradient-text {
-  @apply animate-colorchange bg-gradient-to-r from-ctp-teal via-ctp-lavender bg-clip-text text-transparent
+  @apply animate-colorchange bg-gradient-to-r from-ctp-teal via-ctp-lavender bg-clip-text text-transparent;
+}
+
+.nf {
+  font-family: 'FiraCode Nerd Font Mono' !important;
 }

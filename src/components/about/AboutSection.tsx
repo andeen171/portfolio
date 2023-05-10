@@ -1,14 +1,18 @@
-import { CloudArrowUpIcon, LockClosedIcon, ServerIcon } from '@heroicons/react/20/solid'
-import { useEffect, useRef } from 'react';
-import Typed from 'typed.js';
-
+import { useEffect, useRef } from 'react'
+import Typed from 'typed.js'
 
 const AboutSection: React.FC = () => {
   const titleRef = useRef(null)
 
   useEffect(() => {
     const name = new Typed(titleRef.current, {
-      strings: ['Fullstack Developer', 'Backend Developer', 'Weed Smoker', 'Linux Enthusiast', 'Arch Supremacist'],
+      strings: [
+        'Fullstack Developer',
+        'Backend Developer',
+        'Weed Smoker',
+        'Linux Enthusiast',
+        'Arch Supremacist'
+      ],
       typeSpeed: 70,
       backSpeed: 70,
       loop: true
@@ -31,7 +35,7 @@ const AboutSection: React.FC = () => {
               </p>
               <span
                 ref={titleRef}
-                className="mt-2 min-h-[3rem] text-3xl font-bold tracking-tight sm:text-4xl"
+                className="nf mt-2 min-h-[3rem] text-3xl font-bold tracking-tight sm:text-4xl"
               ></span>
               <p className="mt-8 text-xl leading-8 text-ctp-subtext0">
                 I am a Full Stack Developer with expertise in various
@@ -55,51 +59,41 @@ const AboutSection: React.FC = () => {
               <h2 className="animated-gradient-text text-2xl font-bold tracking-tight">
                 Connect with me
               </h2>
-              <ul role="list" className="mt-8 space-y-8">
-                <li className="flex gap-x-3">
-                  <CloudArrowUpIcon
-                    className="mt-1 h-5 w-5 flex-none text-ctp-lavender"
-                    aria-hidden="true"
-                  />
-                  <span>
-                    <strong className="font-semibold text-ctp-lavender">
-                      Linkedin
-                    </strong>
-                    <span className="ml-2">
-                      Connect with me to know more about my work and experience.
-                      Sometimes I post about my projects and other stuff.
-                    </span>
-                  </span>
+              <ul role="list" className="mt-8 space-y-4">
+                <li className="flex flex-col items-start">
+                  <div className="animated-gradient-text flex items-center">
+                    <div className="h-10 w-10 ">
+                      <i
+                        className="devicon-linkedin-plain flex-none text-2xl"
+                        aria-hidden="true"
+                      ></i>
+                    </div>
+                    <dt className="ml-2 mb-2 pt-6 text-base leading-7">
+                      <strong className="font-semibold">Linkedin</strong>
+                      <span className="ml-2 text-ctp-subtext0">
+                        Connect with me to know more about my work and
+                        experience. Sometimes I post about my projects and other
+                        stuff.
+                      </span>
+                    </dt>
+                  </div>
                 </li>
-                <li className="flex gap-x-3">
-                  <LockClosedIcon
-                    className="mt-1 h-5 w-5 flex-none text-ctp-blue"
-                    aria-hidden="true"
-                  />
-                  <span>
-                    <strong className="font-semibold text-ctp-blue">
-                      Github
-                    </strong>
-                    <span className="ml-2">
-                      Check out my projects and contributions. I am always
-                      working on something, or learning something new.
-                    </span>
-                  </span>
-                </li>
-                <li className="flex gap-x-3">
-                  <ServerIcon
-                    className="mt-1 h-5 w-5 flex-none text-ctp-sapphire"
-                    aria-hidden="true"
-                  />
-                  <span>
-                    <strong className="font-semibold text-ctp-sapphire">
-                      Steam
-                    </strong>
-                    <span className="ml-2">
-                      Add me on Steam to play some games. Even though I dont
-                      play much these days, I am always down to some fun.
-                    </span>
-                  </span>
+                <li className="flex flex-col items-start">
+                  <div className="animated-gradient-text flex items-center">
+                    <div className="h-10 w-10 ">
+                      <i
+                        className="devicon-github-plain flex-none text-2xl"
+                        aria-hidden="true"
+                      ></i>
+                    </div>
+                    <dt className="ml-2 mb-2 pt-6 text-base leading-7">
+                      <strong className="font-semibold">Github</strong>
+                      <span className="ml-2 text-ctp-subtext0">
+                        Check out my projects and contributions. I am always
+                        working on something, or learning something new.
+                      </span>
+                    </dt>
+                  </div>
                 </li>
               </ul>
               <p className="mt-8">
@@ -115,6 +109,6 @@ const AboutSection: React.FC = () => {
       </div>
     </div>
   )
-};
+}
 
 export default AboutSection

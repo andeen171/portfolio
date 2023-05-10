@@ -1,13 +1,6 @@
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import {
-  faJsSquare,
-  faReact,
-  faGoogle
-} from '@fortawesome/free-brands-svg-icons'
-
 interface SkillItemProps {
   skill: {
-    id: number
+    id: string
     name: string
     description: string
     image: string
@@ -16,18 +9,16 @@ interface SkillItemProps {
 
 const SkillItem: React.FC<SkillItemProps> = ({ skill }) => {
   return (
-    <div className="relative pl-16">
-      <dt className="text-base font-semibold leading-7 text-ctp-text">
-        <div className="absolute top-0 left-0 flex h-10 w-10 items-center justify-center rounded-lg bg-ctp-lavender">
-          <img
-            src={skill.image}
-            alt={skill.name}
-            className="h-6 w-6 text-ctp-base"
-          />
+    <div className="flex flex-col items-start rounded-xl bg-ctp-mantle p-6 shadow-xl transition hover:shadow-lg">
+      <div className="animated-gradient-text flex items-center">
+        <div className="mb-4 h-10 w-10 ">
+          <i className={`${skill.image} text-4xl`}></i>
         </div>
-        {skill.name}
-      </dt>
-      <dd className="mt-2 text-base leading-7 text-ctp-subtext0">
+        <dt className="ml-4 mb-2 text-base font-semibold leading-7">
+          {skill.name}
+        </dt>
+      </div>
+      <dd className="text-base leading-7 text-ctp-subtext0">
         {skill.description}
       </dd>
     </div>

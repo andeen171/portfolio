@@ -8,7 +8,7 @@ const SkillsSection: React.FC = () => {
           <h2 className="text-base font-semibold leading-7">
             Skills
           </h2>
-          <p className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">
+          <p className="py-2 text-3xl font-bold tracking-tight sm:text-4xl">
             Technologies I work with
           </p>
         </div>
