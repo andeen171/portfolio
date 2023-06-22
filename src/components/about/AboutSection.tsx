@@ -1,5 +1,7 @@
+import Image from 'next/image'
 import { useEffect, useRef } from 'react'
 import Typed from 'typed.js'
+import ProfilePic from './eu_catppuccin.png'
 
 const AboutSection: React.FC = () => {
   const titleRef = useRef(null)
@@ -9,7 +11,6 @@ const AboutSection: React.FC = () => {
       strings: [
         'Fullstack Developer',
         'Backend Developer',
-        'Weed Smoker',
         'Linux Enthusiast',
         'Arch Supremacist'
       ],
@@ -47,10 +48,11 @@ const AboutSection: React.FC = () => {
           </div>
         </div>
         <div className="-ml-12 -mt-12 p-12 lg:sticky lg:top-4 lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:overflow-hidden">
-          <img
+          <Image
             className="w-[36rem] max-w-none rounded-xl bg-ctp-mantle shadow-xl ring-4 ring-ctp-overlay0 sm:w-[48rem]"
-            src="https://cdn.discordapp.com/attachments/1065993964718661702/1095549156409495602/eu_catppuccin.png.png"
-            alt=""
+            src={ProfilePic}
+            placeholder="blur"
+            alt="Me, Myself and I"
           />
         </div>
         <div className="lg:col-span-2 lg:col-start-1 lg:row-start-2 lg:mx-auto lg:grid lg:w-full lg:max-w-7xl lg:grid-cols-2 lg:gap-x-8 lg:px-8">
@@ -68,7 +70,7 @@ const AboutSection: React.FC = () => {
                         aria-hidden="true"
                       ></i>
                     </div>
-                    <dt className="ml-2 mb-2 pt-6 text-base leading-7">
+                    <dt className="mb-2 ml-2 pt-6 text-base leading-7">
                       <strong className="font-semibold">Linkedin</strong>
                       <span className="ml-2 text-ctp-subtext0">
                         Connect with me to know more about my work and
@@ -86,7 +88,7 @@ const AboutSection: React.FC = () => {
                         aria-hidden="true"
                       ></i>
                     </div>
-                    <dt className="ml-2 mb-2 pt-6 text-base leading-7">
+                    <dt className="mb-2 ml-2 pt-6 text-base leading-7">
                       <strong className="font-semibold">Github</strong>
                       <span className="ml-2 text-ctp-subtext0">
                         Check out my projects and contributions. I am always
