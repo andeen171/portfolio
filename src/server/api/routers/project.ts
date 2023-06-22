@@ -16,7 +16,20 @@ export const projectRouter = createTRPCRouter({
     }),
 
   getAll: publicProcedure.query(({ ctx }) => {
-    return ctx.prisma.project.findMany()
+    // Define pagination variables
+    const page = 1 // change this as needed
+    const pageSize = 10 // number of items per page
+
+    // Get the projects with related skills
+    const projects = ctx.prisma.project.findMany({
+      skip: (page - 1) * pageSize,
+      take: pageSize,
+      include: {
+        skills: true // Include related skills
+      }
+    })
+
+    return projects
   }),
 
   getOne: publicProcedure
