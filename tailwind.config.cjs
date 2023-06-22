@@ -22,7 +22,13 @@ const colors = [
   'surface1'
 ]
 
-const safeList = ['ctp-mocha', 'ctp-macchiato', 'ctp-frappe', 'ctp-latte', 'animate-colorchange']
+const safeList = [
+  'ctp-mocha',
+  'ctp-macchiato',
+  'ctp-frappe',
+  'ctp-latte',
+  'animate-colorchange'
+]
 colors.map((color) => {
   safeList.push(`bg-ctp-${color}`)
   safeList.push(`text-ctp-${color}`)
@@ -34,7 +40,7 @@ const config = {
   theme: {
     extend: {
       animation: {
-        colorchange: 'colorchange 5s ease infinite',
+        colorchange: 'colorchange 5s ease infinite'
       },
       keyframes: {
         colorchange: {
@@ -46,7 +52,7 @@ const config = {
             'background-size': '200% 200%',
             'background-position': 'right center'
           }
-        },
+        }
       }
     }
   },
@@ -55,8 +61,7 @@ const config = {
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     require('@catppuccin/tailwindcss')({
       prefix: 'ctp'
-    }),
-    require('@tailwindcss/line-clamp')
+    })
   ]
 }
 
