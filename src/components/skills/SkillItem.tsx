@@ -14,7 +14,7 @@ const SkillItem: React.FC<SkillItemProps> = ({ skill }) => {
         <div className="mb-4 h-10 w-10 ">
           <i className={`${skill.image} text-4xl`}></i>
         </div>
-        <dt className="ml-4 mb-2 text-base font-semibold leading-7">
+        <dt className="mb-2 ml-4 text-xl font-semibold leading-7">
           {skill.name}
         </dt>
       </div>
