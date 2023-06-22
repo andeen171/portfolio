@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
 import Typed from 'typed.js'
 import ProgrammingSVG from '~/components/ProgrammingSVG'
+import BackgroudBlurSVG from './BackgroundBlurSVG'
 
 const HeroSection: React.FC = () => {
   const nameRef = useRef(null)
@@ -24,7 +25,7 @@ const HeroSection: React.FC = () => {
   }, [])
 
   return (
-    <div className="min-w-screen relative isolate flex min-h-screen flex-col items-center p-2 px-6 pt-14 md:flex-row md:p-12 lg:px-8">
+    <div className="min-w-screen pt-12 relative isolate flex min-h-screen flex-col items-center px-6 md:flex-row lg:px-8">
       <div className="animated-gradient-text h-[35vh] lg:h-full pl-12 w-full lg:w-[50vw] py-2 pt-12 text-6xl sm:min-h-full">
         <span
           className="text-left text-6xl font-bold tracking-tight"
@@ -35,6 +36,7 @@ const HeroSection: React.FC = () => {
       <div className="flex">
         <ProgrammingSVG />
       </div>
+      <BackgroudBlurSVG />
     </div>
   )
 }

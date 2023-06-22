@@ -1,7 +1,8 @@
 import CatppuccinGradient from './CatppuccinGradient'
+import uniqueId from '~/utils/uniqueId'
 
 const PaletteSVG: React.FC = () => {
-  const gradientId = Math.random().toString(36).substring(2, 15)
+  const gradientId = uniqueId('palette-svg-gradient')
 
   return (
     <svg

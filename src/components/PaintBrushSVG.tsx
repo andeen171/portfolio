@@ -1,7 +1,8 @@
 import CatppuccinGradient from './CatppuccinGradient'
+import uniqueId from '~/utils/uniqueId'
 
 const PaintBrushSVG: React.FC = () => {
-  const gradientId = Math.random().toString(36).substring(2, 15)
+  const gradientId = uniqueId('paint-brush-svg-gradient')
 
   return (
     <svg

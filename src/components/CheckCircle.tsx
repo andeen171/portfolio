@@ -1,7 +1,8 @@
+import uniqueId from '~/utils/uniqueId'
 import CatppuccinGradient from './CatppuccinGradient'
 
 const CheckCircle: React.FC = () => {
-  const gradientId = Math.random().toString(36).substring(2, 15)
+  const gradientId = uniqueId('check-circle-gradient')
 
   return (
     <svg

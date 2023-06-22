@@ -4,7 +4,7 @@ import { variants } from '@catppuccin/palette'
 import CatppuccinGradient from './CatppuccinGradient'
 
 const ProgrammingSVG: React.FC = () => {
-  const gradientId = Math.random().toString(36).substring(2, 15)
+  const gradientId = 'programming-svg-gradient'
   const flavor = useCtpStore((state) => state.flavor)
   const [labels, setLabels] = useState(variants.mocha)
 
