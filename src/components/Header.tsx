@@ -2,13 +2,14 @@ import { useState } from 'react'
 import { Dialog } from '@headlessui/react'
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
 import ThemeSelector from './ThemeSelector'
-import { useCtpStore } from '../store';
+import { useCtpStore } from '../store'
+import Link from 'next/link'
 
 const navigation = [
-  { name: 'About', href: '#' },
-  { name: 'Skills', href: '#' },
-  { name: 'Projects', href: '#' },
-  { name: 'Experiences', href: '#' }
+  { name: 'About', href: 'about' },
+  { name: 'Skills', href: 'skills' },
+  { name: 'Projects', href: 'projects' },
+  { name: 'Experiences', href: 'experiences' }
 ]
 
 const Header: React.FC = () => {
@@ -22,12 +23,14 @@ const Header: React.FC = () => {
         aria-label="Global"
       >
         <div
-          className="flex animate-colorchange bg-gradient-to-r from-ctp-teal 
-          via-ctp-lavender bg-clip-text font-semibold text-transparent 
-          first:rounded-t-lg first:from-ctp-lavender first:to-ctp-rosewater 
+          className="flex animate-colorchange bg-gradient-to-r from-ctp-teal
+          via-ctp-lavender bg-clip-text font-semibold text-transparent
+          first:rounded-t-lg first:from-ctp-lavender first:to-ctp-rosewater
           last:rounded-b-lg lg:flex  lg:flex-1 lg:gap-x-12"
         >
-          <span className="text-2xl font-extrabold">戦え</span>
+          <Link href="/" className="text-2xl font-extrabold">
+            戦え
+          </Link>
         </div>
         <div className="flex lg:hidden">
           <button
@@ -40,13 +43,13 @@ const Header: React.FC = () => {
           </button>
         </div>
         <div
-          className="hidden animate-colorchange bg-gradient-to-r from-ctp-teal via-ctp-lavender bg-clip-text font-semibold 
-          text-transparent first:rounded-t-lg first:from-ctp-lavender first:to-ctp-rosewater last:rounded-b-lg  lg:flex lg:gap-x-12"
+          className="hidden animate-colorchange bg-gradient-to-r from-ctp-teal via-ctp-lavender bg-clip-text font-semibold
+            text-transparent first:rounded-t-lg first:from-ctp-lavender first:to-ctp-rosewater last:rounded-b-lg  lg:flex lg:gap-x-12"
         >
-          {navigation.map((item) => (
-            <a key={item.name} href={item.href}>
+          {navigation.map((item, index) => (
+            <Link key={index} href={item.href}>
               {item.name}
-            </a>
+            </Link>
           ))}
         </div>
         <div className="mr-6 hidden lg:flex lg:flex-1 lg:justify-end">
@@ -59,14 +62,12 @@ const Header: React.FC = () => {
         open={mobileMenuOpen}
         onClose={setMobileMenuOpen}
       >
-        <div className="fixed inset-0 z-50" />
         <Dialog.Panel className="fixed inset-y-0 right-0 z-50 w-full overflow-y-auto bg-ctp-base px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-gray-900/10">
           <div className="flex items-center justify-between">
             <div
-              className="flex animate-colorchange bg-gradient-to-r from-ctp-teal 
-          via-ctp-lavender bg-clip-text font-semibold text-transparent 
-          first:rounded-t-lg first:from-ctp-lavender first:to-ctp-rosewater 
-          last:rounded-b-lg lg:flex  lg:flex-1 lg:gap-x-12"
+              className="flex animate-colorchange rounded-lg bg-gradient-to-r
+                from-ctp-teal via-ctp-lavender to-ctp-rosewater bg-clip-text
+                font-semibold text-transparent lg:flex  lg:flex-1 lg:gap-x-12"
             >
               <span className="text-xl font-bold">戦え</span>
             </div>
@@ -80,20 +81,23 @@ const Header: React.FC = () => {
             </button>
           </div>
           <div className="mt-6 flow-root">
-            <div className="-my-6 divide-y divide-gray-500/10">
-              <div className="space-y-2 py-6">
-                {navigation.map((item) => (
-                  <a
-                    key={item.name}
+            <div className="-my-6">
+              <div
+                className="animate-colorchange space-y-2 bg-gradient-to-r from-ctp-teal via-ctp-lavender bg-clip-text py-6
+                font-semibold text-transparent first:rounded-t-lg first:from-ctp-lavender first:to-ctp-rosewater last:rounded-b-lg"
+              >
+                {navigation.map((item, index) => (
+                  <Link
+                    key={index}
                     href={item.href}
-                    className="-mx-3 block rounded-lg py-2 px-3 text-base font-semibold leading-7 text-ctp-text hover:bg-gray-50"
+                    className="-mx-3 block px-3 py-2 text-base font-semibold"
                   >
                     {item.name}
-                  </a>
+                  </Link>
                 ))}
-                <div className="-mx-3 block rounded-lg py-2 px-3 text-base font-semibold leading-7 text-ctp-text hover:bg-gray-50">
-                  <ThemeSelector />
-                </div>
+              </div>
+              <div className="-mx-3 block py-2">
+                <ThemeSelector />
               </div>
             </div>
           </div>

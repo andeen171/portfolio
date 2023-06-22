@@ -1,4 +1,12 @@
 import Link from 'next/link'
+
+const navigation = [
+  { name: 'About', href: 'about' },
+  { name: 'Skills', href: 'skills' },
+  { name: 'Projects', href: 'projects' },
+  { name: 'Experiences', href: 'experiences' }
+]
+
 const Footer: React.FC = () => {
   return (
     <footer aria-label="Site Footer">
@@ -10,33 +18,15 @@ const Footer: React.FC = () => {
 
         <nav aria-label="Footer Nav" className="mt-12">
           <ul className="animated-gradient-text flex flex-wrap justify-center gap-6 font-semibold md:gap-8 lg:gap-12">
-            <li>
-              <Link href="/">About</Link>
-            </li>
-
-            <li>
-              <Link href="/">Careers</Link>
-            </li>
-
-            <li>
-              <Link href="/">History</Link>
-            </li>
-
-            <li>
-              <Link href="/">Services</Link>
-            </li>
-
-            <li>
-              <Link href="/">Projects</Link>
-            </li>
-
-            <li>
-              <Link href="/">Blog</Link>
-            </li>
+            {navigation.map((item, index) => (
+              <li key={index}>
+                <Link href={item.href}>{item.name}</Link>
+              </li>
+            ))}
           </ul>
         </nav>
 
-        <ul className="mt-12 flex justify-center gap-6 md:gap-8 text-ctp-lavender">
+        <ul className="mt-12 flex justify-center gap-6 text-ctp-lavender md:gap-8">
           <li>
             <a
               href="/"
