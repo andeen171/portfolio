@@ -11,7 +11,6 @@ const SkillList: React.FC = () => {
         <>
           <SkillItemSkeleton />
           <SkillItemSkeleton />
-          <SkillItemSkeleton />
         </>
       )}
       {skills.data?.map((skill) => (

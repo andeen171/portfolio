@@ -10,7 +10,6 @@ const ExperienceList: React.FC = () => {
         <>
           <ExperienceItemSkeleton />
           <ExperienceItemSkeleton />
-          <ExperienceItemSkeleton />
         </>
       )}
       {experiences.data?.map((experience) => (
