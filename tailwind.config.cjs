@@ -1,5 +1,5 @@
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-nocheck
+import ctpPlugin from '@catppuccin/tailwindcss'
+
 const colors = [
   'rosewater',
   'flamingo',
@@ -58,8 +58,7 @@ const config = {
   },
   safelist: safeList,
   plugins: [
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    require('@catppuccin/tailwindcss')({
+    ctpPlugin({
       prefix: 'ctp'
     })
   ]
