@@ -25,7 +25,13 @@ export const projectRouter = createTRPCRouter({
       skip: (page - 1) * pageSize,
       take: pageSize,
       include: {
-        skills: true // Include related skills
+        skills: {
+          select: {
+            id: true,
+            name: true
+          },
+          take: 3
+        }
       }
     })
 
