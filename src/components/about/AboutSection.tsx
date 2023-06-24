@@ -21,7 +21,6 @@ const AboutSection: React.FC = () => {
 
     return () => {
       // Destroy Typed instance during cleanup to stop animation
-      // phrase.destroy()
       name.destroy()
     }
   })

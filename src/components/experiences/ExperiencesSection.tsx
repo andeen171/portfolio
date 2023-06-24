@@ -1,27 +1,7 @@
 import Link from 'next/link'
-import ExperienceItem from './ExperienceItem'
+import ExperienceList from './ExperienceList'
 
 const ExperiencesSection: React.FC = () => {
-  const experiences = [
-    {
-      id: '1',
-      name: 'Frontend Developer',
-      company: 'Cubos',
-      description:
-        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod, nunc vel tincidunt lacinia, nunc est aliquam nisl, eget aliquam massa nisl eget dolor. Sed euismod, nunc vel tincidunt lacinia, nunc est aliquam nisl, eget aliquam massa nisl eget dolor.',
-      startDate: '2020-01-01',
-      endDate: '2020-12-31'
-    },
-    {
-      id: '2',
-      name: 'Frontend Developer',
-      company: 'Cubos',
-      description:
-        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod, nunc vel tincidunt lacinia, nunc est aliquam nisl, eget aliquam massa nisl eget dolor. Sed euismod, nunc vel tincidunt lacinia, nunc est aliquam nisl, eget aliquam massa nisl eget dolor.',
-      startDate: '2020-01-01',
-      endDate: '2020-12-31'
-    }
-  ]
   return (
     <section className="bg-ctp-base py-16">
       <div className="container mx-auto px-6 lg:px-8">
@@ -31,11 +11,7 @@ const ExperiencesSection: React.FC = () => {
             Where I&apos;ve worked
           </p>
         </div>
-        <div className="mt-16 grid grid-cols-1 gap-x-6 gap-y-10 md:grid-cols-2">
-          {experiences.map((experience) => (
-            <ExperienceItem key={experience.id} experience={experience} />
-          ))}
-        </div>
+        <ExperienceList />
         <div className="mt-8 text-center">
           <Link
             className="text-lg font-semibold text-ctp-lavender"

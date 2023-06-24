@@ -17,7 +17,7 @@ const ProjectsSection: React.FC = () => {
         <div className="mt-8 text-center">
           <Link
             className="text-lg font-semibold text-ctp-lavender"
-            href="/experiences"
+            href="projects"
           >
             See more amazing projects &rarr;
           </Link>

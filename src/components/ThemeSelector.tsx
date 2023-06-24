@@ -1,9 +1,9 @@
 import { Fragment, useEffect, useState } from 'react'
 import { Listbox, Transition } from '@headlessui/react'
 import { type Flavor, useCtpStore } from '~/store'
-import PaletteSVG from './PaletteSVG'
-import PaintBrushSVG from './PaintBrushSVG'
-import CheckCircle from './CheckCircle'
+import PaletteSVG from './SVG/PaletteSVG'
+import PaintBrushSVG from './SVG/PaintBrushSVG'
+import CheckCircle from './SVG/CheckCircle'
 
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(' ')
@@ -26,7 +26,7 @@ const ThemeSelector: React.FC = () => {
       {({ open }) => (
         <>
           <div className="relative">
-            <Listbox.Button className="relative w-80 lg:w-40 cursor-default rounded-md bg-ctp-mantle p-2 text-left text-ctp-text shadow-sm ring-1 ring-inset ring-ctp-mantle focus:outline-none focus:ring-2 focus:ring-ctp-lavender sm:text-sm sm:leading-6">
+            <Listbox.Button className="relative w-80 cursor-default rounded-md bg-ctp-mantle p-2 text-left text-ctp-text shadow-sm ring-1 ring-inset ring-ctp-mantle focus:outline-none focus:ring-2 focus:ring-ctp-lavender sm:text-sm sm:leading-6 lg:w-40">
               <span className="pointer-events-none  flex items-center pr-2">
                 <PaletteSVG />
                 <span
