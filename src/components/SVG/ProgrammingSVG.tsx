@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useCtpStore } from '~/store'
 import { variants } from '@catppuccin/palette'
-import CatppuccinGradient from './CatppuccinGradient'
+import CatppuccinGradient from '../CatppuccinGradient'
 
 const ProgrammingSVG: React.FC = () => {
   const gradientId = 'programming-svg-gradient'

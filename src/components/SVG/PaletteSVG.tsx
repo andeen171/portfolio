@@ -1,4 +1,4 @@
-import CatppuccinGradient from './CatppuccinGradient'
+import CatppuccinGradient from '../CatppuccinGradient'
 import uniqueId from '~/utils/uniqueId'
 
 const PaletteSVG: React.FC = () => {

@@ -1,5 +1,5 @@
 import uniqueId from '~/utils/uniqueId'
-import CatppuccinGradient from './CatppuccinGradient'
+import CatppuccinGradient from '../CatppuccinGradient'
 
 const CheckCircle: React.FC = () => {
   const gradientId = uniqueId('check-circle-gradient')
