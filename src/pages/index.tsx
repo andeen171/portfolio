@@ -11,15 +11,15 @@ import Head from 'next/head';
 
 const EXPERIENCES_QUERY = `*[
   _type == "experience"
-]`;
+][0..4]`;
 
 const PROJECTS_QUERY = `*[
   _type == "project"
-]`;
+][0..4]`;
 
 const SKILLS_QUERY = `*[
   _type == "skill"
-]`;
+][0..4]`;
 
 const options = { next: { revalidate: 30 } };
 

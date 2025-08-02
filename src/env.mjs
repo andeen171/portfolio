@@ -4,18 +4,16 @@ import { z } from 'zod';
  * Specify your server-side environment variables schema here. This way you can ensure the app isn't
  * built with invalid env vars.
  */
-const server = z.object({
-  SANITY_PROJECT_ID: z.string().min(1),
-  SANITY_DATASET: z.string().min(1),
-  SANITY_API_VERSION: z.string().min(1),
-});
+const server = z.object({});
 
 /**
  * Specify your client-side environment variables schema here. This way you can ensure the app isn't
  * built with invalid env vars. To expose them to the client, prefix them with `NEXT_PUBLIC_`.
  */
 const client = z.object({
-  // NEXT_PUBLIC_: z.string().min(1),
+  NEXT_PUBLIC_SANITY_PROJECT_ID: z.string().min(1),
+  NEXT_PUBLIC_SANITY_DATASET: z.string().min(1),
+  NEXT_PUBLIC_SANITY_API_VERSION: z.string().min(1),
 });
 
 /**
@@ -25,9 +23,9 @@ const client = z.object({
  * @type {Record<keyof z.infer<typeof server> | keyof z.infer<typeof client>, string | undefined>}
  */
 const processEnv = {
-  SANITY_PROJECT_ID: process.env.SANITY_PROJECT_ID,
-  SANITY_DATASET: process.env.SANITY_DATASET,
-  SANITY_API_VERSION: process.env.SANITY_API_VERSION,
+  NEXT_PUBLIC_SANITY_PROJECT_ID: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID,
+  NEXT_PUBLIC_SANITY_DATASET: process.env.NEXT_PUBLIC_SANITY_DATASET,
+  NEXT_PUBLIC_SANITY_API_VERSION: process.env.NEXT_PUBLIC_SANITY_API_VERSION,
 };
 
 // Don't touch the part below

@@ -1,4 +1,5 @@
 import { SanityDocument } from 'next-sanity';
+import Link from 'next/link';
 import SkillList from './SkillList';
 
 type Props = {
@@ -17,6 +18,11 @@ const SkillsSection: React.FC<Props> = ({ skills }) => {
         </div>
         <div className="mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-4xl">
           <SkillList skills={skills} />
+        </div>
+        <div className="mt-8 text-center">
+          <Link className="text-lg font-semibold text-ctp-lavender" href="/skills">
+            See all the skills &rarr;
+          </Link>
         </div>
       </div>
     </div>

@@ -5,11 +5,11 @@ import { Fragment, useEffect, useState } from 'react';
 import ThemeSelector from './ThemeSelector';
 
 const navigation = [
-  { name: 'Home', href: '' },
-  { name: 'About', href: 'about' },
-  { name: 'Skills', href: 'skills' },
-  { name: 'Projects', href: 'projects' },
-  { name: 'Experiences', href: 'experiences' },
+  { name: 'Home', href: '/' },
+  { name: 'About', href: '/about' },
+  { name: 'Skills', href: '/skills' },
+  { name: 'Projects', href: '/projects' },
+  { name: 'Experiences', href: '/experiences' },
 ];
 
 function classNames(...classes: string[]) {
