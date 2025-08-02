@@ -1,4 +1,4 @@
-import {type SanityDocument} from 'next-sanity';
+import { type SanityDocument } from 'next-sanity';
 import SkillItem from './SkillItem';
 
 type Props = {

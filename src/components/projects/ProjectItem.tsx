@@ -1,7 +1,7 @@
-import {client} from '@/sanity/client';
+import { client } from '@/sanity/client';
 import imageUrlBuilder from '@sanity/image-url';
-import type {SanityImageSource} from '@sanity/image-url/lib/types/types';
-import {SanityDocument} from 'next-sanity';
+import type { SanityImageSource } from '@sanity/image-url/lib/types/types';
+import { SanityDocument } from 'next-sanity';
 
 const { projectId, dataset } = client.config();
 const urlFor = (source: SanityImageSource) =>

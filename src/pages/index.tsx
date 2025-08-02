@@ -4,9 +4,9 @@ import AboutSection from '@/components/about/AboutSection';
 import ExperiencesSection from '@/components/experiences/ExperiencesSection';
 import ProjectsSection from '@/components/projects/ProjectsSection';
 import SkillsSection from '@/components/skills/SkillsSection';
-import {client} from '@/sanity/client';
-import {InferGetServerSidePropsType} from 'next';
-import {SanityDocument} from 'next-sanity';
+import { client } from '@/sanity/client';
+import { InferGetServerSidePropsType } from 'next';
+import { SanityDocument } from 'next-sanity';
 import Head from 'next/head';
 
 const EXPERIENCES_QUERY = `*[
