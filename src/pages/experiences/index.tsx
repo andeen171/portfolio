@@ -1,9 +1,9 @@
 import Layout from '@/components/Layout';
 import ExperiencesSection from '@/components/experiences/ExperiencesSection';
-import { InferGetServerSidePropsType } from 'next';
+import {InferGetStaticPropsType} from 'next';
 
-import { client } from '@/sanity/client';
-import { type SanityDocument } from 'next-sanity';
+import {client} from '@/sanity/client';
+import {type SanityDocument} from 'next-sanity';
 
 const EXPERIENCES_QUERY = `*[
   _type == "experience"
@@ -11,15 +11,15 @@ const EXPERIENCES_QUERY = `*[
 
 const options = { next: { revalidate: 30 } };
 
-export async function getServerSideProps() {
+export async function getStaticProps() {
   const experiences = await client.fetch<SanityDocument[]>(EXPERIENCES_QUERY, {}, options);
 
-  return { props: { experiences } };
+  return { props: { experiences }, revalidate: 16800 };
 }
 
 export default function Experiences({
   experiences,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+}: InferGetStaticPropsType<typeof getStaticProps>) {
   return (
     <Layout>
       <div className="pt-36">
