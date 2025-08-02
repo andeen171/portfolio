@@ -1,41 +1,42 @@
-import { useCtpStore } from '@/store';
-import { type FlavorName } from '@catppuccin/palette';
+import { Language, useLanguageStore } from '@/store/language';
 import { Listbox, Transition } from '@headlessui/react';
 import { Fragment, useEffect, useState } from 'react';
 import CheckCircle from './SVG/CheckCircle';
-import PaintBrushSVG from './SVG/PaintBrushSVG';
-import PaletteSVG from './SVG/PaletteSVG';
+import LanguageSVG from './SVG/LanguageSVG';
 
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(' ');
 }
 
-const flavors: FlavorName[] = ['latte', 'frappe', 'macchiato', 'mocha'];
+const languages: { code: Language; label: string }[] = [
+  { code: 'en', label: 'English' },
+  { code: 'pt', label: 'Português' },
+];
 
-const ThemeSelector: React.FC = () => {
-  const activeFlavor = useCtpStore((state) => state.flavor);
-  const [selected, setSelected] = useState<FlavorName>(activeFlavor);
+const LanguageSelector: React.FC = () => {
+  const activeLanguage = useLanguageStore((state) => state.language);
+  const [selected, setSelected] = useState<Language>(activeLanguage);
 
-  const swapFlavor = useCtpStore((state) => state.swapFlavor);
+  const setLanguage = useLanguageStore((state) => state.setLanguage);
 
   useEffect(() => {
-    setSelected(activeFlavor);
-  }, [activeFlavor]);
+    setSelected(activeLanguage);
+  }, [activeLanguage]);
 
   return (
-    <Listbox value={activeFlavor} onChange={swapFlavor}>
+    <Listbox value={activeLanguage} onChange={setLanguage}>
       {({ open }) => (
         <>
           <div className="relative">
-            <Listbox.Button className="relative flex items-center justify-between w-auto sm:min-w-[120px] cursor-default rounded-full bg-ctp-matle/40 backdrop-blur-sm p-2 sm:px-3 text-left text-ctp-text shadow-sm ring-1 ring-inset ring-ctp-overlay0/20 hover:bg-ctp-mantle/60 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-ctp-lavender">
+            <Listbox.Button className="relative flex items-center w-auto cursor-default rounded-full bg-ctp-matle/40 backdrop-blur-sm p-2 md:px-3 text-left text-ctp-text shadow-sm ring-1 ring-inset ring-ctp-overlay0/20 hover:bg-ctp-mantle/60 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-ctp-lavender">
               <span className="pointer-events-none flex items-center">
-                <PaletteSVG />
+                <LanguageSVG />
               </span>
               <span
                 className="animate-colorchange bg-gradient-to-r from-ctp-teal via-ctp-lavender bg-clip-text
-                  text-sm font-semibold text-transparent nf sm:mr-4 hidden sm:inline-block"
+                  text-sm font-semibold text-transparent nf md:mr-3 ml-2 hidden xl:inline-block"
               >
-                {selected.charAt(0).toUpperCase() + selected.slice(1)}
+                {selected === 'en' ? 'EN' : 'PT'}
               </span>
             </Listbox.Button>
 
@@ -47,27 +48,27 @@ const ThemeSelector: React.FC = () => {
               leaveTo="opacity-0"
             >
               <Listbox.Options className="absolute right-0 z-10 mt-2 max-h-56 w-full min-w-[160px] overflow-hidden rounded-xl bg-ctp-base/80 backdrop-blur-md text-base shadow-xl ring-1 ring-ctp-overlay0/20 transition-all focus:outline-none">
-                {flavors.map((flavor) => (
+                {languages.map((lang) => (
                   <Listbox.Option
-                    key={flavor}
+                    key={lang.code}
                     className={({ active }) =>
                       classNames(
                         active ? 'bg-ctp-base/30 text-ctp-text' : 'text-ctp-text',
                         'relative cursor-default select-none transition-colors duration-200'
                       )
                     }
-                    value={flavor}
+                    value={lang.code}
                   >
                     <div className="flex items-center justify-between p-2 px-3">
                       <span className="flex items-center">
-                        {activeFlavor === flavor ? <CheckCircle /> : <PaintBrushSVG />}
+                        {activeLanguage === lang.code ? <CheckCircle /> : <LanguageSVG />}
                       </span>
 
                       <span
                         className="animate-colorchange bg-gradient-to-r from-ctp-teal via-ctp-lavender
                                                 bg-clip-text font-semibold text-transparent nf ml-2 text-sm"
                       >
-                        {flavor.charAt(0).toUpperCase() + flavor.slice(1)}
+                        {lang.label}
                       </span>
                     </div>
                   </Listbox.Option>
@@ -81,4 +82,4 @@ const ThemeSelector: React.FC = () => {
   );
 };
 
-export default ThemeSelector;
+export default LanguageSelector;

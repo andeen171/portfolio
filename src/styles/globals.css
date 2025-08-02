@@ -4,6 +4,14 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Corrigir problemas de overflow em dispositivos móveis */
+html, body {
+  max-width: 100vw;
+  overflow-x: hidden;
+  margin: 0;
+  padding: 0;
+}
+
 .typed-cursor {
   @apply w-60 font-bold text-transparent;
 }

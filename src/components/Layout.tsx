@@ -17,7 +17,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   }, [activeFlavor]);
 
   return (
-    <main className={`ctp-${flavor} min-w-screen min-h-screen bg-ctp-base`}>
+    <main
+      className={`ctp-${flavor} min-h-screen w-full max-w-[100vw] overflow-x-hidden bg-ctp-base`}
+    >
       <Header />
       {children}
       <Footer />

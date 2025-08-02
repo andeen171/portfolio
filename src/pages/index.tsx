@@ -11,11 +11,21 @@ import Head from 'next/head';
 
 const EXPERIENCES_QUERY = `*[
   _type == "experience"
-][0..4]`;
+] | order(startDate desc)[0..5]`;
 
 const PROJECTS_QUERY = `*[
   _type == "project"
-][0..4]`;
+]{ 
+  _id, 
+  _createdAt,
+  name,
+  description,
+  repo,
+  demo,
+  images,
+  "skills": skills[]->{ _id, name },
+  year
+} | order(_createdAt desc)[0..5]`;
 
 const SKILLS_QUERY = `*[
   _type == "skill"
@@ -52,9 +62,9 @@ export default ({
     <Layout>
       <HeroSection />
       <AboutSection />
-      <SkillsSection skills={skills} />
       <ProjectsSection projects={projects} />
       <ExperiencesSection experiences={experiences} />
+      <SkillsSection skills={skills} />
     </Layout>
   </>
 );
