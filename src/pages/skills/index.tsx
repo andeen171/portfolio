@@ -1,8 +1,8 @@
 import Layout from '@/components/Layout';
 import SkillsSection from '@/components/skills/SkillsSection';
-import {client} from '@/sanity/client';
-import {InferGetStaticPropsType} from 'next';
-import {SanityDocument} from 'next-sanity';
+import { client } from '@/sanity/client';
+import { InferGetStaticPropsType } from 'next';
+import { SanityDocument } from 'next-sanity';
 
 const SKILLS_QUERY = `*[
   _type == "skill"

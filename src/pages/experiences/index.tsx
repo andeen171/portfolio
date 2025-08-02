@@ -1,9 +1,9 @@
 import Layout from '@/components/Layout';
 import ExperiencesSection from '@/components/experiences/ExperiencesSection';
-import {InferGetStaticPropsType} from 'next';
+import { InferGetStaticPropsType } from 'next';
 
-import {client} from '@/sanity/client';
-import {type SanityDocument} from 'next-sanity';
+import { client } from '@/sanity/client';
+import { type SanityDocument } from 'next-sanity';
 
 const EXPERIENCES_QUERY = `*[
   _type == "experience"

@@ -1,8 +1,8 @@
 import Layout from '@/components/Layout';
 import ProjectsSection from '@/components/projects/ProjectsSection';
-import {client} from '@/sanity/client';
-import {InferGetStaticPropsType} from 'next';
-import {SanityDocument} from 'next-sanity';
+import { client } from '@/sanity/client';
+import { InferGetStaticPropsType } from 'next';
+import { SanityDocument } from 'next-sanity';
 
 const PROJECTS_QUERY = `*[
   _type == "project"
