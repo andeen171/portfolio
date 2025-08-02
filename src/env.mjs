@@ -25,9 +25,9 @@ const client = z.object({
  * @type {Record<keyof z.infer<typeof server> | keyof z.infer<typeof client>, string | undefined>}
  */
 const processEnv = {
-  SANITY_PROJECT_ID: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID,
-  SANITY_DATASET: process.env.NEXT_PUBLIC_SANITY_DATASET,
-  SANITY_API_VERSION: process.env.NEXT_PUBLIC_SANITY_API_VERSION,
+  SANITY_PROJECT_ID: process.env.SANITY_PROJECT_ID,
+  SANITY_DATASET: process.env.SANITY_DATASET,
+  SANITY_API_VERSION: process.env.SANITY_API_VERSION,
 };
 
 // Don't touch the part below
