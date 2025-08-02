@@ -1,110 +1,124 @@
-import { useState } from 'react'
-import { Dialog } from '@headlessui/react'
-import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
-import ThemeSelector from './ThemeSelector'
-import { useCtpStore } from '../store'
-import Link from 'next/link'
+import { Menu, Transition } from '@headlessui/react';
+import { Bars3Icon } from '@heroicons/react/24/outline';
+import Link from 'next/link';
+import { Fragment, useEffect, useState } from 'react';
+import ThemeSelector from './ThemeSelector';
 
 const navigation = [
+  { name: 'Home', href: '' },
   { name: 'About', href: 'about' },
   { name: 'Skills', href: 'skills' },
   { name: 'Projects', href: 'projects' },
-  { name: 'Experiences', href: 'experiences' }
-]
+  { name: 'Experiences', href: 'experiences' },
+];
 
-const Header: React.FC = () => {
-  const flavor = useCtpStore((state) => state.flavor)
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-
-  return (
-    <header className="absolute inset-x-0 top-0 z-50">
-      <nav
-        className="flex items-center justify-between p-6 lg:px-8"
-        aria-label="Global"
-      >
-        <div
-          className="flex animate-colorchange bg-gradient-to-r from-ctp-teal
-          via-ctp-lavender bg-clip-text font-semibold text-transparent
-          first:rounded-t-lg first:from-ctp-lavender first:to-ctp-rosewater
-          last:rounded-b-lg lg:flex  lg:flex-1 lg:gap-x-12"
-        >
-          <Link href="/" className="text-2xl font-extrabold">
-            戦え
-          </Link>
-        </div>
-        <div className="flex lg:hidden">
-          <button
-            type="button"
-            className="-m-2.5 inline-flex items-center justify-center rounded-md p-2.5 text-ctp-text"
-            onClick={() => setMobileMenuOpen(true)}
-          >
-            <span className="sr-only">Open main menu</span>
-            <Bars3Icon className="h-6 w-6" aria-hidden="true" />
-          </button>
-        </div>
-        <div
-          className="hidden animate-colorchange bg-gradient-to-r from-ctp-teal via-ctp-lavender bg-clip-text font-semibold
-            text-transparent first:rounded-t-lg first:from-ctp-lavender first:to-ctp-rosewater last:rounded-b-lg  lg:flex lg:gap-x-12"
-        >
-          {navigation.map((item, index) => (
-            <Link key={index} href={item.href}>
-              {item.name}
-            </Link>
-          ))}
-        </div>
-        <div className="mr-6 hidden lg:flex lg:flex-1 lg:justify-end">
-          <ThemeSelector />
-        </div>
-      </nav>
-      <Dialog
-        as="div"
-        className={`lg:hidden ctp-${flavor}`}
-        open={mobileMenuOpen}
-        onClose={setMobileMenuOpen}
-      >
-        <Dialog.Panel className="fixed inset-y-0 right-0 z-50 w-full overflow-y-auto bg-ctp-base px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-gray-900/10">
-          <div className="flex items-center justify-between">
-            <div
-              className="flex animate-colorchange rounded-lg bg-gradient-to-r
-                from-ctp-teal via-ctp-lavender to-ctp-rosewater bg-clip-text
-                font-semibold text-transparent lg:flex  lg:flex-1 lg:gap-x-12"
-            >
-              <span className="text-xl font-bold">戦え</span>
-            </div>
-            <button
-              type="button"
-              className="-m-2.5 rounded-md p-2.5 text-ctp-text"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              <span className="sr-only">Close menu</span>
-              <XMarkIcon className="h-6 w-6" aria-hidden="true" />
-            </button>
-          </div>
-          <div className="mt-6 flow-root">
-            <div className="-my-6">
-              <div
-                className="animate-colorchange space-y-2 bg-gradient-to-r from-ctp-teal via-ctp-lavender bg-clip-text py-6
-                font-semibold text-transparent first:rounded-t-lg first:from-ctp-lavender first:to-ctp-rosewater last:rounded-b-lg"
-              >
-                {navigation.map((item, index) => (
-                  <Link
-                    key={index}
-                    href={item.href}
-                    className="-mx-3 block px-3 py-2 text-base font-semibold"
-                  >
-                    {item.name}
-                  </Link>
-                ))}
-              </div>
-              <div className="-mx-3 block py-2">
-                <ThemeSelector />
-              </div>
-            </div>
-          </div>
-        </Dialog.Panel>
-      </Dialog>
-    </header>
-  )
+function classNames(...classes: string[]) {
+  return classes.filter(Boolean).join(' ');
 }
 
-export default Header
+const Header: React.FC = () => {
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 10);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  return (
+    <header
+      className={classNames(
+        'fixed inset-x-0 top-0 z-50 transition-all duration-300',
+        scrolled ? 'py-2 bg-ctp-base/80 backdrop-blur-lg shadow-lg' : 'py-4'
+      )}
+    >
+      <div
+        className={classNames(
+          'mx-auto px-4 sm:px-6 lg:px-8 rounded-xl transition-all duration-300'
+        )}
+      >
+        <nav className="flex items-center justify-between" aria-label="Global">
+          {/* Logo */}
+          <div className="flex items-center">
+            <Link href="/" className="group flex items-center">
+              <span className="text-3xl font-extrabold animated-gradient-text transition-transform duration-300 group-hover:scale-110">
+                戦え
+              </span>
+            </Link>
+          </div>
+
+          {/* Desktop Navigation */}
+          <div className="hidden lg:flex lg:items-center lg:gap-x-8">
+            {navigation.map((item) => (
+              <Link
+                key={item.name}
+                href={item.href}
+                className="relative px-2 py-1 text-ctp-text hover:text-ctp-lavender transition-colors duration-300 font-medium group"
+              >
+                {item.name}
+                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-ctp-teal to-ctp-lavender transition-all duration-300 group-hover:w-full" />
+              </Link>
+            ))}
+
+            {/* Theme Selector - Desktop */}
+            <div className="ml-4 flex items-center">
+              <ThemeSelector />
+            </div>
+          </div>
+
+          {/* Mobile: Theme Selector and Navigation */}
+          <div className="flex items-center gap-4 lg:hidden">
+            {/* Theme Selector - Mobile */}
+            <div className="flex items-center">
+              <ThemeSelector />
+            </div>
+
+            {/* Mobile Navigation Dropdown */}
+            <Menu as="div" className="relative inline-block text-left">
+              <div>
+                <Menu.Button className="inline-flex items-center justify-center rounded-full p-2 text-ctp-text bg-ctp-base/50 hover:bg-ctp-mantle/50 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-ctp-lavender">
+                  <span className="sr-only">Open main menu</span>
+                  <Bars3Icon className="h-6 w-6 text-ctp-lavender" aria-hidden="true" />
+                </Menu.Button>
+              </div>
+              <Transition
+                as={Fragment}
+                enter="transition ease-out duration-200"
+                enterFrom="transform opacity-0 scale-95"
+                enterTo="transform opacity-100 scale-100"
+                leave="transition ease-in duration-150"
+                leaveFrom="transform opacity-100 scale-100"
+                leaveTo="transform opacity-0 scale-95"
+              >
+                <Menu.Items className="absolute right-0 z-10 mt-2 w-42 origin-top-right rounded-xl bg-ctp-base/80 backdrop-blur-md shadow-xl ring-1 ring-ctp-overlay0/20 overflow-hidden focus:outline-none">
+                  <div className="py-1">
+                    {navigation.map((item) => (
+                      <Menu.Item key={item.name}>
+                        {({ active }) => (
+                          <Link
+                            href={item.href}
+                            className={classNames(
+                              active ? 'bg-ctp-overlay0/30 text-ctp-lavender' : 'text-ctp-lavender',
+                              'block px-4 py-3 text-base font-medium nf transition-colors duration-200'
+                            )}
+                          >
+                            {item.name}
+                          </Link>
+                        )}
+                      </Menu.Item>
+                    ))}
+                  </div>
+                </Menu.Items>
+              </Transition>
+            </Menu>
+          </div>
+        </nav>
+      </div>
+    </header>
+  );
+};
+
+export default Header;

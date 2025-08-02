@@ -1,6 +1,6 @@
-import { type NextPage } from 'next'
-import Layout from '~/components/Layout'
-import SkillsSection from '~/components/skills/SkillsSection'
+import Layout from '@/components/Layout';
+import SkillsSection from '@/components/skills/SkillsSection';
+import { type NextPage } from 'next';
 
 const Skills: NextPage = () => {
   return (
@@ -9,7 +9,7 @@ const Skills: NextPage = () => {
         <SkillsSection />
       </div>
     </Layout>
-  )
-}
+  );
+};
 
-export default Skills
+export default Skills;

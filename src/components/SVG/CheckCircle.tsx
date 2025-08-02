@@ -1,8 +1,7 @@
-import uniqueId from '~/utils/uniqueId'
-import CatppuccinGradient from '../CatppuccinGradient'
+import CatppuccinGradient from '../CatppuccinGradient';
 
 const CheckCircle: React.FC = () => {
-  const gradientId = uniqueId('check-circle-gradient')
+  const gradientId = crypto.randomUUID();
 
   return (
     <svg
@@ -11,6 +10,7 @@ const CheckCircle: React.FC = () => {
       fill={`url(#${gradientId})`}
       className="mr-3 h-4 w-4"
     >
+      <title>Check Circle</title>
       <defs>
         <CatppuccinGradient id={gradientId} />
       </defs>
@@ -20,7 +20,7 @@ const CheckCircle: React.FC = () => {
         clipRule="evenodd"
       />
     </svg>
-  )
-}
+  );
+};
 
-export default CheckCircle
+export default CheckCircle;

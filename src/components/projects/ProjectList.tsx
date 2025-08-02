@@ -1,24 +1,18 @@
-import { api } from '~/utils/api'
-import ProjectItem from './ProjectItem'
-import ProjectItemSkeleton from './ProjectItemSkeleton'
+import { SanityDocument } from 'next-sanity';
+import ProjectItem from './ProjectItem';
 
-const ProjectList: React.FC = () => {
-  const projects = api.project.getAll.useQuery()
-
-  return (
-    <dl className="grid max-w-xl grid-cols-1 gap-x-8 gap-y-10 lg:max-w-none lg:grid-cols-2 lg:gap-y-16">
-      {projects.isLoading && (
-        <>
-          <ProjectItemSkeleton />
-          <ProjectItemSkeleton />
-        </>
-      )}
-
-      {projects.data?.map((project) => (
-        <ProjectItem key={project.id} project={project} />
-      ))}
-    </dl>
-  )
+interface ProjectListProps {
+  projects: SanityDocument[];
 }
 
-export default ProjectList
+const ProjectList: React.FC<ProjectListProps> = ({ projects }) => {
+  return (
+    <dl className="grid max-w-xl grid-cols-1 gap-x-8 gap-y-10 lg:max-w-none lg:grid-cols-2 lg:gap-y-16">
+      {projects.map((project) => (
+        <ProjectItem key={project._id} project={project} />
+      ))}
+    </dl>
+  );
+};
+
+export default ProjectList;

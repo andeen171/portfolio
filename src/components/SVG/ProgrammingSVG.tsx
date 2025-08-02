@@ -1,16 +1,17 @@
-import { useEffect, useState } from 'react'
-import { useCtpStore } from '~/store'
-import { variants } from '@catppuccin/palette'
-import CatppuccinGradient from '../CatppuccinGradient'
+import { uniqueId } from '@/lib/utils';
+import { useCtpStore } from '@/store';
+import { type CatppuccinColors, flavors } from '@catppuccin/palette';
+import { useEffect, useState } from 'react';
+import CatppuccinGradient from '../CatppuccinGradient';
 
 const ProgrammingSVG: React.FC = () => {
-  const gradientId = 'programming-svg-gradient'
-  const flavor = useCtpStore((state) => state.flavor)
-  const [labels, setLabels] = useState(variants.mocha)
+  const gradientId = uniqueId();
+  const flavor = useCtpStore((state) => state.flavor);
+  const [labels, setLabels] = useState<CatppuccinColors>(flavors.mocha.colors);
 
   useEffect(() => {
-    setLabels(variants[flavor])
-  }, [flavor])
+    setLabels(flavors[flavor].colors);
+  }, [flavors[flavor].colors]);
 
   return (
     <svg
@@ -22,15 +23,11 @@ const ProgrammingSVG: React.FC = () => {
       xmlnsXlink="http://www.w3.org/1999/xlink"
       className="h-fit w-fit"
     >
+      <title>Programming Dude</title>
       <defs>
         <CatppuccinGradient id={gradientId} />
       </defs>
-      <circle
-        cx="458.32136"
-        cy="74.18162"
-        r="26.70075"
-        fill={`url(#${gradientId})`}
-      />
+      <circle cx="458.32136" cy="74.18162" r="26.70075" fill={`url(#${gradientId})`} />
       <path
         d="M872.03753,661.02307c39.6877-30.22889,58.64352-81.02546,46.77635-129.48234q-.44231-1.806-.93367-3.6038c-7.86742-28.76343-27.33167-56.10058-55.7-65.29129-23.81971-7.71694-49.81962-1.78274-74.66936-4.85149-48.78136-6.02417-86.60057-45.494-113.21115-86.81933-26.61064-41.32546-47.06182-87.58331-82.42157-121.72413-58.28479-56.27536-153.36192-68.39149-225.62671-31.76044C293.98673,254.12142,247.95487,335.39062,249.918,416.38554c1.96322,80.995,50.04632,158.43176,119.87492,199.517,25.65222,15.093,55.32138,25.78522,84.84826,22.04377,25.62011-3.24641,48.89908-17.01264,74.39861-21.09959,40.09115-6.42568,79.92687,11.70084,114.60268,32.82375,34.67571,21.12288,68.17007,46.15988,107.57436,55.95242C789.47831,715.13139,836.88051,687.80109,872.03753,661.02307Z"
         transform="translate(-206.59003 -163.87113)"
@@ -681,27 +678,9 @@ const ProgrammingSVG: React.FC = () => {
         transform="translate(-206.59003 -163.87113)"
         fill={labels.surface0.hex}
       />
-      <ellipse
-        cx="116.05131"
-        cy="192.32963"
-        rx="5.95043"
-        ry="6.08304"
-        fill={labels.surface0.hex}
-      />
-      <ellipse
-        cx="136.60733"
-        cy="192.32963"
-        rx="5.95043"
-        ry="6.08304"
-        fill={labels.surface0.hex}
-      />
-      <ellipse
-        cx="157.16336"
-        cy="192.32963"
-        rx="5.95043"
-        ry="6.08304"
-        fill={labels.surface0.hex}
-      />
+      <ellipse cx="116.05131" cy="192.32963" rx="5.95043" ry="6.08304" fill={labels.surface0.hex} />
+      <ellipse cx="136.60733" cy="192.32963" rx="5.95043" ry="6.08304" fill={labels.surface0.hex} />
+      <ellipse cx="157.16336" cy="192.32963" rx="5.95043" ry="6.08304" fill={labels.surface0.hex} />
       <path
         d="M548.20637,351.622h-14.6a1.1053,1.1053,0,0,0,0,2.21h14.6a1.10511,1.10511,0,0,0,0-2.21Z"
         transform="translate(-206.59003 -163.87113)"
@@ -805,7 +784,7 @@ const ProgrammingSVG: React.FC = () => {
         opacity="0.2"
       />
     </svg>
-  )
-}
+  );
+};
 
-export default ProgrammingSVG
+export default ProgrammingSVG;

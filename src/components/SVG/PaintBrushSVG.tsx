@@ -1,8 +1,7 @@
-import CatppuccinGradient from '../CatppuccinGradient'
-import uniqueId from '~/utils/uniqueId'
+import CatppuccinGradient from '../CatppuccinGradient';
 
 const PaintBrushSVG: React.FC = () => {
-  const gradientId = uniqueId('paint-brush-svg-gradient')
+  const gradientId = crypto.randomUUID();
 
   return (
     <svg
@@ -11,6 +10,7 @@ const PaintBrushSVG: React.FC = () => {
       fill={`url(#${gradientId})`}
       className="mr-3 h-4 w-4"
     >
+      <title>Paint Brush</title>
       <defs>
         <CatppuccinGradient id={gradientId} />
       </defs>
@@ -20,7 +20,7 @@ const PaintBrushSVG: React.FC = () => {
         clipRule="evenodd"
       />
     </svg>
-  )
-}
+  );
+};
 
-export default PaintBrushSVG
+export default PaintBrushSVG;

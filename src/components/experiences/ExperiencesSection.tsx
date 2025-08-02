@@ -1,20 +1,25 @@
-import Link from 'next/link'
-import ExperienceList from './ExperienceList'
+import { SanityDocument } from 'next-sanity';
+import Link from 'next/link';
+import ExperienceList from './ExperienceList';
 
-const ExperiencesSection: React.FC = () => {
+interface Props {
+  experiences: SanityDocument[];
+}
+
+const ExperiencesSection: React.FC<Props> = ({ experiences }) => {
   return (
-    <section className="bg-ctp-base py-16">
-      <div className="container mx-auto px-6 lg:px-8">
-        <div className="animated-gradient-text mx-auto max-w-2xl lg:text-center">
-          <h2 className="text-base font-semibold leading-7">Experiences</h2>
-          <p className="py-2 text-3xl font-bold tracking-tight sm:text-4xl">
+    <section className="bg-ctp-base py-8 sm:py-12 md:py-16">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="animated-gradient-text mx-auto max-w-2xl text-center">
+          <h2 className="text-sm sm:text-base font-semibold leading-7">Experiences</h2>
+          <p className="py-2 text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight">
             Where I&apos;ve worked
           </p>
         </div>
-        <ExperienceList />
-        <div className="mt-8 text-center">
+        <ExperienceList experiences={experiences} />
+        <div className="mt-6 sm:mt-8 text-center">
           <Link
-            className="text-lg font-semibold text-ctp-lavender"
+            className="text-base sm:text-lg font-semibold text-ctp-lavender"
             href="/experiences"
           >
             View all experiences &rarr;
@@ -22,7 +27,7 @@ const ExperiencesSection: React.FC = () => {
         </div>
       </div>
     </section>
-  )
-}
+  );
+};
 
-export default ExperiencesSection
+export default ExperiencesSection;

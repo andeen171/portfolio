@@ -1,25 +1,24 @@
-import { type Experience } from '@prisma/client'
+import {SanityDocument} from 'next-sanity';
 
 interface ExperienceProps {
-  experience: Experience
+  experience: SanityDocument;
 }
 
 const ExperienceItem: React.FC<ExperienceProps> = ({ experience }) => {
   return (
-    <div className="rounded-lg bg-ctp-mantle p-4 text-ctp-text shadow-xl">
-      <h3 className="animated-gradient-text mb-4 text-2xl font-bold">
-        {experience.title}
+    <div className="rounded-lg bg-ctp-mantle p-3 sm:p-4 text-ctp-text shadow-xl">
+      <h3 className="animated-gradient-text mb-2 sm:mb-4 text-xl sm:text-2xl font-bold">
+        {experience.title[0].value}
       </h3>
-      <h4 className="animated-gradient-text mb-2 text-xl font-semibold">
+      <h4 className="animated-gradient-text mb-1 sm:mb-2 text-lg sm:text-xl font-semibold">
         {experience.company}
       </h4>
-      <p className="mb-2 text-sm text-ctp-subtext1">
-        Belo Horizonte &bull; {experience.startDate.toLocaleDateString()} -{' '}
-        {experience.endDate?.toLocaleDateString() || 'Present'}
+      <p className="mb-2 text-xs sm:text-sm text-ctp-subtext1">
+        {experience.location} &bull; {experience.startDate} - {experience.endDate || 'Present'}
       </p>
-      <p className="text-ctp-text">{experience.description}</p>
+      <p className="text-sm sm:text-base text-ctp-text">{experience.description[0].value}</p>
     </div>
-  )
-}
+  );
+};
 
-export default ExperienceItem
+export default ExperienceItem;

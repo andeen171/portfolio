@@ -1,8 +1,7 @@
-import CatppuccinGradient from '../CatppuccinGradient'
-import uniqueId from '~/utils/uniqueId'
+import CatppuccinGradient from '../CatppuccinGradient';
 
 const PaletteSVG: React.FC = () => {
-  const gradientId = uniqueId('palette-svg-gradient')
+  const gradientId = crypto.randomUUID();
 
   return (
     <svg
@@ -11,6 +10,7 @@ const PaletteSVG: React.FC = () => {
       fill={`url(#${gradientId})`}
       className="mr-3 h-5 w-5 transition-all"
     >
+      <title>Palette</title>
       <defs>
         <CatppuccinGradient id={gradientId} />
       </defs>
@@ -21,7 +21,7 @@ const PaletteSVG: React.FC = () => {
       />
       <path d="M10.719 21.75h9.156c1.036 0 1.875-.84 1.875-1.875v-5.25c0-1.036-.84-1.875-1.875-1.875h-.14l-8.742 8.743c-.09.089-.18.175-.274.257zM12.738 17.625l6.474-6.474a1.875 1.875 0 000-2.651L15.5 4.787a1.875 1.875 0 00-2.651 0l-.1.099V17.25c0 .126-.003.251-.01.375z" />
     </svg>
-  )
-}
+  );
+};
 
-export default PaletteSVG
+export default PaletteSVG;

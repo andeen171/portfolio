@@ -1,6 +1,6 @@
-import { type NextPage } from 'next'
-import Layout from '~/components/Layout'
-import AboutSection from '~/components/about/AboutSection'
+import Layout from '@/components/Layout';
+import AboutSection from '@/components/about/AboutSection';
+import { type NextPage } from 'next';
 
 const About: NextPage = () => {
   return (
@@ -9,7 +9,7 @@ const About: NextPage = () => {
         <AboutSection />
       </div>
     </Layout>
-  )
-}
+  );
+};
 
-export default About
+export default About;

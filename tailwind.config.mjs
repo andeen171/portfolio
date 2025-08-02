@@ -1,4 +1,4 @@
-import ctpPlugin from '@catppuccin/tailwindcss'
+import ctpPlugin from '@catppuccin/tailwindcss';
 
 const colors = [
   'rosewater',
@@ -19,20 +19,14 @@ const colors = [
   'mantle',
   'crust',
   'surface0',
-  'surface1'
-]
+  'surface1',
+];
 
-const safeList = [
-  'ctp-mocha',
-  'ctp-macchiato',
-  'ctp-frappe',
-  'ctp-latte',
-  'animate-colorchange'
-]
+const safeList = ['ctp-mocha', 'ctp-macchiato', 'ctp-frappe', 'ctp-latte', 'animate-colorchange'];
 colors.map((color) => {
-  safeList.push(`bg-ctp-${color}`)
-  safeList.push(`text-ctp-${color}`)
-})
+  safeList.push(`bg-ctp-${color}`);
+  safeList.push(`text-ctp-${color}`);
+});
 
 /** @type {import('tailwindcss').Config} */
 const config = {
@@ -40,28 +34,28 @@ const config = {
   theme: {
     extend: {
       animation: {
-        colorchange: 'colorchange 5s ease infinite'
+        colorchange: 'colorchange 5s ease infinite',
       },
       keyframes: {
         colorchange: {
           '0%, 100%': {
             'background-size': '200% 200%',
-            'background-position': 'left center'
+            'background-position': 'left center',
           },
           '50%': {
             'background-size': '200% 200%',
-            'background-position': 'right center'
-          }
-        }
-      }
-    }
+            'background-position': 'right center',
+          },
+        },
+      },
+    },
   },
   safelist: safeList,
   plugins: [
     ctpPlugin({
-      prefix: 'ctp'
-    })
-  ]
-}
+      prefix: 'ctp',
+    }),
+  ],
+};
 
-module.exports = config
+module.exports = config;

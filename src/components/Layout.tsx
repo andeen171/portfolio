@@ -1,19 +1,20 @@
-import { type ReactNode, useState, useEffect } from 'react'
-import { type Flavor, useCtpStore } from '~/store'
-import Header from '~/components/Header'
-import Footer from '~/components/Footer'
+import Footer from '@/components/Footer';
+import Header from '@/components/Header';
+import { useCtpStore } from '@/store';
+import { type FlavorName } from '@catppuccin/palette';
+import { type ReactNode, useEffect, useState } from 'react';
 
 interface LayoutProps {
-  children: ReactNode
+  children: ReactNode;
 }
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
-  const activeFlavor = useCtpStore((state) => state.flavor)
-  const [flavor, setFlavor] = useState<Flavor>('mocha')
+  const activeFlavor = useCtpStore((state) => state.flavor);
+  const [flavor, setFlavor] = useState<FlavorName>('mocha');
 
   useEffect(() => {
-    setFlavor(activeFlavor)
-  }, [activeFlavor])
+    setFlavor(activeFlavor);
+  }, [activeFlavor]);
 
   return (
     <main className={`ctp-${flavor} min-w-screen min-h-screen bg-ctp-base`}>
@@ -21,7 +22,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       {children}
       <Footer />
     </main>
-  )
-}
+  );
+};
 
-export default Layout
+export default Layout;
