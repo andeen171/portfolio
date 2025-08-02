@@ -34,9 +34,9 @@ const LanguageSelector: React.FC = () => {
               </span>
               <span
                 className="animate-colorchange bg-gradient-to-r from-ctp-teal via-ctp-lavender bg-clip-text
-                  text-sm font-semibold text-transparent nf md:mr-3 ml-2 hidden xl:inline-block"
+                  text-sm font-semibold text-transparent nf md:mr-3 ml-2 hidden sm:inline-block"
               >
-                {selected === 'en' ? 'EN' : 'PT'}
+                {selected.toUpperCase()}
               </span>
             </Listbox.Button>
 

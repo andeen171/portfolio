@@ -123,42 +123,36 @@ const Header: React.FC = () => {
                 leaveTo="transform opacity-0 scale-95"
               >
                 <Menu.Items className="absolute right-0 z-10 mt-2 w-42 origin-top-right rounded-xl bg-ctp-base/80 backdrop-blur-md shadow-xl ring-1 ring-ctp-overlay0/20 overflow-hidden focus:outline-none">
-                  <div className="py-1">
-                    {navigation.map((item) => {
-                      const isActive =
-                        currentPath === item.href ||
-                        (item.href !== '/' && currentPath.startsWith(item.href));
-                      const Icon = item.icon;
+                  {navigation.map((item) => {
+                    const isActive =
+                      currentPath === item.href ||
+                      (item.href !== '/' && currentPath.startsWith(item.href));
+                    const Icon = item.icon;
 
-                      return (
-                        <Menu.Item key={item.name}>
-                          {({ active }) => (
-                            <Link
-                              href={item.href}
-                              className={classNames(
-                                active
-                                  ? 'bg-ctp-overlay0/30 text-ctp-lavender'
-                                  : isActive
-                                    ? 'bg-ctp-surface0/50 text-ctp-lavender'
-                                    : 'text-ctp-text',
-                                'flex items-center gap-2 px-4 py-3 text-base font-medium nf transition-colors duration-200'
-                              )}
-                            >
-                              <Icon
-                                className={`h-5 w-5 ${
-                                  isActive ? 'text-ctp-lavender' : 'text-ctp-subtext0'
-                                }`}
-                              />
-                              {item.name}
-                              {isActive && (
-                                <span className="ml-auto h-2 w-2 rounded-full bg-ctp-lavender" />
-                              )}
-                            </Link>
-                          )}
-                        </Menu.Item>
-                      );
-                    })}
-                  </div>
+                    return (
+                      <Menu.Item key={item.name}>
+                        {({ active }) => (
+                          <Link
+                            href={item.href}
+                            className={classNames(
+                              active
+                                ? 'bg-ctp-overlay0/30 text-ctp-lavender'
+                                : isActive
+                                  ? 'text-ctp-lavender'
+                                  : 'text-ctp-text',
+                              'flex items-center gap-2 px-4 py-3 text-base font-medium nf transition-colors duration-200'
+                            )}
+                          >
+                            <Icon className="h-5 w-5" />
+                            {item.name}
+                            {isActive && (
+                              <span className="ml-auto h-2 w-2 rounded-full bg-ctp-lavender" />
+                            )}
+                          </Link>
+                        )}
+                      </Menu.Item>
+                    );
+                  })}
                 </Menu.Items>
               </Transition>
             </Menu>

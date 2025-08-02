@@ -1,8 +1,8 @@
+import ProfilePic from '@/img/icon.png';
 import { useTranslations } from '@/translations';
 import Image from 'next/image';
 import { useEffect, useRef } from 'react';
 import Typed from 'typed.js';
-import ProfilePic from './eu_catppuccin.png';
 
 const AboutSection: React.FC = () => {
   const t = useTranslations();
@@ -51,39 +51,6 @@ const AboutSection: React.FC = () => {
             placeholder="blur"
             alt="Me, Myself and I"
           />
-        </div>
-        <div className="lg:col-span-2 lg:col-start-1 lg:row-start-2 lg:mx-auto lg:grid lg:w-full lg:max-w-7xl lg:grid-cols-2 lg:gap-x-8 lg:px-8">
-          <div className="lg:pr-4">
-            <div className="max-w-xl text-base leading-7 text-ctp-subtext1 lg:max-w-lg">
-              <h2 className="animated-gradient-text text-2xl font-bold tracking-tight">
-                {t.about.connect}
-              </h2>
-              <ul className="mt-8 space-y-4">
-                <li className="flex flex-col items-start">
-                  <div className="animated-gradient-text flex items-center">
-                    <div className="h-8 w-10 ">
-                      <i className="devicon-linkedin-plain flex-none text-2xl" />
-                    </div>
-                    <dt className="mb-2 ml-2 pt-6 text-base leading-7">
-                      <strong className="font-semibold">{t.about.linkedin.title}</strong>
-                      <span className="ml-2 text-ctp-subtext0">{t.about.linkedin.description}</span>
-                    </dt>
-                  </div>
-                </li>
-                <li className="flex flex-col items-start">
-                  <div className="animated-gradient-text flex items-center">
-                    <div className="h-8 w-10 ">
-                      <i className="devicon-github-plain flex-none text-2xl" />
-                    </div>
-                    <dt className="mb-2 ml-2 pt-6 text-base leading-7">
-                      <strong className="font-semibold">{t.about.github.title}</strong>
-                      <span className="ml-2 text-ctp-subtext0">{t.about.github.description}</span>
-                    </dt>
-                  </div>
-                </li>
-              </ul>
-            </div>
-          </div>
         </div>
       </div>
     </div>
