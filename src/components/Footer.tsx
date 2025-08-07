@@ -52,60 +52,75 @@ const Footer: React.FC = () => {
 
   const socialIconClasses = 'text-ctp-subtext0 transition-colors duration-300';
 
+  const socialContacts = [
+    {
+      name: 'LinkedIn',
+      url: 'https://www.linkedin.com/in/andeen171',
+      icon: LinkedInIcon,
+      hoverColor: 'hover:text-ctp-sapphire',
+    },
+    {
+      name: 'Instagram',
+      url: 'https://www.instagram.com/eulmesmo/',
+      icon: InstagramIcon,
+      hoverColor: 'hover:text-ctp-maroon',
+    },
+    {
+      name: 'X',
+      url: 'https://x.com/Andeen171',
+      icon: XIcon,
+      hoverColor: 'hover:text-ctp-sky',
+    },
+    {
+      name: 'GitHub',
+      url: 'https://github.com/andeen171',
+      icon: GithubIcon,
+      hoverColor: 'hover:text-ctp-mauve',
+    },
+  ];
+
   return (
-    <footer aria-label="Site Footer" className="relative bg-ctp-base z-10">
+    <footer aria-label="Site Footer" className="relative bg-ctp-base z-10 mt-16">
       <div className="mx-auto max-w-5xl px-4 py-16 sm:px-6 lg:px-8">
-        <p className="flex justify-center text-center text-ctp-subtext0 font-medium italic">
-          "Ambição sem esforço é apenas ganancia"
+        <p className="flex mb-12 sm:mb-8 justify-center text-center animated-gradient-text font-medium italic text-xl md:text-2xl ">
+          "Ambição sem esforço é apenas ganância"
         </p>
 
-        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-ctp-lavender/20 to-transparent" />
-      </div>
-
-      <div
-        className={`
-          ${isFloating ? 'fixed bottom-5 right-5' : 'absolute bottom-16 right-5'}
-          z-50 transition-all duration-300 ease-in-out
-        `}
-      >
-        <div className="flex flex-col items-center gap-y-4 rounded-full p-3 bg-ctp-base/80 backdrop-blur-lg border border-ctp-overlay0/20 shadow-lg">
-          <a
-            href="https://www.linkedin.com/in/andeen171"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={`${socialIconClasses} hover:text-ctp-sapphire`}
+        <div
+          className={`
+            ${isFloating ? 'fixed bottom-5 right-5 z-50' : 'relative flex justify-center mb-8 z-10'}
+            transition-all duration-500 ease-in-out
+          `}
+        >
+          <div
+            className={`
+              flex items-center gap-6 p-4 transition-all duration-500 ease-in-out
+              ${
+                isFloating
+                  ? 'flex-row sm:flex-col rounded-full bg-ctp-base/80 backdrop-blur-lg border border-ctp-overlay0/20 shadow-lg'
+                  : 'flex-row rounded-none bg-transparent border-0 shadow-none'
+              }
+            `}
           >
-            <span className="sr-only">LinkedIn</span>
-            <LinkedInIcon />
-          </a>
-          <a
-            href="https://www.instagram.com/eulmesmo/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={`${socialIconClasses} hover:text-ctp-maroon`}
-          >
-            <span className="sr-only">Instagram</span>
-            <InstagramIcon />
-          </a>
-          <a
-            href="https://x.com/Andeen171"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={`${socialIconClasses} hover:text-ctp-sky`}
-          >
-            <span className="sr-only">X</span>
-            <XIcon />
-          </a>
-          <a
-            href="https://github.com/andeen171"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={`${socialIconClasses} hover:text-ctp-mauve`}
-          >
-            <span className="sr-only">GitHub</span>
-            <GithubIcon />
-          </a>
+            {socialContacts.map((contact) => {
+              const IconComponent = contact.icon;
+              return (
+                <a
+                  key={contact.name}
+                  href={contact.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`${socialIconClasses} ${contact.hoverColor}`}
+                >
+                  <span className="sr-only">{contact.name}</span>
+                  <IconComponent />
+                </a>
+              );
+            })}
+          </div>
         </div>
+
+        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-ctp-lavender/20 to-transparent" />
       </div>
     </footer>
   );
