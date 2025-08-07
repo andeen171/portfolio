@@ -1,12 +1,6 @@
 import { Translations, useTranslations } from '@/translations';
 import { Menu, Transition } from '@headlessui/react';
-import {
-  Bars3Icon,
-  BriefcaseIcon,
-  CodeBracketIcon,
-  CommandLineIcon,
-  HomeIcon,
-} from '@heroicons/react/24/outline';
+import { Bars3Icon, BriefcaseIcon, CodeBracketIcon, CommandLineIcon, HomeIcon, } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { Fragment, useEffect, useState } from 'react';
@@ -43,8 +37,8 @@ const Header: React.FC = () => {
   return (
     <header
       className={classNames(
-        'fixed inset-x-0 top-0 z-50 transition-all duration-300 w-full max-w-[100vw]',
-        scrolled ? 'py-2 bg-ctp-base/80 backdrop-blur-lg shadow-lg' : 'py-4'
+        'fixed inset-x-0 sm:py-4 top-0 z-50 py-2 transition-all duration-300 w-full max-w-[100vw]',
+        scrolled ? 'bg-ctp-base/80 backdrop-blur-lg shadow-lg' : ''
       )}
     >
       <div
