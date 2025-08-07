@@ -32,6 +32,33 @@ const GithubIcon = () => (
   </svg>
 );
 
+const socialContacts = [
+  {
+    name: 'LinkedIn',
+    url: 'https://www.linkedin.com/in/andeen171',
+    icon: LinkedInIcon,
+    hoverColor: 'hover:text-ctp-sapphire',
+  },
+  {
+    name: 'Instagram',
+    url: 'https://www.instagram.com/eulmesmo/',
+    icon: InstagramIcon,
+    hoverColor: 'hover:text-ctp-maroon',
+  },
+  {
+    name: 'X',
+    url: 'https://x.com/Andeen171',
+    icon: XIcon,
+    hoverColor: 'hover:text-ctp-sky',
+  },
+  {
+    name: 'GitHub',
+    url: 'https://github.com/andeen171',
+    icon: GithubIcon,
+    hoverColor: 'hover:text-ctp-mauve',
+  },
+];
+
 const Footer: React.FC = () => {
   const [isFloating, setIsFloating] = useState(true);
 
@@ -49,35 +76,6 @@ const Footer: React.FC = () => {
     handleScroll();
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
-
-  const socialIconClasses = 'text-ctp-subtext0 transition-colors duration-300';
-
-  const socialContacts = [
-    {
-      name: 'LinkedIn',
-      url: 'https://www.linkedin.com/in/andeen171',
-      icon: LinkedInIcon,
-      hoverColor: 'hover:text-ctp-sapphire',
-    },
-    {
-      name: 'Instagram',
-      url: 'https://www.instagram.com/eulmesmo/',
-      icon: InstagramIcon,
-      hoverColor: 'hover:text-ctp-maroon',
-    },
-    {
-      name: 'X',
-      url: 'https://x.com/Andeen171',
-      icon: XIcon,
-      hoverColor: 'hover:text-ctp-sky',
-    },
-    {
-      name: 'GitHub',
-      url: 'https://github.com/andeen171',
-      icon: GithubIcon,
-      hoverColor: 'hover:text-ctp-mauve',
-    },
-  ];
 
   return (
     <footer aria-label="Site Footer" className="relative bg-ctp-base z-10 mt-16">
@@ -110,7 +108,7 @@ const Footer: React.FC = () => {
                   href={contact.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={`${socialIconClasses} ${contact.hoverColor}`}
+                  className={`text-ctp-subtext0 transition-colors duration-300 ${contact.hoverColor}`}
                 >
                   <span className="sr-only">{contact.name}</span>
                   <IconComponent />
