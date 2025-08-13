@@ -1,6 +1,8 @@
 import { cn } from '@/lib/utils';
+import { useCtpStore } from '@/store';
+import { type CatppuccinColors, flavors } from '@catppuccin/palette';
 import { Properties } from 'csstype';
-import { useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 export const GlareCard = ({
   children,
@@ -9,6 +11,8 @@ export const GlareCard = ({
   children: React.ReactNode;
   className?: string;
 }) => {
+  const flavor = useCtpStore((state) => state.flavor);
+  const [colors, setColors] = useState<CatppuccinColors>(flavors[flavor].colors);
   const isPointerInside = useRef(false);
   const refElement = useRef<HTMLDivElement>(null);
   const state = useRef({
@@ -25,6 +29,13 @@ export const GlareCard = ({
       y: 0,
     },
   });
+
+  useEffect(() => {
+    setColors(flavors[flavor].colors);
+  }, [flavors[flavor]]);
+
+  const isLightTheme = flavor === 'latte';
+  const opacityMultiplier = isLightTheme ? 1.5 : 1;
 
   const containerStyle = {
     '--m-x': '50%',
@@ -43,15 +54,51 @@ export const GlareCard = ({
 
   const backgroundStyle = {
     '--step': '4%',
-    '--subtle-pattern': `url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='20' cy='20' r='1' fill='%23cba6f7' fill-opacity='0.1'/%3E%3C/svg%3E")`,
+    '--subtle-pattern': `url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='20' cy='20' r='1' fill='${colors.lavender.hex.replace(
+      '#',
+      '%23'
+    )}' fill-opacity='${isLightTheme ? '0.3' : '0.1'}'/%3E%3C/svg%3E")`,
     '--pattern': 'var(--subtle-pattern) center/80px 80px repeat',
-    '--catppuccin-rainbow':
-      'repeating-linear-gradient( 45deg, rgba(var(--ctp-teal), 0.8) calc(var(--step) * 1), rgba(var(--ctp-sky), 0.7) calc(var(--step) * 2), rgba(var(--ctp-sapphire), 0.8) calc(var(--step) * 3), rgba(var(--ctp-blue), 0.7) calc(var(--step) * 4), rgba(var(--ctp-lavender), 0.9) calc(var(--step) * 5), rgba(var(--ctp-pink), 0.8) calc(var(--step) * 6), rgba(var(--ctp-mauve), 0.7) calc(var(--step) * 7) ) 0% var(--bg-y)/200% 600% no-repeat',
-    '--diagonal':
-      'repeating-linear-gradient( 135deg, rgba(var(--ctp-surface0), 0.4) 0%, rgba(var(--ctp-surface1), 0.6) 2px, rgba(var(--ctp-surface0), 0.4) 4px, rgba(var(--ctp-mantle), 0.3) 8px ) var(--bg-x) var(--bg-y)/150% 150% no-repeat',
-    '--shine':
-      'linear-gradient( 45deg, transparent 30%, rgba(var(--ctp-lavender), 0.1) 50%, transparent 70% ) var(--bg-x) var(--bg-y)/200% 200% no-repeat',
-    backgroundBlendMode: 'soft-light, hue, multiply, overlay',
+    '--catppuccin-rainbow': `repeating-linear-gradient( 45deg, rgba(${colors.teal.rgb.r}, ${
+      colors.teal.rgb.g
+    }, ${colors.teal.rgb.b}, ${0.8 * opacityMultiplier}) calc(var(--step) * 1), rgba(${
+      colors.sky.rgb.r
+    }, ${colors.sky.rgb.g}, ${colors.sky.rgb.b}, ${
+      0.7 * opacityMultiplier
+    }) calc(var(--step) * 2), rgba(${colors.sapphire.rgb.r}, ${colors.sapphire.rgb.g}, ${
+      colors.sapphire.rgb.b
+    }, ${0.8 * opacityMultiplier}) calc(var(--step) * 3), rgba(${colors.blue.rgb.r}, ${
+      colors.blue.rgb.g
+    }, ${colors.blue.rgb.b}, ${0.7 * opacityMultiplier}) calc(var(--step) * 4), rgba(${
+      colors.lavender.rgb.r
+    }, ${colors.lavender.rgb.g}, ${colors.lavender.rgb.b}, ${
+      0.9 * opacityMultiplier
+    }) calc(var(--step) * 5), rgba(${colors.pink.rgb.r}, ${colors.pink.rgb.g}, ${
+      colors.pink.rgb.b
+    }, ${0.8 * opacityMultiplier}) calc(var(--step) * 6), rgba(${colors.mauve.rgb.r}, ${
+      colors.mauve.rgb.g
+    }, ${colors.mauve.rgb.b}, ${
+      0.7 * opacityMultiplier
+    }) calc(var(--step) * 7) ) 0% var(--bg-y)/200% 600% no-repeat`,
+    '--diagonal': `repeating-linear-gradient( 135deg, rgba(${colors.surface0.rgb.r}, ${
+      colors.surface0.rgb.g
+    }, ${colors.surface0.rgb.b}, ${0.4 * opacityMultiplier}) 0%, rgba(${colors.surface1.rgb.r}, ${
+      colors.surface1.rgb.g
+    }, ${colors.surface1.rgb.b}, ${0.6 * opacityMultiplier}) 2px, rgba(${colors.surface0.rgb.r}, ${
+      colors.surface0.rgb.g
+    }, ${colors.surface0.rgb.b}, ${0.4 * opacityMultiplier}) 4px, rgba(${colors.mantle.rgb.r}, ${
+      colors.mantle.rgb.g
+    }, ${colors.mantle.rgb.b}, ${
+      0.3 * opacityMultiplier
+    }) 8px ) var(--bg-x) var(--bg-y)/150% 150% no-repeat`,
+    '--shine': `linear-gradient( 45deg, transparent 30%, rgba(${colors.lavender.rgb.r}, ${
+      colors.lavender.rgb.g
+    }, ${colors.lavender.rgb.b}, ${
+      0.15 * opacityMultiplier
+    }) 50%, transparent 70% ) var(--bg-x) var(--bg-y)/200% 200% no-repeat`,
+    backgroundBlendMode: isLightTheme
+      ? 'multiply, overlay, soft-light'
+      : 'soft-light, hue, multiply, overlay',
   };
 
   const updateStyles = () => {
@@ -118,11 +165,30 @@ export const GlareCard = ({
         }
       }}
     >
-      <div className="h-full grid will-change-transform origin-center transition-transform duration-[var(--duration)] ease-[var(--easing)] [transform:rotateY(var(--r-x))_rotateX(var(--r-y))] rounded-[var(--radius)] border border-ctp-surface0 hover:[--opacity:0.9] hover:[--duration:150ms] hover:[--easing:linear] overflow-hidden shadow-lg">
+      <div
+        className={`h-full grid will-change-transform origin-center transition-transform duration-[var(--duration)] ease-[var(--easing)] [transform:rotateY(var(--r-x))_rotateX(var(--r-y))] rounded-[var(--radius)] border border-ctp-surface0 hover:[--duration:150ms] hover:[--easing:linear] overflow-hidden shadow-lg ${
+          isLightTheme ? 'hover:[--opacity:1.2]' : 'hover:[--opacity:0.9]'
+        }`}
+      >
         <div className="w-full h-full grid [grid-area:1/1] mix-blend-soft-light [clip-path:inset(0_0_0_0_round_var(--radius))]">
           <div className={cn('h-full w-full bg-ctp-mantle', className)}>{children}</div>
         </div>
-        <div className="w-full h-full grid [grid-area:1/1] mix-blend-soft-light [clip-path:inset(0_0_1px_0_round_var(--radius))] opacity-[var(--opacity)] transition-opacity duration-[var(--duration)] ease-[var(--easing)] will-change-background [background:radial-gradient(farthest-corner_circle_at_var(--m-x)_var(--m-y),_rgba(203,166,247,0.9)_5%,_rgba(148,226,213,0.7)_15%,_rgba(245,194,231,0.5)_30%,_rgba(137,220,235,0.3)_50%,_transparent_90%)]" />
+        <div
+          className="w-full h-full grid [grid-area:1/1] mix-blend-soft-light [clip-path:inset(0_0_1px_0_round_var(--radius))] opacity-[var(--opacity)] transition-opacity duration-[var(--duration)] ease-[var(--easing)] will-change-background"
+          style={{
+            background: `radial-gradient(farthest-corner_circle_at_var(--m-x)_var(--m-y), rgba(${
+              colors.lavender.rgb.r
+            }, ${colors.lavender.rgb.g}, ${colors.lavender.rgb.b}, ${
+              0.9 * opacityMultiplier
+            }) 5%, rgba(${colors.teal.rgb.r}, ${colors.teal.rgb.g}, ${colors.teal.rgb.b}, ${
+              0.7 * opacityMultiplier
+            }) 15%, rgba(${colors.pink.rgb.r}, ${colors.pink.rgb.g}, ${colors.pink.rgb.b}, ${
+              0.5 * opacityMultiplier
+            }) 30%, rgba(${colors.sky.rgb.r}, ${colors.sky.rgb.g}, ${colors.sky.rgb.b}, ${
+              0.3 * opacityMultiplier
+            }) 50%, transparent 90%)`,
+          }}
+        />
         <div
           className="w-full h-full grid [grid-area:1/1] mix-blend-color-dodge opacity-[var(--opacity)] will-change-background transition-opacity [clip-path:inset(0_0_1px_0_round_var(--radius))] relative after:content-[''] after:absolute after:inset-0 after:bg-gradient-to-br after:from-transparent after:via-white/5 after:to-transparent after:mix-blend-overlay"
           style={{

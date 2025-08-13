@@ -23,3 +23,16 @@ html, body {
 .nf {
   font-family: 'FiraCode Nerd Font Mono', monospace !important;
 }
+
+.skill-svg-container svg,
+.skill-svg-container-modal svg {
+  width: 100%;
+  height: 100%;
+}
+
+.skill-svg-container-modal path,
+.skill-svg-container-modal circle,
+.skill-svg-container-modal rect,
+.skill-svg-container-modal polygon {
+  fill: url(#skillGradientModal) !important;
+}
