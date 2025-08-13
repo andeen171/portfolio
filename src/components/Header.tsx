@@ -1,6 +1,12 @@
 import { Translations, useTranslations } from '@/translations';
 import { Menu, Transition } from '@headlessui/react';
-import { Bars3Icon, BriefcaseIcon, CodeBracketIcon, CommandLineIcon, HomeIcon, } from '@heroicons/react/24/outline';
+import {
+  Bars3Icon,
+  BriefcaseIcon,
+  CodeBracketIcon,
+  CommandLineIcon,
+  HomeIcon,
+} from '@heroicons/react/24/outline';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { Fragment, useEffect, useState } from 'react';

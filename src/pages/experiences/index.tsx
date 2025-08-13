@@ -8,7 +8,19 @@ import { type SanityDocument } from 'next-sanity';
 
 const EXPERIENCES_QUERY = `*[
   _type == "experience"
-]`;
+] | order(startDate desc) {
+    title,
+    company,
+    location,
+    startDate,
+    endDate,
+    description,
+    skills[]-> {
+      name,
+      description,
+      svgCode
+    }
+  }`;
 
 const options = { next: { revalidate: 30 } };
 

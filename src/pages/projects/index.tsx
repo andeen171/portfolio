@@ -9,7 +9,7 @@ const PROJECTS_QUERY = `*[
   _type == "project"
 ]{ 
   _id, 
-  _createdAt,
+  date,
   name,
   description,
   repo,
@@ -17,7 +17,7 @@ const PROJECTS_QUERY = `*[
   images,
   "skills": skills[]->{ _id, name },
   year
-} | order(_createdAt desc)`;
+} | order(date desc)`;
 
 const options = { next: { revalidate: 30 } };
 

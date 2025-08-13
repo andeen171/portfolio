@@ -23,7 +23,7 @@ const ProjectTimeline: React.FC<ProjectTimelineProps> = ({ projects }) => {
   const groupedProjects = projects.reduce(
     (acc, project) => {
       // Extrai o ano do projeto (assumindo que existe um campo year ou usando createdAt)
-      const year = project.year || new Date(project._createdAt).getFullYear().toString();
+      const year = project.year || new Date(project.date).getFullYear().toString();
 
       if (!acc[year]) {
         acc[year] = [];

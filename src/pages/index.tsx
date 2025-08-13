@@ -11,13 +11,13 @@ import Head from 'next/head';
 
 const EXPERIENCES_QUERY = `*[
   _type == "experience"
-] | order(startDate desc)[0..5]`;
+] | order(startDate desc)[0..2]`;
 
 const PROJECTS_QUERY = `*[
   _type == "project"
 ]{ 
   _id, 
-  _createdAt,
+  date,
   name,
   description,
   repo,
@@ -25,7 +25,7 @@ const PROJECTS_QUERY = `*[
   images,
   "skills": skills[]->{ _id, name },
   year
-} | order(_createdAt desc)[0..5]`;
+} | order(date desc)[0..3]`;
 
 const SKILLS_QUERY = `*[
   _type == "skill"
