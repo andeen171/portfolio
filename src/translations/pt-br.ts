@@ -9,7 +9,7 @@ export const ptBr = {
   home: {
     hero: {
       greeting: 'Olá, eu sou',
-      subtitle: 'Desenvolvedor de Software',
+      subtitle: 'Desenvolvedor, Empreendedor e Pai',
       description: 'Eu construo coisas para web e mobile',
     },
   },

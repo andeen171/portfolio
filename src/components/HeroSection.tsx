@@ -1,9 +1,11 @@
 import ProgrammingSVG from '@/components/SVG/ProgrammingSVG';
+import { useTranslations } from '@/translations';
 import { useEffect, useRef } from 'react';
 import Typed from 'typed.js';
 import BackgroundBlurSVG from './SVG/BackgroundBlurSVG';
 
 const HeroSection: React.FC = () => {
+  const t = useTranslations();
   const nameRef = useRef(null);
 
   useEffect(() => {
@@ -26,12 +28,12 @@ const HeroSection: React.FC = () => {
         <ProgrammingSVG />
       </div>
       {/* Text below SVG in mobile, side by side in md screens */}
-      <div className="animated-gradient-text w-full py-2 px-4 sm:pl-8 md:pl-12 md:pt-12 lg:h-full lg:w-[50vw]">
+      <div className="animated-gradient-text w-full sm:pl-8 md:pl-12 md:pt-12 lg:h-full lg:w-[50vw] text-4xl sm:text-5xl md:text-6xl">
         <span
           className="text-left text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight"
           ref={nameRef}
         />
-        <p className="text-left text-base sm:text-lg font-semibold">Full Stack Developer</p>
+        <p className="text-left text-base sm:text-lg font-semibold">{t.home.hero.subtitle}</p>
       </div>
       <BackgroundBlurSVG />
     </div>

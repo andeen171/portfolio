@@ -9,7 +9,7 @@ export const en = {
   home: {
     hero: {
       greeting: "Hi, I'm",
-      subtitle: 'Software Developer',
+      subtitle: 'Developer, Entrepreneur and Father',
       description: 'I build things for the web and mobile',
     },
   },
