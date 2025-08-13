@@ -1,4 +1,5 @@
 import { cn } from '@/lib/utils';
+import { Properties } from 'csstype';
 import { useRef } from 'react';
 
 export const GlareCard = ({
@@ -38,19 +39,19 @@ export const GlareCard = ({
     '--radius': '16px',
     '--easing': 'ease',
     '--transition': 'var(--duration) var(--easing)',
-  } as any;
+  } as Properties<string | number>;
 
   const backgroundStyle = {
-    '--step': '5%',
-    '--foil-svg': `url("data:image/svg+xml,%3Csvg width='26' height='26' viewBox='0 0 26 26' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M2.99994 3.419C2.99994 3.419 21.6142 7.43646 22.7921 12.153C23.97 16.8695 3.41838 23.0306 3.41838 23.0306' stroke='white' stroke-width='3' stroke-miterlimit='3.86874' stroke-linecap='round' style='mix-blend-mode:darken'/%3E%3C/svg%3E")`,
-    '--pattern': 'var(--foil-svg) center/100% no-repeat',
+    '--step': '4%',
+    '--subtle-pattern': `url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='20' cy='20' r='1' fill='%23cba6f7' fill-opacity='0.1'/%3E%3C/svg%3E")`,
+    '--pattern': 'var(--subtle-pattern) center/80px 80px repeat',
     '--catppuccin-rainbow':
-      'repeating-linear-gradient( 45deg, rgb(var(--ctp-teal)) calc(var(--step) * 1), rgb(var(--ctp-sky)) calc(var(--step) * 2), rgb(var(--ctp-sapphire)) calc(var(--step) * 3), rgb(var(--ctp-blue)) calc(var(--step) * 4), rgb(var(--ctp-lavender)) calc(var(--step) * 5), rgb(var(--ctp-pink)) calc(var(--step) * 6), rgb(var(--ctp-mauve)) calc(var(--step) * 7) ) 0% var(--bg-y)/200% 700% no-repeat',
+      'repeating-linear-gradient( 45deg, rgba(var(--ctp-teal), 0.8) calc(var(--step) * 1), rgba(var(--ctp-sky), 0.7) calc(var(--step) * 2), rgba(var(--ctp-sapphire), 0.8) calc(var(--step) * 3), rgba(var(--ctp-blue), 0.7) calc(var(--step) * 4), rgba(var(--ctp-lavender), 0.9) calc(var(--step) * 5), rgba(var(--ctp-pink), 0.8) calc(var(--step) * 6), rgba(var(--ctp-mauve), 0.7) calc(var(--step) * 7) ) 0% var(--bg-y)/200% 600% no-repeat',
     '--diagonal':
-      'repeating-linear-gradient( 128deg, rgb(var(--ctp-crust)) 0%, rgb(var(--ctp-surface0)) 3.8%, rgb(var(--ctp-surface1)) 4.5%, rgb(var(--ctp-surface2)) 5.2%, rgb(var(--ctp-mantle)) 10%, rgb(var(--ctp-base)) 12% ) var(--bg-x) var(--bg-y)/300% no-repeat',
-    '--shade':
-      'radial-gradient( farthest-corner circle at var(--m-x) var(--m-y), rgba(var(--ctp-text), 0.1) 12%, rgba(var(--ctp-text), 0.15) 20%, rgba(var(--ctp-text), 0.25) 120% ) var(--bg-x) var(--bg-y)/300% no-repeat',
-    backgroundBlendMode: 'hue, hue, hue, overlay',
+      'repeating-linear-gradient( 135deg, rgba(var(--ctp-surface0), 0.4) 0%, rgba(var(--ctp-surface1), 0.6) 2px, rgba(var(--ctp-surface0), 0.4) 4px, rgba(var(--ctp-mantle), 0.3) 8px ) var(--bg-x) var(--bg-y)/150% 150% no-repeat',
+    '--shine':
+      'linear-gradient( 45deg, transparent 30%, rgba(var(--ctp-lavender), 0.1) 50%, transparent 70% ) var(--bg-x) var(--bg-y)/200% 200% no-repeat',
+    backgroundBlendMode: 'soft-light, hue, multiply, overlay',
   };
 
   const updateStyles = () => {
@@ -117,14 +118,19 @@ export const GlareCard = ({
         }
       }}
     >
-      <div className="h-full grid will-change-transform origin-center transition-transform duration-[var(--duration)] ease-[var(--easing)] [transform:rotateY(var(--r-x))_rotateX(var(--r-y))] rounded-[var(--radius)] border border-ctp-surface0 hover:[--opacity:0.8] hover:[--duration:200ms] hover:[--easing:linear] overflow-hidden shadow-lg">
+      <div className="h-full grid will-change-transform origin-center transition-transform duration-[var(--duration)] ease-[var(--easing)] [transform:rotateY(var(--r-x))_rotateX(var(--r-y))] rounded-[var(--radius)] border border-ctp-surface0 hover:[--opacity:0.9] hover:[--duration:150ms] hover:[--easing:linear] overflow-hidden shadow-lg">
         <div className="w-full h-full grid [grid-area:1/1] mix-blend-soft-light [clip-path:inset(0_0_0_0_round_var(--radius))]">
           <div className={cn('h-full w-full bg-ctp-mantle', className)}>{children}</div>
         </div>
-        <div className="w-full h-full grid [grid-area:1/1] mix-blend-soft-light [clip-path:inset(0_0_1px_0_round_var(--radius))] opacity-[var(--opacity)] transition-opacity duration-[var(--duration)] ease-[var(--easing)] will-change-background [background:radial-gradient(farthest-corner_circle_at_var(--m-x)_var(--m-y),_rgba(var(--ctp-lavender),0.8)_10%,_rgba(var(--ctp-teal),0.65)_20%,_rgba(var(--ctp-pink),0)_90%)]" />
+        <div className="w-full h-full grid [grid-area:1/1] mix-blend-soft-light [clip-path:inset(0_0_1px_0_round_var(--radius))] opacity-[var(--opacity)] transition-opacity duration-[var(--duration)] ease-[var(--easing)] will-change-background [background:radial-gradient(farthest-corner_circle_at_var(--m-x)_var(--m-y),_rgba(203,166,247,0.9)_5%,_rgba(148,226,213,0.7)_15%,_rgba(245,194,231,0.5)_30%,_rgba(137,220,235,0.3)_50%,_transparent_90%)]" />
         <div
-          className="w-full h-full grid [grid-area:1/1] mix-blend-color-dodge opacity-[var(--opacity)] will-change-background transition-opacity [clip-path:inset(0_0_1px_0_round_var(--radius))] [background-blend-mode:hue_hue_hue_overlay] [background:var(--pattern),_var(--catppuccin-rainbow),_var(--diagonal),_var(--shade)] relative after:content-[''] after:grid-area-[inherit] after:bg-repeat-[inherit] after:bg-attachment-[inherit] after:bg-origin-[inherit] after:bg-clip-[inherit] after:bg-[inherit] after:mix-blend-exclusion after:[background-size:var(--foil-size),_200%_400%,_800%,_200%] after:[background-position:center,_0%_var(--bg-y),_calc(var(--bg-x)*_-1)_calc(var(--bg-y)*_-1),_var(--bg-x)_var(--bg-y)] after:[background-blend-mode:soft-light,_hue,_hard-light]"
-          style={{ ...backgroundStyle }}
+          className="w-full h-full grid [grid-area:1/1] mix-blend-color-dodge opacity-[var(--opacity)] will-change-background transition-opacity [clip-path:inset(0_0_1px_0_round_var(--radius))] relative after:content-[''] after:absolute after:inset-0 after:bg-gradient-to-br after:from-transparent after:via-white/5 after:to-transparent after:mix-blend-overlay"
+          style={{
+            background: 'var(--catppuccin-rainbow), var(--diagonal), var(--shine)',
+            backgroundSize: '200% 600%, 150% 150%, 200% 200%',
+            backgroundPosition: '0% var(--bg-y), var(--bg-x) var(--bg-y), var(--bg-x) var(--bg-y)',
+            ...backgroundStyle,
+          }}
         />
       </div>
     </div>
