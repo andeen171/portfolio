@@ -37,7 +37,7 @@ export default function Experiences({
 
   return (
     <Layout>
-      <section className="bg-ctp-base py-16 sm:py-20 md:py-32 mt-12">
+      <section className="py-16 sm:py-20 md:py-32 mt-12">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="animated-gradient-text mx-auto max-w-2xl text-center mb-10">
             <h2 className="text-sm sm:text-base font-semibold leading-7">{t.experiences.title}</h2>
