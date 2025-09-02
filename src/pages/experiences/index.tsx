@@ -2,7 +2,7 @@ import Layout from '@/components/Layout';
 import { InferGetStaticPropsType } from 'next';
 
 import ExperienceTimeline from '@/components/experiences/ExperienceTimeline';
-import { client } from '@/sanity/client';
+import { client } from '@/sanity/lib/client';
 import { listExperiencesQuery } from '@/sanity/queries';
 import { useTranslations } from '@/translations';
 

@@ -1,6 +1,6 @@
 import Layout from '@/components/Layout';
 import ProjectTimeline from '@/components/projects/ProjectTimeline';
-import { client } from '@/sanity/client';
+import { client } from '@/sanity/lib/client';
 import { listProjectsQuery } from '@/sanity/queries';
 import { useTranslations } from '@/translations';
 import { InferGetStaticPropsType } from 'next';

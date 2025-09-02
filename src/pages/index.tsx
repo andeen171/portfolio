@@ -4,12 +4,8 @@ import AboutSection from '@/components/about/AboutSection';
 import ExperiencesSection from '@/components/experiences/ExperiencesSection';
 import ProjectsSection from '@/components/projects/ProjectsSection';
 import SkillsSection from '@/components/skills/SkillsSection';
-import { client } from '@/sanity/client';
-import {
-  previewExperiencesQuery,
-  previewProjectsQuery,
-  previewSkillsQuery,
-} from '@/sanity/queries';
+import { client } from '@/sanity/lib/client';
+import { previewExperiencesQuery, previewProjectsQuery, previewSkillsQuery, } from '@/sanity/queries';
 import { InferGetStaticPropsType } from 'next';
 import Head from 'next/head';
 

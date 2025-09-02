@@ -305,7 +305,7 @@ export type PreviewProjectsQueryResult = Array<{
   }> | null;
 }>;
 // Variable: listExperiencesQuery
-// Query: *[_type == "experience"] {    ...,    skills[]->  } | order(startDate desc)
+// Query: *[_type == "experience"] | order(startDate desc)
 export type ListExperiencesQueryResult = Array<{
   _id: string;
   _type: "experience";
@@ -322,18 +322,13 @@ export type ListExperiencesQueryResult = Array<{
   description?: Array<{
     _key: string;
   } & InternationalizedArrayStringValue>;
-  skills: Array<{
-    _id: string;
-    _type: "skill";
-    _createdAt: string;
-    _updatedAt: string;
-    _rev: string;
-    name?: string;
-    description?: Array<{
-      _key: string;
-    } & InternationalizedArrayStringValue>;
-    svgCode?: string;
-  }> | null;
+  skills?: Array<{
+    _ref: string;
+    _type: "reference";
+    _weak?: boolean;
+    _key: string;
+    [internalGroqTypeReferenceTo]?: "skill";
+  }>;
 }>;
 // Variable: previewExperiencesQuery
 // Query: *[_type == "experience"] | order(startDate desc)[0..2]
@@ -396,7 +391,7 @@ declare module "@sanity/client" {
   interface SanityQueries {
     "\n  *[_type == \"project\"] { \n    ...,\n    skills[]->\n  } | order(date desc)\n": ListProjectsQueryResult;
     "\n  *[_type == \"project\"] { \n    ...,\n    skills[]->\n  } | order(date desc)[0..3]\n": PreviewProjectsQueryResult;
-    "\n  *[_type == \"experience\"] {\n    ...,\n    skills[]->\n  } | order(startDate desc)\n": ListExperiencesQueryResult;
+    "\n  *[_type == \"experience\"] | order(startDate desc)\n": ListExperiencesQueryResult;
     "\n  *[_type == \"experience\"] | order(startDate desc)[0..2]\n": PreviewExperiencesQueryResult;
     "\n  *[ _type == \"skill\"]\n": ListSkillsQueryResult;
     "\n  *[ _type == \"skill\"][0..4]\n": PreviewSkillsQueryResult;

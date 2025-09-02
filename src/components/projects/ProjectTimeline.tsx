@@ -1,4 +1,4 @@
-import { client } from '@/sanity/client';
+import { client } from '@/sanity/lib/client';
 import type { ListProjectsQueryResult, Skill } from '@/sanity/types';
 import { useLanguageStore } from '@/store/language';
 import { useTranslations } from '@/translations';

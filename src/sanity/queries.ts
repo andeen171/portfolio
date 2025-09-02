@@ -17,10 +17,7 @@ export const previewProjectsQuery = defineQuery(`
 
 // Experiences
 export const listExperiencesQuery = defineQuery(`
-  *[_type == "experience"] {
-    ...,
-    skills[]->
-  } | order(startDate desc)
+  *[_type == "experience"] | order(startDate desc)
 `);
 
 export const previewExperiencesQuery = defineQuery(`

@@ -1,6 +1,6 @@
 import Layout from '@/components/Layout';
 import SkillList from '@/components/skills/SkillList';
-import { client } from '@/sanity/client';
+import { client } from '@/sanity/lib/client';
 import { listSkillsQuery } from '@/sanity/queries';
 import type { Skill } from '@/sanity/types';
 import { useTranslations } from '@/translations';
