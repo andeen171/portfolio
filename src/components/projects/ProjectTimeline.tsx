@@ -1,14 +1,14 @@
 import { client } from '@/sanity/client';
+import type { ListProjectsQueryResult, Skill } from '@/sanity/types';
 import { useLanguageStore } from '@/store/language';
 import { useTranslations } from '@/translations';
-import { getLocalizedValue } from '@/utils/localization';
+import { useLocalization } from '@/utils/localization';
 import imageUrlBuilder from '@sanity/image-url';
 import type { SanityImageSource } from '@sanity/image-url/lib/types/types';
-import { SanityDocument } from 'next-sanity';
 import { Timeline } from '../timeline/timeline';
 
 interface ProjectTimelineProps {
-  projects: SanityDocument[];
+  projects: ListProjectsQueryResult;
 }
 
 const { projectId, dataset } = client.config();
@@ -18,12 +18,12 @@ const urlFor = (source: SanityImageSource) =>
 const ProjectTimeline: React.FC<ProjectTimelineProps> = ({ projects }) => {
   const language = useLanguageStore((state) => state.language);
   const t = useTranslations();
+  const { getLocalizedValue } = useLocalization();
 
   // Agrupa projetos por ano
   const groupedProjects = projects.reduce(
     (acc, project) => {
-      // Extrai o ano do projeto (assumindo que existe um campo year ou usando createdAt)
-      const year = project.year || new Date(project.date).getFullYear().toString();
+      const year = new Date(project.date!).getFullYear().toString();
 
       if (!acc[year]) {
         acc[year] = [];
@@ -32,7 +32,7 @@ const ProjectTimeline: React.FC<ProjectTimelineProps> = ({ projects }) => {
       acc[year].push(project);
       return acc;
     },
-    {} as Record<string, SanityDocument[]>
+    {} as Record<string, ListProjectsQueryResult>
   );
 
   // Converte para o formato esperado pelo componente Timeline
@@ -67,14 +67,14 @@ const ProjectTimeline: React.FC<ProjectTimelineProps> = ({ projects }) => {
                   <div className="mb-3 flex flex-wrap gap-2">
                     {project.skills &&
                       Array.isArray(project.skills) &&
-                      project.skills.map((skill: SanityDocument, index: number) => (
+                      project.skills.map((skill, index: number) => (
                         <span
                           key={skill._id || index}
                           className={`whitespace-nowrap rounded-full px-2.5 py-0.5 text-xs 
                           font-semibold text-ctp-base ${
                             index === 0
                               ? 'bg-ctp-lavender'
-                              : index === project.skills.length - 1
+                              : index === project.skills?.length! - 1
                                 ? 'bg-ctp-teal'
                                 : 'bg-ctp-pink'
                           }`}
@@ -112,9 +112,9 @@ const ProjectTimeline: React.FC<ProjectTimelineProps> = ({ projects }) => {
                         &rarr;
                       </span>
                     </a>
-                    {project.demo && (
+                    {project.url && (
                       <a
-                        href={project.demo}
+                        href={project.url}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="group inline-flex items-center gap-1 text-sm font-medium text-ctp-teal"

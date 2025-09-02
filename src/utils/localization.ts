@@ -1,9 +1,5 @@
+import { InternationalizedArrayString } from '@/sanity/types';
 import { Language } from '@/store/language';
-
-interface LocalizedField {
-  _key: string;
-  value: string;
-}
 
 /**
  * Gets the localized value from a Sanity localized field array
@@ -11,7 +7,10 @@ interface LocalizedField {
  * @param language The current language
  * @returns The localized value for the current language, or the first value as fallback
  */
-export function getLocalizedValue(field: LocalizedField[], language: Language): string {
+function getLocalizedValue(
+  field: InternationalizedArrayString | undefined,
+  language: Language
+): string {
   if (!field || !Array.isArray(field) || field.length === 0) {
     return '';
   }
@@ -20,7 +19,7 @@ export function getLocalizedValue(field: LocalizedField[], language: Language): 
   const localizedValue = field.find((item) => item._key === language);
 
   // If found, return it, otherwise return the first value as fallback
-  return localizedValue ? localizedValue.value : field[0]!.value;
+  return localizedValue?.value ? localizedValue.value : field[0]!.value!;
 }
 
 /**

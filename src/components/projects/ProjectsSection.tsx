@@ -1,10 +1,10 @@
+import type { PreviewProjectsQueryResult } from '@/sanity/types';
 import { useTranslations } from '@/translations';
-import { SanityDocument } from 'next-sanity';
 import Link from 'next/link';
 import ProjectTimeline from './ProjectTimeline';
 
 interface ProjectsSectionProps {
-  projects: SanityDocument[];
+  projects: PreviewProjectsQueryResult;
 }
 
 const ProjectsSection: React.FC<ProjectsSectionProps> = ({ projects }) => {

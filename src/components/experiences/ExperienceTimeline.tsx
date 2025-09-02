@@ -1,14 +1,19 @@
+import { ListExperiencesQueryResult, PreviewExperiencesQueryResult } from '@/sanity/types';
 import { useLanguageStore } from '@/store/language';
-import { getLocalizedValue } from '@/utils/localization';
-import { SanityDocument } from 'next-sanity';
+import { useLocalization } from '@/utils/localization';
 import { Timeline } from '../timeline/timeline';
 
+type Experiences = ListExperiencesQueryResult | PreviewExperiencesQueryResult;
+
+type Experience = Experiences[number];
+
 interface ExperienceTimelineProps {
-  experiences: SanityDocument[];
+  experiences: Experiences;
 }
 
 const ExperienceTimeline: React.FC<ExperienceTimelineProps> = ({ experiences }) => {
   const language = useLanguageStore((state) => state.language);
+  const { getLocalizedValue } = useLocalization();
 
   // Agrupa experiências por ano
   const groupedExperiences = experiences.reduce(
@@ -25,7 +30,7 @@ const ExperienceTimeline: React.FC<ExperienceTimelineProps> = ({ experiences }) 
       acc[year].push(experience);
       return acc;
     },
-    {} as Record<string, SanityDocument[]>
+    {} as Record<string, Experience[]>
   );
 
   // Converte para o formato esperado pelo componente Timeline

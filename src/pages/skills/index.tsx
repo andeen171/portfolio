@@ -1,18 +1,15 @@
 import Layout from '@/components/Layout';
 import SkillList from '@/components/skills/SkillList';
 import { client } from '@/sanity/client';
+import { listSkillsQuery } from '@/sanity/queries';
+import type { Skill } from '@/sanity/types';
 import { useTranslations } from '@/translations';
 import { InferGetStaticPropsType } from 'next';
-import { SanityDocument } from 'next-sanity';
-
-const SKILLS_QUERY = `*[
-  _type == "skill"
-]`;
 
 const options = { next: { revalidate: 30 } };
 
 export const getStaticProps = async () => {
-  const skills = await client.fetch<SanityDocument[]>(SKILLS_QUERY, {}, options);
+  const skills = await client.fetch<Skill[]>(listSkillsQuery, {}, options);
 
   return {
     props: {

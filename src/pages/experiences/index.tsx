@@ -3,29 +3,13 @@ import { InferGetStaticPropsType } from 'next';
 
 import ExperienceTimeline from '@/components/experiences/ExperienceTimeline';
 import { client } from '@/sanity/client';
+import { listExperiencesQuery } from '@/sanity/queries';
 import { useTranslations } from '@/translations';
-import { type SanityDocument } from 'next-sanity';
-
-const EXPERIENCES_QUERY = `*[
-  _type == "experience"
-] | order(startDate desc) {
-    title,
-    company,
-    location,
-    startDate,
-    endDate,
-    description,
-    skills[]-> {
-      name,
-      description,
-      svgCode
-    }
-  }`;
 
 const options = { next: { revalidate: 30 } };
 
 export async function getStaticProps() {
-  const experiences = await client.fetch<SanityDocument[]>(EXPERIENCES_QUERY, {}, options);
+  const experiences = await client.fetch(listExperiencesQuery, {}, options);
 
   return { props: { experiences }, revalidate: 16800 };
 }

@@ -1,14 +1,15 @@
 import CatppuccinGlareCard from '@/components/GlareCard';
+import type { Skill } from '@/sanity/types';
 import { useLanguageStore } from '@/store/language';
-import { getLocalizedValue } from '@/utils/localization';
-import { SanityDocument } from 'next-sanity';
+import { useLocalization } from '@/utils/localization';
 
 interface SkillItemProps {
-  skill: SanityDocument;
+  skill: Skill;
 }
 
 const SkillItem: React.FC<SkillItemProps> = ({ skill }) => {
   const language = useLanguageStore((state) => state.language);
+  const { getLocalizedValue } = useLocalization();
   const description = getLocalizedValue(skill.description, language);
 
   return (
@@ -44,7 +45,7 @@ const SkillItem: React.FC<SkillItemProps> = ({ skill }) => {
                 <div
                   className="h-full w-full flex items-center justify-center skill-svg-container"
                   // biome-ignore lint/security/noDangerouslySetInnerHtml: Sanity content
-                  dangerouslySetInnerHTML={{ __html: skill.svgCode }}
+                  dangerouslySetInnerHTML={{ __html: skill.svgCode! }}
                 />
               </div>
 

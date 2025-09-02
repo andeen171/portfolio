@@ -1,11 +1,10 @@
-import { uniqueId } from '@/lib/utils';
 import { useCtpStore } from '@/store';
 import { type CatppuccinColors, flavors } from '@catppuccin/palette';
-import { useEffect, useState } from 'react';
+import { useEffect, useId, useState } from 'react';
 import CatppuccinGradient from '../CatppuccinGradient';
 
 const ProgrammingSVG: React.FC = () => {
-  const gradientId = uniqueId();
+  const gradientId = useId();
   const flavor = useCtpStore((state) => state.flavor);
   const [labels, setLabels] = useState<CatppuccinColors>(flavors.mocha.colors);
 

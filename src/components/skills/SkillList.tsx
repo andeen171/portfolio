@@ -1,8 +1,8 @@
-import { type SanityDocument } from 'next-sanity';
+import type { Skill } from '@/sanity/types';
 import SkillItem from './SkillItem';
 
 type Props = {
-  skills: SanityDocument[];
+  skills: Skill[];
 };
 
 const SkillList: React.FC<Props> = ({ skills }) => {

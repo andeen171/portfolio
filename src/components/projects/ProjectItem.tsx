@@ -1,14 +1,8 @@
-import { client } from '@/sanity/client';
+import { urlFor } from '@/sanity/lib/image';
 import { useLanguageStore } from '@/store/language';
 import { useTranslations } from '@/translations';
-import { getLocalizedValue } from '@/utils/localization';
-import imageUrlBuilder from '@sanity/image-url';
-import type { SanityImageSource } from '@sanity/image-url/lib/types/types';
+import { useLocalization } from '@/utils/localization';
 import { SanityDocument } from 'next-sanity';
-
-const { projectId, dataset } = client.config();
-const urlFor = (source: SanityImageSource) =>
-  projectId && dataset ? imageUrlBuilder({ projectId, dataset }).image(source) : null;
 
 interface ProjectItemProps {
   project: SanityDocument;
@@ -17,19 +11,18 @@ interface ProjectItemProps {
 const ProjectItem: React.FC<ProjectItemProps> = ({ project }) => {
   const language = useLanguageStore((state) => state.language);
   const t = useTranslations();
+  const { getLocalizedValue } = useLocalization();
 
-  const projectImageUrl = project.images
-    ? urlFor(project.images[0]!)?.width(550).height(310).url()
-    : null;
+  const projectImage = project.images[0] ? urlFor(project.images[0]) : null;
 
   const projectName = getLocalizedValue(project.name, language);
   const projectDescription = getLocalizedValue(project.description, language);
 
   return (
     <article className="overflow-hidden rounded-xl shadow-xl transition hover:shadow-lg hover:scale-[1.02]">
-      {projectImageUrl && (
+      {projectImage && (
         <img
-          src={projectImageUrl}
+          src={projectImage?.width(550).height(310).url()}
           alt={projectName}
           className="aspect-video rounded-xl"
           width="550"

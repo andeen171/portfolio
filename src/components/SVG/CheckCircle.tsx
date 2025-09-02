@@ -1,7 +1,8 @@
+import { useId } from 'react';
 import CatppuccinGradient from '../CatppuccinGradient';
 
 const CheckCircle: React.FC = () => {
-  const gradientId = crypto.randomUUID();
+  const gradientId = useId();
 
   return (
     <svg

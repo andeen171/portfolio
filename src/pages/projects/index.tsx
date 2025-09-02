@@ -1,28 +1,14 @@
 import Layout from '@/components/Layout';
 import ProjectTimeline from '@/components/projects/ProjectTimeline';
 import { client } from '@/sanity/client';
+import { listProjectsQuery } from '@/sanity/queries';
 import { useTranslations } from '@/translations';
 import { InferGetStaticPropsType } from 'next';
-import { SanityDocument } from 'next-sanity';
-
-const PROJECTS_QUERY = `*[
-  _type == "project"
-]{ 
-  _id, 
-  date,
-  name,
-  description,
-  repo,
-  demo,
-  images,
-  "skills": skills[]->{ _id, name },
-  year
-} | order(date desc)`;
 
 const options = { next: { revalidate: 30 } };
 
 export async function getStaticProps() {
-  const projects = await client.fetch<SanityDocument[]>(PROJECTS_QUERY, {}, options);
+  const projects = await client.fetch(listProjectsQuery, {}, options);
 
   return { props: { projects }, revalidate: 16800 };
 }

@@ -5,38 +5,20 @@ import ExperiencesSection from '@/components/experiences/ExperiencesSection';
 import ProjectsSection from '@/components/projects/ProjectsSection';
 import SkillsSection from '@/components/skills/SkillsSection';
 import { client } from '@/sanity/client';
+import {
+  previewExperiencesQuery,
+  previewProjectsQuery,
+  previewSkillsQuery,
+} from '@/sanity/queries';
 import { InferGetStaticPropsType } from 'next';
-import { SanityDocument } from 'next-sanity';
 import Head from 'next/head';
-
-const EXPERIENCES_QUERY = `*[
-  _type == "experience"
-] | order(startDate desc)[0..2]`;
-
-const PROJECTS_QUERY = `*[
-  _type == "project"
-]{ 
-  _id, 
-  date,
-  name,
-  description,
-  repo,
-  demo,
-  images,
-  "skills": skills[]->{ _id, name },
-  year
-} | order(date desc)[0..3]`;
-
-const SKILLS_QUERY = `*[
-  _type == "skill"
-][0..4]`;
 
 const options = { next: { revalidate: 30 } };
 
 export const getStaticProps = async () => {
-  const experiences = await client.fetch<SanityDocument[]>(EXPERIENCES_QUERY, {}, options);
-  const projects = await client.fetch<SanityDocument[]>(PROJECTS_QUERY, {}, options);
-  const skills = await client.fetch<SanityDocument[]>(SKILLS_QUERY, {}, options);
+  const experiences = await client.fetch(previewExperiencesQuery, {}, options);
+  const projects = await client.fetch(previewProjectsQuery, {}, options);
+  const skills = await client.fetch(previewSkillsQuery, {}, options);
 
   return {
     props: {

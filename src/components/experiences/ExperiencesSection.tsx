@@ -1,10 +1,10 @@
+import type { PreviewExperiencesQueryResult } from '@/sanity/types';
 import { useTranslations } from '@/translations';
-import { SanityDocument } from 'next-sanity';
 import Link from 'next/link';
 import ExperienceTimeline from './ExperienceTimeline';
 
 interface Props {
-  experiences: SanityDocument[];
+  experiences: PreviewExperiencesQueryResult;
 }
 
 const ExperiencesSection: React.FC<Props> = ({ experiences }) => {

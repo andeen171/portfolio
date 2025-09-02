@@ -1,10 +1,10 @@
+import { PreviewSkillsQueryResult } from '@/sanity/types';
 import { useTranslations } from '@/translations';
-import { SanityDocument } from 'next-sanity';
 import Link from 'next/link';
 import SkillList from './SkillList';
 
 type Props = {
-  skills: SanityDocument[];
+  skills: PreviewSkillsQueryResult;
 };
 
 const SkillsSection: React.FC<Props> = ({ skills }) => {

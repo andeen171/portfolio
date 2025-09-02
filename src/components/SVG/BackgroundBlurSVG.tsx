@@ -1,7 +1,8 @@
+import { useId } from 'react';
 import CatppuccinGradient from '../CatppuccinGradient';
 
 const BackgroundBlurSVG = () => {
-  const gradientId = crypto.randomUUID();
+  const gradientId = useId();
 
   return (
     <>
