@@ -1,3 +1,4 @@
+import { useTranslations } from '@/translations';
 import { useEffect, useState } from 'react';
 
 const LinkedInIcon = () => (
@@ -61,6 +62,7 @@ const socialContacts = [
 
 const Footer: React.FC = () => {
   const [isFloating, setIsFloating] = useState(true);
+  const t = useTranslations();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -80,9 +82,12 @@ const Footer: React.FC = () => {
   return (
     <footer aria-label="Site Footer" className="relative bg-ctp-base z-10 mt-16">
       <div className="mx-auto max-w-5xl px-4 py-16 sm:px-6 lg:px-8">
-        <p className="flex mb-12 sm:mb-8 justify-center text-center animated-gradient-text font-medium italic text-xl md:text-2xl ">
-          "Ambição sem esforço é apenas ganância"
-        </p>
+        <blockquote className="mb-12 sm:mb-8 text-center">
+          <p className="animated-gradient-text font-medium italic text-xl md:text-2xl mb-4">
+            "{t.footer.quote}"
+          </p>
+          <cite className="text-ctp-subtext0 text-sm not-italic">— Anderson Lopes, 2022</cite>
+        </blockquote>
 
         <div
           className={`

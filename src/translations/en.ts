@@ -54,4 +54,7 @@ export const en = {
     subtitle: 'My professional journey',
     seeMore: 'View all experiences',
   },
+  footer: {
+    quote: 'Ambition without effort is just greed',
+  },
 };
