@@ -1,8 +1,6 @@
-# My Dynamic Portfolio
-### Production deployment on vercel is active, [test it out!](https://portfolio-andeen171.vercel.app/)
-This is a [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3-app`.
+# My Dynamic Portfolio built with NextJs and Sanity [Check it out!](https://portfolio-andeen171.vercel.app/)
 
-## How do i develop on top of this?
+### How do i contribute to this?
 ### First clone or fork the repository to your desired enviroment
 
 ### Install dependencies
