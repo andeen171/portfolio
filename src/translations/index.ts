@@ -9,7 +9,7 @@ export const translations = {
 
 export function useTranslations(): Translations {
   const language = useLanguageStore((state) => state.language);
-  return translations[language];
+  return translations[language] ?? translations['en-US'];
 }
 
 export type Translations = typeof en;
