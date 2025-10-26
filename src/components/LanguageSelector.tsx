@@ -1,6 +1,7 @@
-import { Language, useLanguageStore } from '@/store/language';
 import { Listbox, Transition } from '@headlessui/react';
-import { Fragment, useEffect, useState } from 'react';
+import { useRouter } from 'next/router';
+import { useLocale } from 'next-intl';
+import { Fragment } from 'react';
 import CheckCircle from './SVG/CheckCircle';
 import LanguageSVG from './SVG/LanguageSVG';
 
@@ -8,23 +9,21 @@ function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(' ');
 }
 
-const languages: { code: Language; label: string }[] = [
+const languages: { code: string; label: string }[] = [
   { code: 'en-US', label: 'English' },
   { code: 'pt-BR', label: 'Português' },
 ];
 
 const LanguageSelector: React.FC = () => {
-  const activeLanguage = useLanguageStore((state) => state.language);
-  const [selected, setSelected] = useState<Language>(activeLanguage);
+  const router = useRouter();
+  const locale = useLocale();
 
-  const setLanguage = useLanguageStore((state) => state.setLanguage);
-
-  useEffect(() => {
-    setSelected(activeLanguage);
-  }, [activeLanguage]);
+  const switchLanguage = (newLocale: string) => {
+    router.push(router.pathname, router.asPath, { locale: newLocale });
+  };
 
   return (
-    <Listbox value={activeLanguage} onChange={setLanguage}>
+    <Listbox value={locale} onChange={switchLanguage}>
       {({ open }) => (
         <>
           <div className="relative">
@@ -36,7 +35,7 @@ const LanguageSelector: React.FC = () => {
                 className="animate-colorchange bg-gradient-to-r from-ctp-teal via-ctp-lavender bg-clip-text
                   text-sm font-semibold text-transparent nf md:mr-3 ml-2 hidden sm:inline-block"
               >
-                {selected.toUpperCase()}
+                {locale.toUpperCase()}
               </span>
             </Listbox.Button>
 
@@ -61,7 +60,7 @@ const LanguageSelector: React.FC = () => {
                   >
                     <div className="flex items-center justify-between p-2 px-3">
                       <span className="flex items-center">
-                        {activeLanguage === lang.code ? <CheckCircle /> : <LanguageSVG />}
+                        {locale === lang.code ? <CheckCircle /> : <LanguageSVG />}
                       </span>
 
                       <span

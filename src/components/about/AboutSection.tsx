@@ -1,20 +1,20 @@
 import ProfilePic from '@/img/icon.png';
-import { useTranslations } from '@/translations';
+import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import { useEffect, useRef } from 'react';
 import Typed from 'typed.js';
 
 const AboutSection: React.FC = () => {
-  const t = useTranslations();
+  const t = useTranslations('about');
   const titleRef = useRef(null);
 
   useEffect(() => {
     const name = new Typed(titleRef.current, {
       strings: [
-        t.about.typedStrings.fullstack,
-        t.about.typedStrings.backend,
-        t.about.typedStrings.linux,
-        t.about.typedStrings.arch,
+        t('typedStrings.fullstack'),
+        t('typedStrings.backend'),
+        t('typedStrings.linux'),
+        t('typedStrings.arch'),
       ],
       typeSpeed: 70,
       backSpeed: 70,
@@ -32,14 +32,14 @@ const AboutSection: React.FC = () => {
           <div className="px-2 sm:px-4 lg:pr-4">
             <div className="animated-gradient-text text-3xl sm:text-4xl lg:max-w-lg">
               <p className="text-base sm:text-lg font-semibold leading-7 text-ctp-lavender">
-                {t.about.greeting}
+                {t('greeting')}
               </p>
               <span
                 ref={titleRef}
                 className="nf mt-2 min-h-[3rem] text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight"
               />
               <p className="mt-4 sm:mt-8 text-lg sm:text-xl leading-7 sm:leading-8 text-ctp-subtext0">
-                {t.about.description}
+                {t('description')}
               </p>
             </div>
           </div>

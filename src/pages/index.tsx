@@ -11,13 +11,15 @@ import Head from 'next/head';
 
 const options = { next: { revalidate: 30 } };
 
-export const getStaticProps = async () => {
+export const getStaticProps = async ({ locale }: { locale: string }) => {
   const experiences = await client.fetch(previewExperiencesQuery, {}, options);
   const projects = await client.fetch(previewProjectsQuery, {}, options);
   const skills = await client.fetch(previewSkillsQuery, {}, options);
 
   return {
     props: {
+      messages: (await import(`../../messages/${locale}.json`)).default,
+      locale,
       experiences,
       projects,
       skills,

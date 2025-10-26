@@ -1,6 +1,5 @@
 import { ListExperiencesQueryResult } from '@/sanity/types';
-import { useLanguageStore } from '@/store/language';
-import { useTranslations } from '@/translations';
+import { useTranslations, useLocale } from 'next-intl';
 import { useLocalization } from '@/utils/localization';
 import { useMemo, useState } from 'react';
 
@@ -11,26 +10,26 @@ interface ExperienceProps {
 const ExperienceItem: React.FC<ExperienceProps> = ({ experience }) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
-  const language = useLanguageStore((state) => state.language);
+  const locale = useLocale();
   const { getLocalizedValue } = useLocalization();
 
-  const title = getLocalizedValue(experience.title, language);
-  const description = getLocalizedValue(experience.description, language) || '';
+  const title = getLocalizedValue(experience.title, locale as 'en-US' | 'pt-BR');
+  const description = getLocalizedValue(experience.description, locale as 'en-US' | 'pt-BR') || '';
 
-  const t = useTranslations();
+  const t = useTranslations('experiences');
 
   const formatDate = useMemo(() => {
     const formatDateString = (dateString: string | undefined) => {
       if (!dateString) return null;
       const date = new Date(dateString);
-      return date.toLocaleDateString(language, { month: 'short', year: 'numeric' });
+      return date.toLocaleDateString(locale, { month: 'short', year: 'numeric' });
     };
 
     const start = formatDateString(experience.startDate);
-    const end = experience.endDate ? formatDateString(experience.endDate) : t.experiences.current;
+    const end = experience.endDate ? formatDateString(experience.endDate) : t('current');
 
     return { start, end, full: `${start} - ${end}` };
-  }, [experience.startDate, experience.endDate, language, t.experiences.current]);
+  }, [experience.startDate, experience.endDate, locale, t]);
 
   return (
     <div

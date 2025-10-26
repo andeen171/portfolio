@@ -1,6 +1,5 @@
 import { urlFor } from '@/sanity/lib/image';
-import { useLanguageStore } from '@/store/language';
-import { useTranslations } from '@/translations';
+import { useTranslations, useLocale } from 'next-intl';
 import { useLocalization } from '@/utils/localization';
 import { SanityDocument } from 'next-sanity';
 
@@ -9,14 +8,14 @@ interface ProjectItemProps {
 }
 
 const ProjectItem: React.FC<ProjectItemProps> = ({ project }) => {
-  const language = useLanguageStore((state) => state.language);
-  const t = useTranslations();
+  const locale = useLocale();
+  const t = useTranslations('projects');
   const { getLocalizedValue } = useLocalization();
 
   const projectImage = project.images[0] ? urlFor(project.images[0]) : null;
 
-  const projectName = getLocalizedValue(project.name, language);
-  const projectDescription = getLocalizedValue(project.description, language);
+  const projectName = getLocalizedValue(project.name, locale as 'en-US' | 'pt-BR');
+  const projectDescription = getLocalizedValue(project.description, locale as 'en-US' | 'pt-BR');
 
   return (
     <article className="overflow-hidden rounded-xl shadow-xl transition hover:shadow-lg hover:scale-[1.02]">
@@ -68,7 +67,7 @@ const ProjectItem: React.FC<ProjectItemProps> = ({ project }) => {
             rel="noopener noreferrer"
             className="group inline-flex items-center gap-1 text-sm font-medium text-ctp-lavender"
           >
-            {t.projects.repository}
+            {t('repository')}
             <span aria-hidden="true" className="block transition group-hover:translate-x-0.5">
               &rarr;
             </span>
@@ -80,7 +79,7 @@ const ProjectItem: React.FC<ProjectItemProps> = ({ project }) => {
               rel="noopener noreferrer"
               className="group inline-flex items-center gap-1 text-sm font-medium text-ctp-teal"
             >
-              {t.projects.demo}
+              {t('demo')}
               <span aria-hidden="true" className="block transition group-hover:translate-x-0.5">
                 &rarr;
               </span>

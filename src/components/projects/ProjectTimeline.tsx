@@ -1,7 +1,6 @@
 import { client } from '@/sanity/lib/client';
 import type { ListProjectsQueryResult, Skill } from '@/sanity/types';
-import { useLanguageStore } from '@/store/language';
-import { useTranslations } from '@/translations';
+import { useTranslations, useLocale } from 'next-intl';
 import { useLocalization } from '@/utils/localization';
 import imageUrlBuilder from '@sanity/image-url';
 import type { SanityImageSource } from '@sanity/image-url/lib/types/types';
@@ -16,8 +15,8 @@ const urlFor = (source: SanityImageSource) =>
   projectId && dataset ? imageUrlBuilder({ projectId, dataset }).image(source) : null;
 
 const ProjectTimeline: React.FC<ProjectTimelineProps> = ({ projects }) => {
-  const language = useLanguageStore((state) => state.language);
-  const t = useTranslations();
+  const locale = useLocale();
+  const t = useTranslations('projects');
   const { getLocalizedValue } = useLocalization();
 
   // Agrupa projetos por ano
@@ -43,8 +42,8 @@ const ProjectTimeline: React.FC<ProjectTimelineProps> = ({ projects }) => {
       content: (
         <div className="space-y-8 sm:space-y-10">
           {yearProjects.map((project) => {
-            const projectName = getLocalizedValue(project.name, language);
-            const projectDescription = getLocalizedValue(project.description, language);
+            const projectName = getLocalizedValue(project.name, locale as 'en-US' | 'pt-BR');
+            const projectDescription = getLocalizedValue(project.description, locale as 'en-US' | 'pt-BR');
             const projectImageUrl = project.images
               ? urlFor(project.images[0]!)?.width(550).height(310).url()
               : null;
@@ -104,7 +103,7 @@ const ProjectTimeline: React.FC<ProjectTimelineProps> = ({ projects }) => {
                       rel="noopener noreferrer"
                       className="group inline-flex items-center gap-1 text-sm font-medium text-ctp-lavender"
                     >
-                      {t.projects.repository}
+                      {t('repository')}
                       <span
                         aria-hidden="true"
                         className="block transition group-hover:translate-x-0.5"
@@ -119,7 +118,7 @@ const ProjectTimeline: React.FC<ProjectTimelineProps> = ({ projects }) => {
                         rel="noopener noreferrer"
                         className="group inline-flex items-center gap-1 text-sm font-medium text-ctp-teal"
                       >
-                        {t.projects.demo}
+                        {t('demo')}
                         <span
                           aria-hidden="true"
                           className="block transition group-hover:translate-x-0.5"

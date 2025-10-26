@@ -1,4 +1,4 @@
-import { Translations, useTranslations } from '@/translations';
+import { useTranslations } from 'next-intl';
 import { Menu, Transition } from '@headlessui/react';
 import {
   Bars3Icon,
@@ -13,11 +13,11 @@ import { Fragment, useEffect, useState } from 'react';
 import LanguageSelector from './LanguageSelector';
 import ThemeSelector from './ThemeSelector';
 
-const getNavigation = (t: Translations) => [
-  { name: t.navigation.home, href: '/', icon: HomeIcon },
-  { name: t.navigation.skills, href: '/skills', icon: CommandLineIcon },
-  { name: t.navigation.projects, href: '/projects', icon: CodeBracketIcon },
-  { name: t.navigation.experiences, href: '/experiences', icon: BriefcaseIcon },
+const getNavigation = (t: (key: string) => string) => [
+  { name: t('home'), href: '/', icon: HomeIcon },
+  { name: t('skills'), href: '/skills', icon: CommandLineIcon },
+  { name: t('projects'), href: '/projects', icon: CodeBracketIcon },
+  { name: t('experiences'), href: '/experiences', icon: BriefcaseIcon },
 ];
 
 function classNames(...classes: string[]) {
@@ -26,7 +26,7 @@ function classNames(...classes: string[]) {
 
 const Header: React.FC = () => {
   const [scrolled, setScrolled] = useState(false);
-  const t = useTranslations();
+  const t = useTranslations('navigation');
   const router = useRouter();
   const currentPath = router.pathname;
   const navigation = getNavigation(t);

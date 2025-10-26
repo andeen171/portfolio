@@ -10,6 +10,11 @@
 const config = {
   reactStrictMode: true,
 
+  i18n: {
+    locales: ['en-US', 'pt-BR'],
+    defaultLocale: 'en-US',
+  },
+
   images: {
     remotePatterns: [
       {

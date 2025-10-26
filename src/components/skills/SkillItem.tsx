@@ -1,6 +1,6 @@
 import CatppuccinGlareCard from '@/components/GlareCard';
 import type { Skill } from '@/sanity/types';
-import { useLanguageStore } from '@/store/language';
+import { useLocale } from 'next-intl';
 import { useLocalization } from '@/utils/localization';
 
 interface SkillItemProps {
@@ -8,9 +8,9 @@ interface SkillItemProps {
 }
 
 const SkillItem: React.FC<SkillItemProps> = ({ skill }) => {
-  const language = useLanguageStore((state) => state.language);
+  const locale = useLocale();
   const { getLocalizedValue } = useLocalization();
-  const description = getLocalizedValue(skill.description, language);
+  const description = getLocalizedValue(skill.description, locale as 'en-US' | 'pt-BR');
 
   return (
     <>

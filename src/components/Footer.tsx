@@ -1,4 +1,4 @@
-import { useTranslations } from '@/translations';
+import { useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
 
 const LinkedInIcon = () => (
@@ -62,7 +62,7 @@ const socialContacts = [
 
 const Footer: React.FC = () => {
   const [isFloating, setIsFloating] = useState(true);
-  const t = useTranslations();
+  const t = useTranslations('footer');
 
   useEffect(() => {
     const handleScroll = () => {
@@ -84,7 +84,7 @@ const Footer: React.FC = () => {
       <div className="mx-auto max-w-5xl px-4 py-16 sm:px-6 lg:px-8">
         <blockquote className="mb-12 sm:mb-8 text-center">
           <p className="animated-gradient-text font-medium italic text-xl md:text-2xl mb-4">
-            "{t.footer.quote}"
+            "{t('quote')}"
           </p>
           <cite className="text-ctp-subtext0 text-sm not-italic">— Anderson Lopes, 2022</cite>
         </blockquote>

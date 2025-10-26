@@ -1,11 +1,11 @@
 import ProgrammingSVG from '@/components/SVG/ProgrammingSVG';
-import { useTranslations } from '@/translations';
+import { useTranslations } from 'next-intl';
 import { useEffect, useRef } from 'react';
 import Typed from 'typed.js';
 import BackgroundBlurSVG from './SVG/BackgroundBlurSVG';
 
 const HeroSection: React.FC = () => {
-  const t = useTranslations();
+  const t = useTranslations('home.hero');
   const nameRef = useRef(null);
 
   useEffect(() => {
@@ -33,7 +33,7 @@ const HeroSection: React.FC = () => {
           className="text-left text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight"
           ref={nameRef}
         />
-        <p className="text-left text-base sm:text-lg font-semibold">{t.home.hero.subtitle}</p>
+        <p className="text-left text-base sm:text-lg font-semibold">{t('subtitle')}</p>
       </div>
       <BackgroundBlurSVG />
     </div>

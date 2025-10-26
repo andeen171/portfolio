@@ -1,7 +1,6 @@
 import { InternationalizedArrayString } from '@/sanity/types';
-import { Language } from '@/store/language';
 
-function getLanguageKey(language: Language) {
+function getLanguageKey(language: 'en-US' | 'pt-BR') {
   switch (language) {
     case 'en-US':
       return 'en';
@@ -18,7 +17,7 @@ function getLanguageKey(language: Language) {
  */
 function getLocalizedValue(
   field: InternationalizedArrayString | undefined,
-  language: Language
+  language: 'en-US' | 'pt-BR'
 ): string {
   if (!field || !Array.isArray(field) || field.length === 0) {
     return '';
@@ -36,6 +35,7 @@ function getLocalizedValue(
 /**
  * A hook to get a function that returns localized values
  * To be used in components that need to display localized content
+ * Now synced with next-intl - components should pass locale from useLocale()
  */
 export function useLocalization() {
   return {
