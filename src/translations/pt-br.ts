@@ -53,6 +53,7 @@ export const ptBr = {
     title: 'Experiências',
     subtitle: 'Minha jornada profissional',
     seeMore: 'Ver todas as experiências',
+    current: 'Atual',
   },
   footer: {
     quote: 'Ambição sem esforço é apenas ganância',

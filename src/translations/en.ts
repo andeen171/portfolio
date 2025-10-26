@@ -53,6 +53,7 @@ export const en = {
     title: 'Experiences',
     subtitle: 'My professional journey',
     seeMore: 'View all experiences',
+    current: 'Present',
   },
   footer: {
     quote: 'Ambition without effort is just greed',

@@ -1,6 +1,15 @@
 import { InternationalizedArrayString } from '@/sanity/types';
 import { Language } from '@/store/language';
 
+function getLanguageKey(language: Language) {
+  switch (language) {
+    case 'en-US':
+      return 'en';
+    case 'pt-BR':
+      return 'pt';
+  }
+}
+
 /**
  * Gets the localized value from a Sanity localized field array
  * @param field The localized field array from Sanity
@@ -15,8 +24,10 @@ function getLocalizedValue(
     return '';
   }
 
+  const languageKey = getLanguageKey(language);
+
   // Try to find the value for the current language
-  const localizedValue = field.find((item) => item._key === language);
+  const localizedValue = field.find((item) => item._key === languageKey);
 
   // If found, return it, otherwise return the first value as fallback
   return localizedValue?.value ? localizedValue.value : field[0]!.value!;

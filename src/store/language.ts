@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 
-export type Language = 'en' | 'pt';
+export type Language = 'pt-BR' | 'en-US';
 
 interface LanguageState {
   language: Language;
@@ -12,7 +12,7 @@ export const useLanguageStore = create<LanguageState>()(
   devtools(
     persist(
       (set) => ({
-        language: 'en', // Default language
+        language: 'en-US', // Default language
         setLanguage: (language) => set(() => ({ language })),
       }),
       {

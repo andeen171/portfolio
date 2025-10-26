@@ -3,8 +3,8 @@ import { en } from './en';
 import { ptBr } from './pt-br';
 
 export const translations = {
-  en,
-  pt: ptBr,
+  'en-US': en,
+  'pt-BR': ptBr,
 };
 
 export function useTranslations(): Translations {

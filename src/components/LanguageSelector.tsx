@@ -9,8 +9,8 @@ function classNames(...classes: string[]) {
 }
 
 const languages: { code: Language; label: string }[] = [
-  { code: 'en', label: 'English' },
-  { code: 'pt', label: 'Português' },
+  { code: 'en-US', label: 'English' },
+  { code: 'pt-BR', label: 'Português' },
 ];
 
 const LanguageSelector: React.FC = () => {
