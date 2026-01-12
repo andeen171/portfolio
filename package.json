@@ -19,7 +19,7 @@
     "clsx": "^2.1.1",
     "dotenv": "^17.2.0",
     "motion": "^12.23.12",
-    "next": "^15.1",
+    "next": "16.1.0-canary.19",
     "next-intl": "^4.4.0",
     "next-sanity": "10.0.15",
     "react": "^19",
