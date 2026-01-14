@@ -1,4 +1,4 @@
-import { InternationalizedArrayString } from '@/sanity/types';
+import type { InternationalizedArrayString } from '@/sanity/types';
 
 function getLanguageKey(language: 'en-US' | 'pt-BR') {
   switch (language) {

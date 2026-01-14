@@ -1,5 +1,5 @@
 import ExperienceItem from '@/components/experiences/ExperienceItem';
-import { ListExperiencesQueryResult, PreviewExperiencesQueryResult } from '@/sanity/types';
+import type { ListExperiencesQueryResult, PreviewExperiencesQueryResult } from '@/sanity/types';
 import { Timeline } from '../timeline/timeline';
 
 type Experiences = ListExperiencesQueryResult | PreviewExperiencesQueryResult;

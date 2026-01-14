@@ -1,7 +1,7 @@
-import { useCtpStore } from '@/store';
-import { type FlavorName } from '@catppuccin/palette';
+import type { FlavorName } from '@catppuccin/palette';
 import { Listbox, Transition } from '@headlessui/react';
 import { Fragment, useEffect, useState } from 'react';
+import { useCtpStore } from '@/store';
 import CheckCircle from './SVG/CheckCircle';
 import PaintBrushSVG from './SVG/PaintBrushSVG';
 import PaletteSVG from './SVG/PaletteSVG';

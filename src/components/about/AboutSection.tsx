@@ -1,8 +1,8 @@
-import ProfilePic from '@/img/icon.png';
-import { useTranslations } from 'next-intl';
 import Image from 'next/image';
+import { useTranslations } from 'next-intl';
 import { useEffect, useRef } from 'react';
 import Typed from 'typed.js';
+import ProfilePic from '@/img/icon.png';
 
 const AboutSection: React.FC = () => {
   const t = useTranslations('about');
@@ -36,7 +36,7 @@ const AboutSection: React.FC = () => {
               </p>
               <span
                 ref={titleRef}
-                className="nf mt-2 min-h-[3rem] text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight"
+                className="font-nf mt-2 min-h-[3rem] text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight"
               />
               <p className="mt-4 sm:mt-8 text-lg sm:text-xl leading-7 sm:leading-8 text-ctp-subtext0">
                 {t('description')}

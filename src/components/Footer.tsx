@@ -80,7 +80,7 @@ const Footer: React.FC = () => {
   }, []);
 
   return (
-    <footer aria-label="Site Footer" className="relative bg-ctp-base z-10 mt-16">
+    <footer className="relative bg-ctp-base z-10 mt-16">
       <div className="mx-auto max-w-5xl px-4 py-16 sm:px-6 lg:px-8">
         <blockquote className="mb-12 sm:mb-8 text-center">
           <p className="animated-gradient-text font-medium italic text-xl md:text-2xl mb-4">
@@ -123,7 +123,7 @@ const Footer: React.FC = () => {
           </div>
         </div>
 
-        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-ctp-lavender/20 to-transparent" />
+        <div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-ctp-lavender/20 to-transparent" />
       </div>
     </footer>
   );

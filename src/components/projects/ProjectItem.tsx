@@ -1,7 +1,7 @@
+import { useLocale, useTranslations } from 'next-intl';
+import type { SanityDocument } from 'next-sanity';
 import { urlFor } from '@/sanity/lib/image';
-import { useTranslations, useLocale } from 'next-intl';
 import { useLocalization } from '@/utils/localization';
-import { SanityDocument } from 'next-sanity';
 
 interface ProjectItemProps {
   project: SanityDocument;

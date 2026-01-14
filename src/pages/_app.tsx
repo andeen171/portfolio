@@ -1,5 +1,5 @@
-import { IntlProvider } from 'next-intl';
 import type { AppProps } from 'next/app';
+import { IntlProvider } from 'next-intl';
 
 import '@/styles/globals.css';
 

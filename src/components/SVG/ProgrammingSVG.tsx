@@ -1,6 +1,6 @@
-import { useCtpStore } from '@/store';
 import { type CatppuccinColors, flavors } from '@catppuccin/palette';
 import { useEffect, useId, useState } from 'react';
+import { useCtpStore } from '@/store';
 import CatppuccinGradient from '../CatppuccinGradient';
 
 const ProgrammingSVG: React.FC = () => {
@@ -10,7 +10,7 @@ const ProgrammingSVG: React.FC = () => {
 
   useEffect(() => {
     setLabels(flavors[flavor].colors);
-  }, [flavors[flavor].colors]);
+  }, [flavor]);
 
   return (
     <svg

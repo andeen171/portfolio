@@ -1,6 +1,6 @@
-import { PreviewSkillsQueryResult } from '@/sanity/types';
-import { useTranslations } from 'next-intl';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
+import type { PreviewSkillsQueryResult } from '@/sanity/types';
 import SkillList from './SkillList';
 
 type Props = {
@@ -13,7 +13,7 @@ const SkillsSection: React.FC<Props> = ({ skills }) => {
   return (
     <div className="py-24 sm:py-32">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
-        <div className="mx-auto max-w-2xl lg:text-center animated-gradient-text">
+        <div className="mx-auto max-w-2xl lg:text-center animated-gradient-text font-nf">
           <h2 className="text-base font-semibold leading-7">{t('title')}</h2>
           <p className="py-2 text-3xl font-bold tracking-tight sm:text-4xl">{t('subtitle')}</p>
         </div>

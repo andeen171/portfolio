@@ -1,8 +1,7 @@
-import Layout from '@/components/Layout';
-import { InferGetStaticPropsType } from 'next';
+import type { InferGetStaticPropsType } from 'next';
 import { useTranslations } from 'next-intl';
-
 import ExperienceTimeline from '@/components/experiences/ExperienceTimeline';
+import Layout from '@/components/Layout';
 import { client } from '@/sanity/lib/client';
 import { listExperiencesQuery } from '@/sanity/queries';
 
@@ -30,7 +29,7 @@ export default function Experiences({
     <Layout>
       <section className="py-16 sm:py-20 md:py-32 mt-12">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="animated-gradient-text mx-auto max-w-2xl text-center mb-10">
+          <div className="animated-gradient-text mx-auto max-w-2xl text-center mb-10 font-nf">
             <h2 className="text-sm sm:text-base font-semibold leading-7">{t('title')}</h2>
             <p className="py-2 text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight">
               {t('subtitle')}

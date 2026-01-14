@@ -1,10 +1,10 @@
+import type { FlavorName } from '@catppuccin/palette';
+import { type ReactNode, useEffect, useState } from 'react';
 import Footer from '@/components/Footer';
 import Header from '@/components/Header';
 import ShootingStars from '@/components/ShootingStars';
 import StarsBackground from '@/components/StarsBackground';
 import { useCtpStore } from '@/store';
-import { type FlavorName } from '@catppuccin/palette';
-import { type ReactNode, useEffect, useState } from 'react';
 
 interface LayoutProps {
   children: ReactNode;

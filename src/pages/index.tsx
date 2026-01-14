@@ -1,13 +1,17 @@
-import HeroSection from '@/components/HeroSection';
-import Layout from '@/components/Layout';
+import type { InferGetStaticPropsType } from 'next';
+import Head from 'next/head';
 import AboutSection from '@/components/about/AboutSection';
 import ExperiencesSection from '@/components/experiences/ExperiencesSection';
+import HeroSection from '@/components/HeroSection';
+import Layout from '@/components/Layout';
 import ProjectsSection from '@/components/projects/ProjectsSection';
 import SkillsSection from '@/components/skills/SkillsSection';
 import { client } from '@/sanity/lib/client';
-import { previewExperiencesQuery, previewProjectsQuery, previewSkillsQuery, } from '@/sanity/queries';
-import { InferGetStaticPropsType } from 'next';
-import Head from 'next/head';
+import {
+  previewExperiencesQuery,
+  previewProjectsQuery,
+  previewSkillsQuery,
+} from '@/sanity/queries';
 
 const options = { next: { revalidate: 30 } };
 

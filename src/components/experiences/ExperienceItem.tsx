@@ -1,7 +1,7 @@
-import { ListExperiencesQueryResult } from '@/sanity/types';
-import { useTranslations, useLocale } from 'next-intl';
-import { useLocalization } from '@/utils/localization';
+import { useLocale, useTranslations } from 'next-intl';
 import { useMemo, useState } from 'react';
+import type { ListExperiencesQueryResult } from '@/sanity/types';
+import { useLocalization } from '@/utils/localization';
 
 interface ExperienceProps {
   experience: ListExperiencesQueryResult[number];
@@ -32,18 +32,17 @@ const ExperienceItem: React.FC<ExperienceProps> = ({ experience }) => {
   }, [experience.startDate, experience.endDate, locale, t]);
 
   return (
-    <div
+    <button
+      type="button"
       key={experience._id}
       onClick={() => setIsExpanded((v) => !v)}
       onKeyDown={(e) => e.key === 'Enter' && setIsExpanded((v) => !v)}
-      role="button"
-      tabIndex={0}
-      className="group relative overflow-hidden rounded-lg border border-ctp-surface1/40 bg-ctp-mantle/50 p-6 transition-all duration-300 hover:border-ctp-surface2 hover:bg-ctp-mantle/70 cursor-pointer backdrop-blur-sm"
+      className="group w-full text-left relative flex flex-col min-h-45 overflow-hidden rounded-lg border border-ctp-surface1/40 bg-ctp-mantle/50 p-6 transition-all duration-300 hover:border-ctp-surface2 hover:bg-ctp-mantle/70 cursor-pointer backdrop-blur-sm"
     >
       {/* Subtle gradient overlay on hover */}
-      <div className="absolute inset-0 bg-gradient-to-br from-ctp-blue/5 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+      <div className="absolute inset-0 bg-linear-to-br from-ctp-blue/5 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
 
-      <div className="relative z-10">
+      <div className="relative z-10 flex flex-col h-full">
         {/* Header */}
         <div className="flex items-start justify-between gap-4 mb-3">
           <div className="flex-1">
@@ -63,10 +62,10 @@ const ExperienceItem: React.FC<ExperienceProps> = ({ experience }) => {
         </div>
 
         {/* Description with smooth expand/collapse */}
-        <div className="relative">
+        <div className="relative flex-1">
           <div
             className={`overflow-hidden transition-all duration-500 ease-in-out ${
-              isExpanded ? 'max-h-[2000px] opacity-100' : 'max-h-[4.5rem] opacity-90'
+              isExpanded ? 'max-h-500 opacity-100' : 'max-h-18 opacity-90'
             }`}
           >
             <p className="text-sm leading-relaxed text-ctp-text/90">{description}</p>
@@ -74,7 +73,7 @@ const ExperienceItem: React.FC<ExperienceProps> = ({ experience }) => {
 
           {/* Fade overlay when collapsed */}
           {!isExpanded && description.length > 150 && (
-            <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-ctp-mantle/50 to-transparent pointer-events-none" />
+            <div className="absolute bottom-0 left-0 right-0 h-8 bg-linear-to-t from-ctp-mantle/50 to-transparent pointer-events-none" />
           )}
         </div>
 
@@ -103,7 +102,7 @@ const ExperienceItem: React.FC<ExperienceProps> = ({ experience }) => {
           </div>
         )}
       </div>
-    </div>
+    </button>
   );
 };
 

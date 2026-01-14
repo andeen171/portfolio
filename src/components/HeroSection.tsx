@@ -1,7 +1,7 @@
-import ProgrammingSVG from '@/components/SVG/ProgrammingSVG';
 import { useTranslations } from 'next-intl';
 import { useEffect, useRef } from 'react';
 import Typed from 'typed.js';
+import ProgrammingSVG from '@/components/SVG/ProgrammingSVG';
 import BackgroundBlurSVG from './SVG/BackgroundBlurSVG';
 
 const HeroSection: React.FC = () => {
@@ -28,7 +28,7 @@ const HeroSection: React.FC = () => {
         <ProgrammingSVG />
       </div>
       {/* Text below SVG in mobile, side by side in md screens */}
-      <div className="animated-gradient-text w-full sm:pl-8 md:pl-12 md:pt-12 lg:h-full lg:w-[50vw] text-4xl sm:text-5xl md:text-6xl">
+      <div className="animated-gradient-text w-full sm:pl-8 md:pl-12 md:pt-12 lg:h-full lg:w-[50vw] text-4xl sm:text-5xl md:text-6xl font-nf">
         <span
           className="text-left text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight"
           ref={nameRef}

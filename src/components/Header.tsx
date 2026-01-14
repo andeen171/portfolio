@@ -1,4 +1,3 @@
-import { useTranslations } from 'next-intl';
 import { Menu, Transition } from '@headlessui/react';
 import {
   Bars3Icon,
@@ -9,6 +8,7 @@ import {
 } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
+import { useTranslations } from 'next-intl';
 import { Fragment, useEffect, useState } from 'react';
 import LanguageSelector from './LanguageSelector';
 import ThemeSelector from './ThemeSelector';

@@ -1,6 +1,6 @@
-import { useCtpStore } from '@/store';
 import { type CatppuccinColors, flavors } from '@catppuccin/palette';
 import { useEffect, useState } from 'react';
+import { useCtpStore } from '@/store';
 
 type Props = {
   id: string;
@@ -12,7 +12,7 @@ const CatppuccinGradient: React.FC<Props> = ({ id }) => {
 
   useEffect(() => {
     setLabels(flavors[flavor].colors);
-  }, [flavors[flavor].colors]);
+  }, [flavor]);
   return (
     <linearGradient id={id} x1="0%" y1="0%" x2="200%" y2="0%">
       <stop offset="0%" stopColor={labels.teal.hex}>

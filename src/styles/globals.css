@@ -1,11 +1,15 @@
-@import 'https://www.nerdfonts.com/assets/css/webfont.css';
-@import '@catppuccin/tailwindcss/mocha.css';
-@import '@catppuccin/tailwindcss/frappe.css';
-@import '@catppuccin/tailwindcss/macchiato.css';
+@import "https://www.nerdfonts.com/assets/css/webfont.css";
+@import "@catppuccin/tailwindcss/mocha.css";
+@import "@catppuccin/tailwindcss/frappe.css";
+@import "@catppuccin/tailwindcss/macchiato.css";
 
-@import 'tailwindcss';
+@import "tailwindcss";
 
-@config '../../tailwind.config.mjs';
+@theme {
+  --font-nf: "FiraCode NF", monospace;
+}
+
+@config "../../tailwind.config.mjs";
 
 /*
   The default border color has changed to `currentcolor` in Tailwind CSS v4,
@@ -26,7 +30,8 @@
 }
 
 /* Corrigir problemas de overflow em dispositivos móveis */
-html, body {
+html,
+body {
   max-width: 100vw;
   overflow-x: hidden;
   margin: 0;
@@ -50,7 +55,7 @@ body::-webkit-scrollbar {
 }
 
 .nf {
-  font-family: 'FiraCode Nerd Font Mono', monospace !important;
+  font-family: "FiraCode NF", monospace;
 }
 
 .skill-svg-container svg,
@@ -63,5 +68,5 @@ body::-webkit-scrollbar {
 .skill-svg-container-modal circle,
 .skill-svg-container-modal rect,
 .skill-svg-container-modal polygon {
-  fill: url(#skillGradientModal) !important;
+  fill: url(#skillGradientModal);
 }

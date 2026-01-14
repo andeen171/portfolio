@@ -1,9 +1,9 @@
-import { client } from '@/sanity/lib/client';
-import type { ListProjectsQueryResult, Skill } from '@/sanity/types';
-import { useTranslations, useLocale } from 'next-intl';
-import { useLocalization } from '@/utils/localization';
 import imageUrlBuilder from '@sanity/image-url';
 import type { SanityImageSource } from '@sanity/image-url/lib/types/types';
+import { useLocale, useTranslations } from 'next-intl';
+import { client } from '@/sanity/lib/client';
+import type { ListProjectsQueryResult } from '@/sanity/types';
+import { useLocalization } from '@/utils/localization';
 import { Timeline } from '../timeline/timeline';
 
 interface ProjectTimelineProps {
@@ -43,7 +43,10 @@ const ProjectTimeline: React.FC<ProjectTimelineProps> = ({ projects }) => {
         <div className="space-y-8 sm:space-y-10">
           {yearProjects.map((project) => {
             const projectName = getLocalizedValue(project.name, locale as 'en-US' | 'pt-BR');
-            const projectDescription = getLocalizedValue(project.description, locale as 'en-US' | 'pt-BR');
+            const projectDescription = getLocalizedValue(
+              project.description,
+              locale as 'en-US' | 'pt-BR'
+            );
             const projectImageUrl = project.images
               ? urlFor(project.images[0]!)?.width(550).height(310).url()
               : null;
@@ -51,18 +54,20 @@ const ProjectTimeline: React.FC<ProjectTimelineProps> = ({ projects }) => {
             return (
               <div
                 key={project._id}
-                className="overflow-hidden rounded-xl bg-ctp-mantle shadow-xl transition-all duration-300 hover:shadow-lg hover:scale-[1.01]"
+                className="flex flex-col h-full overflow-hidden rounded-xl bg-ctp-mantle shadow-xl transition-all duration-300 hover:shadow-lg hover:scale-[1.01]"
               >
                 {projectImageUrl && (
-                  <img
-                    src={projectImageUrl}
-                    alt={projectName}
-                    className="aspect-video w-full rounded-t-xl object-cover"
-                    width="550"
-                    height="310"
-                  />
+                  <div className="shrink-0">
+                    <img
+                      src={projectImageUrl}
+                      alt={projectName}
+                      className="aspect-video w-full rounded-t-xl object-cover"
+                      width="550"
+                      height="310"
+                    />
+                  </div>
                 )}
-                <div className="p-5">
+                <div className="flex flex-col flex-1 p-5">
                   <div className="mb-3 flex flex-wrap gap-2">
                     {project.skills &&
                       Array.isArray(project.skills) &&
@@ -73,7 +78,7 @@ const ProjectTimeline: React.FC<ProjectTimelineProps> = ({ projects }) => {
                           font-semibold text-ctp-base ${
                             index === 0
                               ? 'bg-ctp-lavender'
-                              : index === project.skills?.length! - 1
+                              : project.skills && index === project.skills.length - 1
                                 ? 'bg-ctp-teal'
                                 : 'bg-ctp-pink'
                           }`}

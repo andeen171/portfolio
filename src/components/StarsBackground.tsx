@@ -1,7 +1,8 @@
+import { type CatppuccinColors, flavors } from '@catppuccin/palette';
+import type React from 'react';
+import { type RefObject, useCallback, useEffect, useRef, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { useCtpStore } from '@/store';
-import { type CatppuccinColors, flavors } from '@catppuccin/palette';
-import React, { RefObject, useCallback, useEffect, useRef, useState } from 'react';
 
 interface StarProps {
   x: number;
@@ -40,7 +41,7 @@ export const StarsBackground: React.FC<StarBackgroundProps> = ({
   // Update colors when flavor changes
   useEffect(() => {
     setColors(flavors[flavor].colors);
-  }, [flavors[flavor]]);
+  }, [flavor]);
 
   const getStarColor = (colorIndex: number, opacity: number): string => {
     const starColors = [

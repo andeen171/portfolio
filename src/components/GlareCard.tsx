@@ -1,8 +1,8 @@
+import { type CatppuccinColors, flavors } from '@catppuccin/palette';
+import type { Properties } from 'csstype';
+import { useEffect, useRef, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { useCtpStore } from '@/store';
-import { type CatppuccinColors, flavors } from '@catppuccin/palette';
-import { Properties } from 'csstype';
-import { useEffect, useRef, useState } from 'react';
 
 export const GlareCard = ({
   children,
@@ -32,7 +32,7 @@ export const GlareCard = ({
 
   useEffect(() => {
     setColors(flavors[flavor].colors);
-  }, [flavors[flavor]]);
+  }, [flavor]);
 
   const isLightTheme = flavor === 'latte';
   const opacityMultiplier = isLightTheme ? 1.5 : 1;
