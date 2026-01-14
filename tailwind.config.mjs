@@ -1,32 +1,5 @@
-const colors = [
-  'rosewater',
-  'flamingo',
-  'pink',
-  'mauve',
-  'red',
-  'maroon',
-  'peach',
-  'yellow',
-  'green',
-  'teal',
-  'sky',
-  'sapphire',
-  'blue',
-  'lavender',
-  'base',
-  'mantle',
-  'crust',
-  'surface0',
-  'surface1',
-];
+// @ts-nocheck
 
-const safeList = ['ctp-mocha', 'ctp-macchiato', 'ctp-frappe', 'ctp-latte', 'animate-colorchange'];
-colors.map((color) => {
-  safeList.push(`bg-ctp-${color}`);
-  safeList.push(`text-ctp-${color}`);
-});
-
-/** @type {import('tailwindcss').Config} */
 const config = {
   content: ['./src/**/*.{js,ts,j1sx,tsx}'],
   theme: {
@@ -48,7 +21,6 @@ const config = {
       },
     },
   },
-  safelist: safeList,
   plugins: [],
 };
 
