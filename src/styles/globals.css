@@ -1,4 +1,5 @@
 @import 'https://www.nerdfonts.com/assets/css/webfont.css';
+@import "@catppuccin/tailwindcss/mocha.css";
 
 @tailwind base;
 @tailwind components;
