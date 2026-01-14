@@ -1,5 +1,5 @@
+import type { SanityImageSource } from '@sanity/image-url';
 import imageUrlBuilder from '@sanity/image-url';
-import type { SanityImageSource } from '@sanity/image-url/lib/types/types';
 import { useLocale, useTranslations } from 'next-intl';
 import { client } from '@/sanity/lib/client';
 import type { ListProjectsQueryResult } from '@/sanity/types';

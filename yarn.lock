@@ -4620,13 +4620,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sanity/image-url@npm:1":
-  version: 1.2.0
-  resolution: "@sanity/image-url@npm:1.2.0"
-  checksum: 10c0/cb2de279d9efae91c856688d5a0b1919335ea884f9957085489244d0124ee403fe17c2d4513eb5312d6f6a95ee2c8202e2e9e10cf61b3e7587d252de0f38cf74
-  languageName: node
-  linkType: hard
-
 "@sanity/image-url@npm:^2.0.2":
   version: 2.0.2
   resolution: "@sanity/image-url@npm:2.0.2"
@@ -10033,7 +10026,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"next-sanity@npm:^12":
+"next-sanity@npm:^12.0.12":
   version: 12.0.12
   resolution: "next-sanity@npm:12.0.12"
   dependencies:
@@ -10058,7 +10051,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"next@npm:16.1.1":
+"next@npm:^16.0.0":
   version: 16.1.1
   resolution: "next@npm:16.1.1"
   dependencies:
@@ -10724,7 +10717,7 @@ __metadata:
     "@heroicons/react": "npm:^2.0.18"
     "@portabletext/react": "npm:^6.0.2"
     "@sanity/client": "npm:^7.14.0"
-    "@sanity/image-url": "npm:1"
+    "@sanity/image-url": "npm:^2.0.2"
     "@sanity/vision": "npm:4"
     "@tailwindcss/forms": "npm:^0.5.11"
     "@tailwindcss/postcss": "npm:^4.1.18"
@@ -10738,13 +10731,13 @@ __metadata:
     clsx: "npm:^2.1.1"
     dotenv: "npm:^17.2.3"
     motion: "npm:^12.26.2"
-    next: "npm:16.1.1"
+    next: "npm:^16.0.0"
     next-intl: "npm:^4.7.0"
-    next-sanity: "npm:^12"
+    next-sanity: "npm:^12.0.12"
     postcss: "npm:8.5.6"
     react: "npm:^19.2.3"
     react-dom: "npm:^19.2.3"
-    sanity: "npm:5.3.0"
+    sanity: "npm:^5.3.0"
     sanity-plugin-internationalized-array: "npm:^3.2.2"
     styled-components: "npm:^6.1"
     superjson: "npm:2.2.6"
@@ -11672,7 +11665,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"sanity@npm:5.3.0":
+"sanity@npm:^5.3.0":
   version: 5.3.0
   resolution: "sanity@npm:5.3.0"
   dependencies:

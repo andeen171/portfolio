@@ -1,6 +1,6 @@
 import { type CatppuccinColors, flavors } from '@catppuccin/palette';
 import type React from 'react';
-import { type RefObject, useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { useCtpStore } from '@/store';
 
@@ -36,7 +36,7 @@ export const StarsBackground: React.FC<StarBackgroundProps> = ({
   const [stars, setStars] = useState<StarProps[]>([]);
   const [scrollY, setScrollY] = useState(0);
   const [colors, setColors] = useState<CatppuccinColors>(flavors[flavor].colors);
-  const canvasRef: RefObject<HTMLCanvasElement> = useRef<HTMLCanvasElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
   // Update colors when flavor changes
   useEffect(() => {
