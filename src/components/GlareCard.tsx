@@ -115,7 +115,6 @@ export const GlareCard = ({
 
   return (
     <div
-      // @ts-expect-error
       style={containerStyle}
       className="relative isolate contain-[layout_style] perspective-[600px] transition-transform duration-(--duration) ease-(--easing) will-change-transform w-full aspect-4/5 max-w-50 h-70"
       ref={refElement}
