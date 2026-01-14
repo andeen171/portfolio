@@ -1,3 +1,4 @@
+import { SpeedInsights } from '@vercel/speed-insights/next';
 import type { AppProps } from 'next/app';
 import { IntlProvider } from 'next-intl';
 
@@ -12,6 +13,7 @@ const MyApp = ({ Component, pageProps }: AppProps<PageProps>) => {
   return (
     <IntlProvider messages={pageProps.messages} locale={pageProps.locale || 'en-US'}>
       <Component {...pageProps} />
+      <SpeedInsights />
     </IntlProvider>
   );
 };

@@ -115,8 +115,9 @@ export const GlareCard = ({
 
   return (
     <div
+      // @ts-expect-error
       style={containerStyle}
-      className="relative isolate [contain:layout_style] [perspective:600px] transition-transform duration-[var(--duration)] ease-[var(--easing)] will-change-transform w-full aspect-[4/5] max-w-[280px]"
+      className="relative isolate contain-[layout_style] perspective-[600px] transition-transform duration-(--duration) ease-(--easing) will-change-transform w-full aspect-4/5 max-w-50 h-70"
       ref={refElement}
       onPointerMove={(event) => {
         const rotateFactor = 0.3;
@@ -166,7 +167,7 @@ export const GlareCard = ({
       }}
     >
       <div
-        className={`h-full grid will-change-transform origin-center transition-transform duration-[var(--duration)] ease-[var(--easing)] [transform:rotateY(var(--r-x))_rotateX(var(--r-y))] rounded-[var(--radius)] border border-ctp-surface0 hover:[--duration:150ms] hover:[--easing:linear] overflow-hidden shadow-lg ${
+        className={`h-full grid will-change-transform origin-center transition-transform duration-(--duration) ease-(--easing) transform-[rotateY(var(--r-x))_rotateX(var(--r-y))] rounded-(--radius) border border-ctp-surface0 hover:[--duration:150ms] hover:[--easing:linear] overflow-hidden shadow-lg ${
           isLightTheme ? 'hover:[--opacity:1.2]' : 'hover:[--opacity:0.9]'
         }`}
       >
@@ -174,7 +175,7 @@ export const GlareCard = ({
           <div className={cn('h-full w-full bg-ctp-mantle', className)}>{children}</div>
         </div>
         <div
-          className="w-full h-full grid [grid-area:1/1] mix-blend-soft-light [clip-path:inset(0_0_1px_0_round_var(--radius))] opacity-[var(--opacity)] transition-opacity duration-[var(--duration)] ease-[var(--easing)] will-change-background"
+          className="w-full h-full grid [grid-area:1/1] mix-blend-soft-light [clip-path:inset(0_0_1px_0_round_var(--radius))] opacity-(--opacity) transition-opacity duration-(--duration) ease-(--easing) will-change-background"
           style={{
             background: `radial-gradient(farthest-corner_circle_at_var(--m-x)_var(--m-y), rgba(${
               colors.lavender.rgb.r
@@ -190,7 +191,7 @@ export const GlareCard = ({
           }}
         />
         <div
-          className="w-full h-full grid [grid-area:1/1] mix-blend-color-dodge opacity-[var(--opacity)] will-change-background transition-opacity [clip-path:inset(0_0_1px_0_round_var(--radius))] relative after:content-[''] after:absolute after:inset-0 after:bg-gradient-to-br after:from-transparent after:via-white/5 after:to-transparent after:mix-blend-overlay"
+          className="w-full h-full grid [grid-area:1/1] mix-blend-color-dodge opacity-(--opacity) will-change-background transition-opacity [clip-path:inset(0_0_1px_0_round_var(--radius))] relative after:content-[''] after:absolute after:inset-0 after:bg-linear-to-br after:from-transparent after:via-white/5 after:to-transparent after:mix-blend-overlay"
           style={{
             background: 'var(--catppuccin-rainbow), var(--diagonal), var(--shine)',
             backgroundSize: '200% 600%, 150% 150%, 200% 200%',
