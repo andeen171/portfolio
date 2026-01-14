@@ -1,5 +1,3 @@
-import ctpPlugin from '@catppuccin/tailwindcss';
-
 const colors = [
   'rosewater',
   'flamingo',
@@ -51,11 +49,7 @@ const config = {
     },
   },
   safelist: safeList,
-  plugins: [
-    ctpPlugin({
-      prefix: 'ctp',
-    }),
-  ],
+  plugins: [],
 };
 
 module.exports = config;
