@@ -1,15 +1,12 @@
-import { getTranslations, setRequestLocale } from 'next-intl/server';
 import SkillList from '@/components/skills/SkillList';
 import { client } from '@/sanity/lib/client';
 import { listSkillsQuery } from '@/sanity/queries';
 import type { Skill } from '@/sanity/types';
+import { getTranslations } from 'next-intl/server';
 
 const options = { next: { revalidate: 16800 } };
 
-export default async function SkillsPage({ params }: { params: Promise<{ locale: string }> }) {
-  const { locale } = await params;
-  setRequestLocale(locale);
-
+export default async function SkillsPage() {
   const skills = await client.fetch<Skill[]>(listSkillsQuery, {}, options);
   const t = await getTranslations('skills');
 

@@ -1,14 +1,11 @@
-import { getTranslations, setRequestLocale } from 'next-intl/server';
 import ExperienceTimeline from '@/components/experiences/ExperienceTimeline';
 import { client } from '@/sanity/lib/client';
 import { listExperiencesQuery } from '@/sanity/queries';
+import { getTranslations } from 'next-intl/server';
 
 const options = { next: { revalidate: 16800 } };
 
-export default async function ExperiencesPage({ params }: { params: Promise<{ locale: string }> }) {
-  const { locale } = await params;
-  setRequestLocale(locale);
-
+export default async function ExperiencesPage() {
   const experiences = await client.fetch(listExperiencesQuery, {}, options);
   const t = await getTranslations('experiences');
 

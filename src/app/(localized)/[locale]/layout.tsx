@@ -1,14 +1,20 @@
-import { SpeedInsights } from '@vercel/speed-insights/next';
-import { notFound } from 'next/navigation';
-import { NextIntlClientProvider } from 'next-intl';
-import { getMessages, setRequestLocale } from 'next-intl/server';
 import Layout from '@/components/Layout';
 import { routing } from '@/i18n/routing';
 import '@/styles/globals.css';
+import { SpeedInsights } from '@vercel/speed-insights/next';
+import { Metadata } from 'next';
+import { NextIntlClientProvider } from 'next-intl';
+import { getMessages, setRequestLocale } from 'next-intl/server';
+import { notFound } from 'next/navigation';
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
 }
+
+export const metadata: Metadata = {
+  title: 'Anderson Ribeiro Lopes',
+  description: "Anderson's Portfolio",
+};
 
 export default async function LocaleLayout({
   children,

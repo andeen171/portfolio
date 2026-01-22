@@ -1,14 +1,11 @@
-import { getTranslations, setRequestLocale } from 'next-intl/server';
 import ProjectTimeline from '@/components/projects/ProjectTimeline';
 import { client } from '@/sanity/lib/client';
 import { listProjectsQuery } from '@/sanity/queries';
+import { getTranslations } from 'next-intl/server';
 
 const options = { next: { revalidate: 16800 } };
 
-export default async function ProjectsPage({ params }: { params: Promise<{ locale: string }> }) {
-  const { locale } = await params;
-  setRequestLocale(locale);
-
+export default async function ProjectsPage() {
   const projects = await client.fetch(listProjectsQuery, {}, options);
   const t = await getTranslations('projects');
 
