@@ -1,3 +1,5 @@
+'use client';
+
 import { type CatppuccinColors, flavors } from '@catppuccin/palette';
 import type React from 'react';
 import { useCallback, useEffect, useRef, useState } from 'react';

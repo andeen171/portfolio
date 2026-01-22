@@ -35,7 +35,7 @@ const ExperienceTimeline: React.FC<ExperienceTimelineProps> = ({ experiences }) 
         .map(([year, yearExperiences]) => ({
           title: year,
           content: (
-            <div className="space-y-8 sm:space-y-10">
+            <div id={`experience-timeline-${year}`} className="space-y-8 sm:space-y-10">
               {yearExperiences.map((experience) => (
                 <ExperienceItem key={experience._id} experience={experience} />
               ))}

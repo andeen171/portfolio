@@ -1,3 +1,5 @@
+'use client';
+
 import { useLocale } from 'next-intl';
 import CatppuccinGlareCard from '@/components/GlareCard';
 import type { Skill } from '@/sanity/types';

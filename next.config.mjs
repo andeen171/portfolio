@@ -6,14 +6,13 @@
  */
 !process.env.SKIP_ENV_VALIDATION && (await import('./src/env.mjs'));
 
+import createNextIntlPlugin from 'next-intl/plugin';
+
+const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts');
+
 /** @type {import("next").NextConfig} */
 const config = {
   reactStrictMode: true,
-
-  i18n: {
-    locales: ['en-US', 'pt-BR'],
-    defaultLocale: 'en-US',
-  },
 
   images: {
     remotePatterns: [
@@ -26,4 +25,4 @@ const config = {
     ],
   },
 };
-export default config;
+export default withNextIntl(config);

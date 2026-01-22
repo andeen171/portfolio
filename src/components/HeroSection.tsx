@@ -1,3 +1,5 @@
+'use client';
+
 import { useTranslations } from 'next-intl';
 import { useEffect, useRef } from 'react';
 import Typed from 'typed.js';

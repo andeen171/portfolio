@@ -1,5 +1,6 @@
+'use client';
+
 import { type CatppuccinColors, flavors } from '@catppuccin/palette';
-import type { Properties } from 'csstype';
 import { useEffect, useRef, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { useCtpStore } from '@/store';

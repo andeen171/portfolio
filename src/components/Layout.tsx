@@ -1,3 +1,5 @@
+'use client';
+
 import type { FlavorName } from '@catppuccin/palette';
 import { type ReactNode, useEffect, useState } from 'react';
 import Footer from '@/components/Footer';

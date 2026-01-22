@@ -1,3 +1,5 @@
+'use client';
+
 import { Menu, Transition } from '@headlessui/react';
 import {
   Bars3Icon,
@@ -6,10 +8,9 @@ import {
   CommandLineIcon,
   HomeIcon,
 } from '@heroicons/react/24/outline';
-import Link from 'next/link';
-import { useRouter } from 'next/router';
 import { useTranslations } from 'next-intl';
 import { Fragment, useEffect, useState } from 'react';
+import { Link, usePathname } from '@/i18n/routing';
 import LanguageSelector from './LanguageSelector';
 import ThemeSelector from './ThemeSelector';
 
@@ -27,8 +28,7 @@ function classNames(...classes: string[]) {
 const Header: React.FC = () => {
   const [scrolled, setScrolled] = useState(false);
   const t = useTranslations('navigation');
-  const router = useRouter();
-  const currentPath = router.pathname;
+  const currentPath = usePathname();
   const navigation = getNavigation(t);
 
   useEffect(() => {
@@ -82,7 +82,7 @@ const Header: React.FC = () => {
                   <span>{item.name}</span>
                   <span
                     className={classNames(
-                      'absolute bottom-0 left-0 h-0.5 bg-gradient-to-r from-ctp-teal to-ctp-lavender transition-all duration-300 ',
+                      'absolute bottom-0 left-0 h-0.5 bg-linear-to-r from-ctp-teal to-ctp-lavender transition-all duration-300 ',
                       isActive ? 'w-full' : 'w-0 group-hover:w-full'
                     )}
                   />

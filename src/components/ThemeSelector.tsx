@@ -1,3 +1,5 @@
+'use client';
+
 import type { FlavorName } from '@catppuccin/palette';
 import { Listbox, Transition } from '@headlessui/react';
 import { Fragment, useEffect, useState } from 'react';

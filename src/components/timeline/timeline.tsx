@@ -1,3 +1,5 @@
+'use client';
+
 import { motion, useScroll, useTransform } from 'motion/react';
 import type React from 'react';
 import { useEffect, useRef, useState } from 'react';
@@ -30,8 +32,11 @@ export const Timeline = ({ data }: { data: TimelineEntry[] }) => {
   return (
     <div className="w-full font-sans" ref={containerRef}>
       <div ref={ref} className="relative max-w-7xl mx-auto pb-20">
-        {data.map((item) => (
-          <div key={item.title} className="flex justify-start pt-10 md:pt-40 md:gap-6">
+        {data.map((item, index) => (
+          <div
+            key={`${item.title}-${index}`}
+            className="flex justify-start pt-10 md:pt-40 md:gap-6"
+          >
             <div className="sticky flex flex-col md:flex-row z-40 items-center top-20 md:top-40 self-start max-w-xs lg:max-w-sm md:w-full">
               <div className="h-10 absolute left-3 md:left-3 w-10 rounded-full bg-ctp-base flex items-center justify-center z-10">
                 <div className="h-4 w-4 rounded-full bg-linear-to-r from-ctp-teal to-ctp-lavender" />

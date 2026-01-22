@@ -40,7 +40,7 @@ const ProjectTimeline: React.FC<ProjectTimelineProps> = ({ projects }) => {
     .map(([year, yearProjects]) => ({
       title: year,
       content: (
-        <div className="space-y-8 sm:space-y-10">
+        <div id={`project-timeline-${year}`} className="space-y-8 sm:space-y-10">
           {yearProjects.map((project) => {
             const projectName = getLocalizedValue(project.name, locale as 'en-US' | 'pt-BR');
             const projectDescription = getLocalizedValue(
@@ -73,7 +73,7 @@ const ProjectTimeline: React.FC<ProjectTimelineProps> = ({ projects }) => {
                       Array.isArray(project.skills) &&
                       project.skills.map((skill, index: number) => (
                         <span
-                          key={skill._id || index}
+                          key={`${skill._id || skill.name}-${index}`}
                           className={`whitespace-nowrap rounded-full px-2.5 py-0.5 text-xs 
                           font-semibold text-ctp-base ${
                             index === 0
