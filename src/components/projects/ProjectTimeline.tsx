@@ -1,5 +1,5 @@
 import type { SanityImageSource } from '@sanity/image-url';
-import imageUrlBuilder from '@sanity/image-url';
+import { createImageUrlBuilder } from '@sanity/image-url';
 import { useLocale, useTranslations } from 'next-intl';
 import { client } from '@/sanity/lib/client';
 import type { ListProjectsQueryResult } from '@/sanity/types';
@@ -12,7 +12,7 @@ interface ProjectTimelineProps {
 
 const { projectId, dataset } = client.config();
 const urlFor = (source: SanityImageSource) =>
-  projectId && dataset ? imageUrlBuilder({ projectId, dataset }).image(source) : null;
+  projectId && dataset ? createImageUrlBuilder({ projectId, dataset }).image(source) : null;
 
 const ProjectTimeline: React.FC<ProjectTimelineProps> = ({ projects }) => {
   const locale = useLocale();

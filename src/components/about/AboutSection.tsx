@@ -24,7 +24,7 @@ const AboutSection: React.FC = () => {
     return () => {
       name.destroy();
     };
-  });
+  }, [t]);
   return (
     <div className="relative isolate overflow-hidden px-4 py-8 sm:px-6 lg:overflow-visible lg:px-0">
       <div className="mx-auto grid max-w-2xl grid-cols-1 gap-x-6 gap-y-8 sm:gap-x-8 sm:gap-y-12 lg:mx-0 lg:max-w-none lg:grid-cols-2 lg:items-start lg:gap-y-10">

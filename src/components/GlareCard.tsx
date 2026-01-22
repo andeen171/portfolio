@@ -50,7 +50,7 @@ export const GlareCard = ({
     '--radius': '16px',
     '--easing': 'ease',
     '--transition': 'var(--duration) var(--easing)',
-  } as Properties<string | number>;
+  } as React.CSSProperties;
 
   const backgroundStyle = {
     '--step': '4%',
@@ -99,7 +99,7 @@ export const GlareCard = ({
     backgroundBlendMode: isLightTheme
       ? 'multiply, overlay, soft-light'
       : 'soft-light, hue, multiply, overlay',
-  };
+  } as React.CSSProperties;
 
   const updateStyles = () => {
     if (refElement.current) {

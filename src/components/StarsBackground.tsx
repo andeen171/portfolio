@@ -130,7 +130,7 @@ export const StarsBackground: React.FC<StarBackgroundProps> = ({
 
     let animationFrameId: number;
 
-    const render = () => {
+    const render = (time: number) => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       // biome-ignore lint/complexity/noForEach: <explanation>
@@ -141,10 +141,16 @@ export const StarsBackground: React.FC<StarBackgroundProps> = ({
         // Skip stars that are out of view
         if (parallaxY < -50 || parallaxY > canvas.height + 50) return;
 
+        // Update twinkle
+        let currentOpacity = star.opacity;
+        if (star.twinkleSpeed !== null) {
+          currentOpacity = 0.2 + Math.abs(Math.sin((time * 0.001) / star.twinkleSpeed) * 0.4);
+        }
+
         ctx.beginPath();
         ctx.arc(star.x, parallaxY, star.radius, 0, Math.PI * 2);
 
-        const color = getStarColor(star.colorIndex, star.opacity);
+        const color = getStarColor(star.colorIndex, currentOpacity);
         ctx.fillStyle = color;
 
         // Add subtle glow for larger stars
@@ -156,17 +162,12 @@ export const StarsBackground: React.FC<StarBackgroundProps> = ({
         } else {
           ctx.fill();
         }
-
-        // Update twinkle
-        if (star.twinkleSpeed !== null) {
-          star.opacity = 0.2 + Math.abs(Math.sin((Date.now() * 0.001) / star.twinkleSpeed) * 0.4);
-        }
       });
 
       animationFrameId = requestAnimationFrame(render);
     };
 
-    render();
+    animationFrameId = requestAnimationFrame(render);
 
     return () => {
       cancelAnimationFrame(animationFrameId);

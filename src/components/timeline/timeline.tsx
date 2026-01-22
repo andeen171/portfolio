@@ -12,13 +12,12 @@ export const Timeline = ({ data }: { data: TimelineEntry[] }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [height, setHeight] = useState(0);
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: Because
   useEffect(() => {
     if (ref.current) {
       const rect = ref.current.getBoundingClientRect();
       setHeight(rect.height);
     }
-  }, [ref]);
+  }, []);
 
   const { scrollYProgress } = useScroll({
     target: containerRef,

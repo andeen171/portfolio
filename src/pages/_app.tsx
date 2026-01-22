@@ -11,7 +11,15 @@ type PageProps = {
 
 const MyApp = ({ Component, pageProps }: AppProps<PageProps>) => {
   return (
-    <IntlProvider messages={pageProps.messages} locale={pageProps.locale || 'en-US'}>
+    <IntlProvider
+      messages={pageProps.messages || {}}
+      locale={pageProps.locale || 'en-US'}
+      onError={(error) => {
+        if (error.code !== 'MISSING_MESSAGE') {
+          console.error(error);
+        }
+      }}
+    >
       <Component {...pageProps} />
       <SpeedInsights />
     </IntlProvider>
