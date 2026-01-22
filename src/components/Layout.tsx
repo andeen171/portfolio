@@ -1,12 +1,12 @@
 'use client';
 
-import type { FlavorName } from '@catppuccin/palette';
-import { type ReactNode, useEffect, useState } from 'react';
 import Footer from '@/components/Footer';
 import Header from '@/components/Header';
 import ShootingStars from '@/components/ShootingStars';
 import StarsBackground from '@/components/StarsBackground';
 import { useCtpStore } from '@/store';
+import type { FlavorName } from '@catppuccin/palette';
+import { type ReactNode, useEffect, useState } from 'react';
 
 interface LayoutProps {
   children: ReactNode;
@@ -27,7 +27,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       {/* Background Stars */}
       <div className="fixed inset-0 z-0">
         <StarsBackground
-          starDensity={0.00012}
+          starDensity={0.00015}
           allStarsTwinkle={true}
           twinkleProbability={0.7}
           minTwinkleSpeed={1.2}

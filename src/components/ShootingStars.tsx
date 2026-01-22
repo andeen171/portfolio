@@ -1,8 +1,10 @@
 'use client';
 
+import { cn } from '@/lib/utils';
+import { useCtpStore } from '@/store';
+import { type CatppuccinColors, flavors } from '@catppuccin/palette';
 import type React from 'react';
 import { useEffect, useRef, useState } from 'react';
-import { cn } from '@/lib/utils';
 
 interface ShootingStar {
   id: number;
@@ -52,8 +54,15 @@ export const ShootingStars: React.FC<ShootingStarsProps> = ({
   starHeight = 1,
   className,
 }) => {
+  const flavor = useCtpStore((state) => state.flavor);
+  const [colors, setColors] = useState<CatppuccinColors>(flavors[flavor].colors);
   const [star, setStar] = useState<ShootingStar | null>(null);
   const svgRef = useRef<SVGSVGElement>(null);
+
+  // Update colors when flavor changes
+  useEffect(() => {
+    setColors(flavors[flavor].colors);
+  }, [flavor]);
 
   useEffect(() => {
     let timeoutId: NodeJS.Timeout;
@@ -136,19 +145,73 @@ export const ShootingStars: React.FC<ShootingStarsProps> = ({
       )}
       <defs>
         <linearGradient id="gradient0" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" style={{ stopColor: 'rgb(var(--ctp-teal))', stopOpacity: 0 }} />
-          <stop offset="50%" style={{ stopColor: 'rgb(var(--ctp-sapphire))', stopOpacity: 0.6 }} />
-          <stop offset="100%" style={{ stopColor: 'rgb(var(--ctp-lavender))', stopOpacity: 1 }} />
+          <stop
+            offset="0%"
+            style={{
+              stopColor: `rgb(${colors.teal.rgb.r}, ${colors.teal.rgb.g}, ${colors.teal.rgb.b})`,
+              stopOpacity: 0,
+            }}
+          />
+          <stop
+            offset="50%"
+            style={{
+              stopColor: `rgb(${colors.sapphire.rgb.r}, ${colors.sapphire.rgb.g}, ${colors.sapphire.rgb.b})`,
+              stopOpacity: 0.6,
+            }}
+          />
+          <stop
+            offset="100%"
+            style={{
+              stopColor: `rgb(${colors.lavender.rgb.r}, ${colors.lavender.rgb.g}, ${colors.lavender.rgb.b})`,
+              stopOpacity: 1,
+            }}
+          />
         </linearGradient>
         <linearGradient id="gradient1" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" style={{ stopColor: 'rgb(var(--ctp-pink))', stopOpacity: 0 }} />
-          <stop offset="50%" style={{ stopColor: 'rgb(var(--ctp-mauve))', stopOpacity: 0.6 }} />
-          <stop offset="100%" style={{ stopColor: 'rgb(var(--ctp-pink))', stopOpacity: 1 }} />
+          <stop
+            offset="0%"
+            style={{
+              stopColor: `rgb(${colors.pink.rgb.r}, ${colors.pink.rgb.g}, ${colors.pink.rgb.b})`,
+              stopOpacity: 0,
+            }}
+          />
+          <stop
+            offset="50%"
+            style={{
+              stopColor: `rgb(${colors.mauve.rgb.r}, ${colors.mauve.rgb.g}, ${colors.mauve.rgb.b})`,
+              stopOpacity: 0.6,
+            }}
+          />
+          <stop
+            offset="100%"
+            style={{
+              stopColor: `rgb(${colors.pink.rgb.r}, ${colors.pink.rgb.g}, ${colors.pink.rgb.b})`,
+              stopOpacity: 1,
+            }}
+          />
         </linearGradient>
         <linearGradient id="gradient2" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" style={{ stopColor: 'rgb(var(--ctp-sky))', stopOpacity: 0 }} />
-          <stop offset="50%" style={{ stopColor: 'rgb(var(--ctp-blue))', stopOpacity: 0.6 }} />
-          <stop offset="100%" style={{ stopColor: 'rgb(var(--ctp-teal))', stopOpacity: 1 }} />
+          <stop
+            offset="0%"
+            style={{
+              stopColor: `rgb(${colors.sky.rgb.r}, ${colors.sky.rgb.g}, ${colors.sky.rgb.b})`,
+              stopOpacity: 0,
+            }}
+          />
+          <stop
+            offset="50%"
+            style={{
+              stopColor: `rgb(${colors.blue.rgb.r}, ${colors.blue.rgb.g}, ${colors.blue.rgb.b})`,
+              stopOpacity: 0.6,
+            }}
+          />
+          <stop
+            offset="100%"
+            style={{
+              stopColor: `rgb(${colors.teal.rgb.r}, ${colors.teal.rgb.g}, ${colors.teal.rgb.b})`,
+              stopOpacity: 1,
+            }}
+          />
         </linearGradient>
       </defs>
     </svg>

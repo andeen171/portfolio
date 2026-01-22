@@ -1,10 +1,10 @@
 'use client';
 
+import { cn } from '@/lib/utils';
+import { useCtpStore } from '@/store';
 import { type CatppuccinColors, flavors } from '@catppuccin/palette';
 import type React from 'react';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { cn } from '@/lib/utils';
-import { useCtpStore } from '@/store';
 
 interface StarProps {
   x: number;
@@ -27,7 +27,7 @@ interface StarBackgroundProps {
 }
 
 export const StarsBackground: React.FC<StarBackgroundProps> = ({
-  starDensity = 0.00008,
+  starDensity = 0.00015,
   allStarsTwinkle = true,
   twinkleProbability = 0.8,
   minTwinkleSpeed = 0.8,
@@ -63,21 +63,20 @@ export const StarsBackground: React.FC<StarBackgroundProps> = ({
 
   const generateStars = useCallback(
     (width: number, height: number): StarProps[] => {
-      const area = width * (height + 1000); // Extra height for parallax
+      const area = width * height;
       const numStars = Math.floor(area * starDensity);
       return Array.from({ length: numStars }, (_) => {
         const shouldTwinkle = allStarsTwinkle || Math.random() < twinkleProbability;
-        const y = Math.random() * (height + 1000) - 500;
         return {
           x: Math.random() * width,
-          y,
-          initialY: y,
+          y: Math.random() * height,
+          initialY: Math.random() * height,
           radius: Math.random() * 1.2 + 0.4,
           opacity: Math.random() * 0.4 + 0.3,
           twinkleSpeed: shouldTwinkle
             ? minTwinkleSpeed + Math.random() * (maxTwinkleSpeed - minTwinkleSpeed)
             : null,
-          parallaxSpeed: Math.random() * 0.5 + 0.2,
+          parallaxSpeed: Math.random() * 0.5 + 0.1,
           colorIndex: Math.floor(Math.random() * 6),
         };
       });
@@ -102,9 +101,11 @@ export const StarsBackground: React.FC<StarBackgroundProps> = ({
         if (!ctx) return;
 
         const { width, height } = canvas.getBoundingClientRect();
-        canvas.width = width;
-        canvas.height = height;
-        setStars(generateStars(width, height));
+        if (canvas.width !== width || canvas.height !== height) {
+          canvas.width = width;
+          canvas.height = height;
+          setStars(generateStars(width, height));
+        }
       }
     };
 
@@ -137,11 +138,10 @@ export const StarsBackground: React.FC<StarBackgroundProps> = ({
 
       // biome-ignore lint/complexity/noForEach: <explanation>
       stars.forEach((star) => {
-        // Apply parallax effect
-        const parallaxY = star.initialY + scrollY * star.parallaxSpeed;
-
-        // Skip stars that are out of view
-        if (parallaxY < -50 || parallaxY > canvas.height + 50) return;
+        // Apply parallax effect with wrapping
+        // The stars move based on scroll, and we wrap them around the canvas height
+        let parallaxY = (star.initialY - scrollY * star.parallaxSpeed) % canvas.height;
+        if (parallaxY < 0) parallaxY += canvas.height;
 
         // Update twinkle
         let currentOpacity = star.opacity;

@@ -33,9 +33,14 @@ const ExperienceTimeline: React.FC<ExperienceTimelineProps> = ({ experiences }) 
       data={Object.entries(groupedExperiences)
         .sort(([yearA], [yearB]) => Number(yearB) - Number(yearA))
         .map(([year, yearExperiences]) => ({
+          id: `experience-year-${year}`,
           title: year,
           content: (
-            <div id={`experience-timeline-${year}`} className="space-y-8 sm:space-y-10">
+            <div
+              key={`experience-timeline-content-${year}`}
+              id={`experience-timeline-${year}`}
+              className="space-y-8 sm:space-y-10"
+            >
               {yearExperiences.map((experience) => (
                 <ExperienceItem key={experience._id} experience={experience} />
               ))}

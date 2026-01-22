@@ -1,9 +1,9 @@
-import type { SanityImageSource } from '@sanity/image-url';
-import { createImageUrlBuilder } from '@sanity/image-url';
-import { useLocale, useTranslations } from 'next-intl';
 import { client } from '@/sanity/lib/client';
 import type { ListProjectsQueryResult } from '@/sanity/types';
 import { useLocalization } from '@/utils/localization';
+import type { SanityImageSource } from '@sanity/image-url';
+import { createImageUrlBuilder } from '@sanity/image-url';
+import { useLocale, useTranslations } from 'next-intl';
 import { Timeline } from '../timeline/timeline';
 
 interface ProjectTimelineProps {
@@ -37,10 +37,13 @@ const ProjectTimeline: React.FC<ProjectTimelineProps> = ({ projects }) => {
   // Converte para o formato esperado pelo componente Timeline
   const timelineData = Object.entries(groupedProjects)
     .sort(([yearA], [yearB]) => Number(yearB) - Number(yearA))
-    .map(([year, yearProjects]) => ({
-      title: year,
-      content: (
-        <div id={`project-timeline-${year}`} className="space-y-8 sm:space-y-10">
+    .map(([year, yearProjects]) => {
+      const content = (
+        <div
+          key={`project-timeline-content-${year}`}
+          id={`project-timeline-${year}`}
+          className="space-y-8 sm:space-y-10"
+        >
           {yearProjects.map((project) => {
             const projectName = getLocalizedValue(project.name, locale as 'en-US' | 'pt-BR');
             const projectDescription = getLocalizedValue(
@@ -138,8 +141,14 @@ const ProjectTimeline: React.FC<ProjectTimelineProps> = ({ projects }) => {
             );
           })}
         </div>
-      ),
-    }));
+      );
+
+      return {
+        id: `project-year-${year}`,
+        title: year,
+        content: content,
+      };
+    });
 
   return <Timeline data={timelineData} />;
 };

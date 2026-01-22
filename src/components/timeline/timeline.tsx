@@ -5,6 +5,7 @@ import type React from 'react';
 import { useEffect, useRef, useState } from 'react';
 
 interface TimelineEntry {
+  id?: string;
   title: string;
   content: React.ReactNode;
 }
@@ -34,7 +35,7 @@ export const Timeline = ({ data }: { data: TimelineEntry[] }) => {
       <div ref={ref} className="relative max-w-7xl mx-auto pb-20">
         {data.map((item, index) => (
           <div
-            key={`${item.title}-${index}`}
+            key={item.id || `${item.title}-${index}`}
             className="flex justify-start pt-10 md:pt-40 md:gap-6"
           >
             <div className="sticky flex flex-col md:flex-row z-40 items-center top-20 md:top-40 self-start max-w-xs lg:max-w-sm md:w-full">
@@ -50,7 +51,7 @@ export const Timeline = ({ data }: { data: TimelineEntry[] }) => {
               <h3 className="md:hidden block text-2xl mb-6 text-left font-extrabold animated-gradient-text">
                 {item.title}
               </h3>
-              {item.content}{' '}
+              {item.content}
             </div>
           </div>
         ))}
