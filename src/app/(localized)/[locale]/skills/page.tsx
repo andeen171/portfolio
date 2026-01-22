@@ -1,8 +1,8 @@
+import { getTranslations } from 'next-intl/server';
 import SkillList from '@/components/skills/SkillList';
 import { client } from '@/sanity/lib/client';
 import { listSkillsQuery } from '@/sanity/queries';
 import type { Skill } from '@/sanity/types';
-import { getTranslations } from 'next-intl/server';
 
 const options = { next: { revalidate: 16800 } };
 

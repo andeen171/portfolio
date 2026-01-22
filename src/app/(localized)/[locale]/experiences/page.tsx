@@ -1,7 +1,7 @@
+import { getTranslations } from 'next-intl/server';
 import ExperienceTimeline from '@/components/experiences/ExperienceTimeline';
 import { client } from '@/sanity/lib/client';
 import { listExperiencesQuery } from '@/sanity/queries';
-import { getTranslations } from 'next-intl/server';
 
 const options = { next: { revalidate: 16800 } };
 

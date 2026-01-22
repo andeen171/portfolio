@@ -2,10 +2,10 @@ import Layout from '@/components/Layout';
 import { routing } from '@/i18n/routing';
 import '@/styles/globals.css';
 import { SpeedInsights } from '@vercel/speed-insights/next';
-import { Metadata } from 'next';
+import type { Metadata } from 'next';
+import { notFound } from 'next/navigation';
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages, setRequestLocale } from 'next-intl/server';
-import { notFound } from 'next/navigation';
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));

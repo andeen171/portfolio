@@ -1,6 +1,6 @@
-import HeroSection from '@/components/HeroSection';
 import AboutSection from '@/components/about/AboutSection';
 import ExperiencesSection from '@/components/experiences/ExperiencesSection';
+import HeroSection from '@/components/HeroSection';
 import ProjectsSection from '@/components/projects/ProjectsSection';
 import SkillsSection from '@/components/skills/SkillsSection';
 import { client } from '@/sanity/lib/client';

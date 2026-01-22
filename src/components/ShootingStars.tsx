@@ -1,10 +1,10 @@
 'use client';
 
-import { cn } from '@/lib/utils';
-import { useCtpStore } from '@/store';
 import { type CatppuccinColors, flavors } from '@catppuccin/palette';
 import type React from 'react';
 import { useEffect, useRef, useState } from 'react';
+import { cn } from '@/lib/utils';
+import { useCtpStore } from '@/store';
 
 interface ShootingStar {
   id: number;

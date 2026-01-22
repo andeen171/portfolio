@@ -1,9 +1,9 @@
-import { client } from '@/sanity/lib/client';
-import type { ListProjectsQueryResult } from '@/sanity/types';
-import { useLocalization } from '@/utils/localization';
 import type { SanityImageSource } from '@sanity/image-url';
 import { createImageUrlBuilder } from '@sanity/image-url';
 import { useLocale, useTranslations } from 'next-intl';
+import { client } from '@/sanity/lib/client';
+import type { ListProjectsQueryResult } from '@/sanity/types';
+import { useLocalization } from '@/utils/localization';
 import { Timeline } from '../timeline/timeline';
 
 interface ProjectTimelineProps {

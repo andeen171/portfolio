@@ -1,7 +1,7 @@
+import { getTranslations } from 'next-intl/server';
 import ProjectTimeline from '@/components/projects/ProjectTimeline';
 import { client } from '@/sanity/lib/client';
 import { listProjectsQuery } from '@/sanity/queries';
-import { getTranslations } from 'next-intl/server';
 
 const options = { next: { revalidate: 16800 } };
 

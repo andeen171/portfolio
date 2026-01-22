@@ -1,6 +1,5 @@
 'use client';
 
-import { usePathname, useRouter } from '@/i18n/routing';
 import {
   Listbox,
   ListboxButton,
@@ -10,6 +9,7 @@ import {
 } from '@headlessui/react';
 import { useLocale } from 'next-intl';
 import { Fragment, useTransition } from 'react';
+import { usePathname, useRouter } from '@/i18n/routing';
 import CheckCircle from './SVG/CheckCircle';
 import LanguageSVG from './SVG/LanguageSVG';
 
