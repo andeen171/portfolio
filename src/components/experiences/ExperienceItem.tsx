@@ -46,12 +46,12 @@ const ExperienceItem: React.FC<ExperienceProps> = ({ experience }) => {
 
       <div className="relative z-10 flex flex-col h-full">
         {/* Header */}
-        <div className="flex items-start justify-between gap-4 mb-3">
+        <div className="flex flex-col gap-3 mb-3 sm:flex-row sm:items-start sm:justify-between">
           <div className="flex-1">
             <h3 className="animated-gradient-text text-lg font-semibold mb-1">{title}</h3>
             <p className="text-ctp-subtext0 font-medium text-sm">{experience.company}</p>
           </div>
-          <div className="flex flex-col items-end gap-1 text-xs text-ctp-subtext1">
+          <div className="flex flex-col items-start gap-1 text-xs text-ctp-subtext1 sm:items-end sm:text-right">
             <span className="font-medium">{formatDate.end}</span>
             <span className="opacity-70">{experience.location}</span>
           </div>

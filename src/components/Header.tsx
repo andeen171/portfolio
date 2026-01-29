@@ -122,7 +122,7 @@ const Header: React.FC = () => {
                 leaveFrom="transform opacity-100 scale-100"
                 leaveTo="transform opacity-0 scale-95"
               >
-                <Menu.Items className="absolute right-0 z-10 mt-2 w-42 origin-top-right rounded-xl bg-ctp-base/80 backdrop-blur-md shadow-xl ring-1 ring-ctp-overlay0/20 overflow-hidden focus:outline-none">
+                <Menu.Items className="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-xl bg-ctp-base/80 backdrop-blur-md shadow-xl ring-1 ring-ctp-overlay0/20 overflow-hidden focus:outline-none">
                   {navigation.map((item) => {
                     const isActive =
                       currentPath === item.href ||
@@ -144,7 +144,7 @@ const Header: React.FC = () => {
                             )}
                           >
                             <Icon className="h-5 w-5" />
-                            {item.name}
+                            <span className="flex-1 whitespace-nowrap">{item.name}</span>
                             {isActive && (
                               <span className="ml-auto h-2 w-2 rounded-full bg-ctp-lavender" />
                             )}

@@ -14,6 +14,7 @@ export const GlareCard = ({
 }) => {
   const flavor = useCtpStore((state) => state.flavor);
   const [colors, setColors] = useState<CatppuccinColors>(flavors[flavor].colors);
+  const [isActive, setIsActive] = useState(false);
   const isPointerInside = useRef(false);
   const refElement = useRef<HTMLDivElement>(null);
   const state = useRef({
@@ -47,7 +48,6 @@ export const GlareCard = ({
     '--bg-y': '50%',
     '--duration': '300ms',
     '--foil-size': '100%',
-    '--opacity': '0',
     '--radius': '16px',
     '--easing': 'ease',
     '--transition': 'var(--duration) var(--easing)',
@@ -114,38 +114,46 @@ export const GlareCard = ({
     }
   };
 
+  const updateFromEvent = (event: React.PointerEvent<HTMLDivElement>) => {
+    const rotateFactor = 0.3;
+    const rect = event.currentTarget.getBoundingClientRect();
+    const position = {
+      x: event.clientX - rect.left,
+      y: event.clientY - rect.top,
+    };
+    const percentage = {
+      x: (100 / rect.width) * position.x,
+      y: (100 / rect.height) * position.y,
+    };
+    const delta = {
+      x: percentage.x - 50,
+      y: percentage.y - 50,
+    };
+
+    const { background, rotate, glare } = state.current;
+    background.x = 50 + percentage.x / 4 - 12.5;
+    background.y = 50 + percentage.y / 3 - 16.67;
+    rotate.x = -(delta.x / 3.5);
+    rotate.y = delta.y / 2;
+    rotate.x *= rotateFactor;
+    rotate.y *= rotateFactor;
+    glare.x = percentage.x;
+    glare.y = percentage.y;
+
+    updateStyles();
+  };
+
   return (
     <div
       style={containerStyle}
-      className="relative isolate contain-[layout_style] perspective-[600px] transition-transform duration-(--duration) ease-(--easing) will-change-transform w-full aspect-4/5 max-w-50 h-70"
+      className="relative isolate contain-[layout_style] perspective-[600px] transition-transform duration-(--duration) ease-(--easing) will-change-transform w-full aspect-4/5 max-w-50 h-70 touch-pan-y"
       ref={refElement}
-      onPointerMove={(event) => {
-        const rotateFactor = 0.3;
-        const rect = event.currentTarget.getBoundingClientRect();
-        const position = {
-          x: event.clientX - rect.left,
-          y: event.clientY - rect.top,
-        };
-        const percentage = {
-          x: (100 / rect.width) * position.x,
-          y: (100 / rect.height) * position.y,
-        };
-        const delta = {
-          x: percentage.x - 50,
-          y: percentage.y - 50,
-        };
-
-        const { background, rotate, glare } = state.current;
-        background.x = 50 + percentage.x / 4 - 12.5;
-        background.y = 50 + percentage.y / 3 - 16.67;
-        rotate.x = -(delta.x / 3.5);
-        rotate.y = delta.y / 2;
-        rotate.x *= rotateFactor;
-        rotate.y *= rotateFactor;
-        glare.x = percentage.x;
-        glare.y = percentage.y;
-
-        updateStyles();
+      onPointerMove={updateFromEvent}
+      onPointerDown={(event) => {
+        isPointerInside.current = true;
+        setIsActive(true);
+        refElement.current?.style.setProperty('--duration', '0s');
+        updateFromEvent(event);
       }}
       onPointerEnter={() => {
         isPointerInside.current = true;
@@ -159,6 +167,25 @@ export const GlareCard = ({
       }}
       onPointerLeave={() => {
         isPointerInside.current = false;
+        setIsActive(false);
+        if (refElement.current) {
+          refElement.current.style.removeProperty('--duration');
+          refElement.current?.style.setProperty('--r-x', '0deg');
+          refElement.current?.style.setProperty('--r-y', '0deg');
+        }
+      }}
+      onPointerUp={() => {
+        isPointerInside.current = false;
+        setIsActive(false);
+        if (refElement.current) {
+          refElement.current.style.removeProperty('--duration');
+          refElement.current?.style.setProperty('--r-x', '0deg');
+          refElement.current?.style.setProperty('--r-y', '0deg');
+        }
+      }}
+      onPointerCancel={() => {
+        isPointerInside.current = false;
+        setIsActive(false);
         if (refElement.current) {
           refElement.current.style.removeProperty('--duration');
           refElement.current?.style.setProperty('--r-x', '0deg');
@@ -167,8 +194,11 @@ export const GlareCard = ({
       }}
     >
       <div
-        className={`h-full grid will-change-transform origin-center transition-transform duration-(--duration) ease-(--easing) transform-[rotateY(var(--r-x))_rotateX(var(--r-y))] rounded-(--radius) border border-ctp-surface0 hover:[--duration:150ms] hover:[--easing:linear] overflow-hidden shadow-lg ${
-          isLightTheme ? 'hover:[--opacity:1.2]' : 'hover:[--opacity:0.9]'
+        data-active={isActive}
+        className={`h-full grid will-change-transform origin-center transition-transform duration-(--duration) ease-(--easing) transform-[rotateY(var(--r-x))_rotateX(var(--r-y))] rounded-(--radius) border border-ctp-surface0 [--opacity:0] hover:[--duration:150ms] hover:[--easing:linear] overflow-hidden shadow-lg ${
+          isLightTheme
+            ? 'hover:[--opacity:1.2] data-[active=true]:[--opacity:1.2]'
+            : 'hover:[--opacity:0.9] data-[active=true]:[--opacity:0.9]'
         }`}
       >
         <div className="w-full h-full grid [grid-area:1/1] mix-blend-soft-light [clip-path:inset(0_0_0_0_round_var(--radius))]">
