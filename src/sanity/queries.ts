@@ -12,7 +12,7 @@ export const previewProjectsQuery = defineQuery(`
   *[_type == "project"] { 
     ...,
     skills[]->
-  } | order(date desc)[0..3]
+  } | order(date desc)[0..1]
 `);
 
 // Experiences

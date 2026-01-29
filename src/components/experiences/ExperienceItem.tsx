@@ -1,7 +1,7 @@
 'use client';
 
 import { useLocale, useTranslations } from 'next-intl';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import type { ListExperiencesQueryResult } from '@/sanity/types';
 import { useLocalization } from '@/utils/localization';
 
@@ -11,6 +11,8 @@ interface ExperienceProps {
 
 const ExperienceItem: React.FC<ExperienceProps> = ({ experience }) => {
   const [isExpanded, setIsExpanded] = useState(false);
+  const [showToggle, setShowToggle] = useState(false);
+  const descriptionRef = useRef<HTMLDivElement>(null);
 
   const locale = useLocale();
   const { getLocalizedValue } = useLocalization();
@@ -33,6 +35,14 @@ const ExperienceItem: React.FC<ExperienceProps> = ({ experience }) => {
     return { start, end, full: `${start} - ${end}` };
   }, [experience.startDate, experience.endDate, locale, t]);
 
+  useEffect(() => {
+    const element = descriptionRef.current;
+    if (!element) return;
+    const collapsedMaxHeight = 72;
+    const isOverflowing = element.scrollHeight > collapsedMaxHeight + 1;
+    setShowToggle(isOverflowing);
+  }, []);
+
   return (
     <button
       type="button"
@@ -52,7 +62,7 @@ const ExperienceItem: React.FC<ExperienceProps> = ({ experience }) => {
             <p className="text-ctp-subtext0 font-medium text-sm">{experience.company}</p>
           </div>
           <div className="flex flex-col items-start gap-1 text-xs text-ctp-subtext1 sm:items-end sm:text-right">
-            <span className="font-medium">{formatDate.end}</span>
+            <span className="font-medium hidden md:block">{formatDate.end}</span>
             <span className="opacity-70">{experience.location}</span>
           </div>
         </div>
@@ -66,6 +76,7 @@ const ExperienceItem: React.FC<ExperienceProps> = ({ experience }) => {
         {/* Description with smooth expand/collapse */}
         <div className="relative flex-1">
           <div
+            ref={descriptionRef}
             className={`overflow-hidden transition-all duration-500 ease-in-out ${
               isExpanded ? 'max-h-500 opacity-100' : 'max-h-18 opacity-90'
             }`}
@@ -74,17 +85,16 @@ const ExperienceItem: React.FC<ExperienceProps> = ({ experience }) => {
           </div>
 
           {/* Fade overlay when collapsed */}
-          {!isExpanded && description.length > 150 && (
+          {!isExpanded && showToggle && (
             <div className="absolute bottom-0 left-0 right-0 h-8 bg-linear-to-t from-ctp-mantle/50 to-transparent pointer-events-none" />
           )}
         </div>
 
         {/* Expand/collapse indicator */}
-        {description.length > 150 && (
+        {showToggle && (
           <div className="flex items-center justify-center mt-4">
             <div className="flex items-center gap-2 text-xs text-ctp-subtext1/70 group-hover:text-ctp-subtext1 transition-colors">
-              <span>{isExpanded ? 'Click to collapse' : 'Click to expand'}</span>
-              {/* biome-ignore lint/a11y/noSvgWithoutTitle: <explanation> */}
+              <span>{isExpanded ? t('collapse') : t('expand')}</span>
               <svg
                 className={`w-4 h-4 transition-transform duration-300 ${
                   isExpanded ? 'rotate-180' : ''
@@ -92,7 +102,9 @@ const ExperienceItem: React.FC<ExperienceProps> = ({ experience }) => {
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
+                aria-label={isExpanded ? t('collapse') : t('expand')}
               >
+                <title>{isExpanded ? t('collapse') : t('expand')}</title>
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"

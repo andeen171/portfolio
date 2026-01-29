@@ -50,7 +50,9 @@
     "title": "Experiences",
     "subtitle": "My professional journey",
     "seeMore": "View all experiences",
-    "current": "Present"
+    "current": "Present",
+    "expand": "Click to expand",
+    "collapse": "Click to collapse"
   },
   "footer": {
     "quote": "Ambition without effort is just greed"

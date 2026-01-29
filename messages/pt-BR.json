@@ -50,7 +50,9 @@
     "title": "Experiências",
     "subtitle": "Minha jornada profissional",
     "seeMore": "Ver todas as experiências",
-    "current": "Atual"
+    "current": "Atual",
+    "expand": "Clique para expandir",
+    "collapse": "Clique para recolher"
   },
   "footer": {
     "quote": "Ambição sem esforço é apenas ganância"
