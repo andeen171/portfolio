@@ -16,6 +16,7 @@ const HeroSection: React.FC = () => {
       typeSpeed: 30,
       backSpeed: 50,
       loop: true,
+      showCursor: true,
     });
 
     return () => {

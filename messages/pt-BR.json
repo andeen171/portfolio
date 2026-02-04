@@ -17,12 +17,15 @@
     "title": "Sobre",
     "subtitle": "Conheça-me melhor",
     "greeting": "Olá, eu sou um",
-    "description": "Sou um Desenvolvedor Full Stack com experiência em várias tecnologias e frameworks. Tenho paixão por criar soluções inovadoras para problemas complexos e adoro aprender novas tecnologias.",
+    "description": "Sou desenvolvedor de software com experiência em produtos reais e sistemas em escala, atuando principalmente no backend. Já trabalhei com microserviços, APIs e integrações complexas em ambientes de produção críticos, sempre com foco em estabilidade, desempenho e impacto direto no negócio.\n\nGosto de entender o problema a fundo antes de pensar na solução. Para mim, escrever código vai além de “fazer funcionar”: envolve clareza, boa arquitetura, responsabilidade técnica e manutenção no longo prazo. Valorizo código limpo, testável e bem estruturado, e tenho um olhar crítico para refatoração e melhoria contínua.\n\nSou autodidata, curioso e inquieto por natureza. Aprendo construindo, quebrando e melhorando sistemas, e me sinto confortável navegando por diferentes camadas da aplicação — do backend à infraestrutura, e eventualmente ao frontend quando necessário. Tenho facilidade em trabalhar de forma independente, mas também em colaborar com times multidisciplinares, especialmente em contextos remotos e ambientes ágeis.",
     "typedStrings": {
       "fullstack": "Desenvolvedor Fullstack",
       "backend": "Desenvolvedor Backend",
       "linux": "Entusiasta Linux",
-      "arch": "Supremacista Arch"
+      "arch": "Supremacista Arch",
+      "entrepreneur": "Empreendedor",
+      "father": "Pai Amoroso",
+      "thinker": "Pensador crítico"
     },
     "connect": "Conecte-se comigo",
     "linkedin": {

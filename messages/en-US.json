@@ -17,12 +17,15 @@
     "title": "About",
     "subtitle": "Get to know me",
     "greeting": "Hi, I am an",
-    "description": "I am a Full Stack Developer with expertise in various technologies and frameworks. I have a passion for creating innovative solutions to complex problems and love to learn new technologies.",
+    "description": "I am a software developer with experience building real-world products and large-scale systems, primarily working on the backend. I have worked with microservices, APIs, and complex integrations in critical production environments, always focusing on stability, performance, and direct business impact.\n\nI like to deeply understand the problem before thinking about the solution. To me, writing code goes beyond simply “making it work”: it involves clarity, solid architecture, technical ownership, and long-term maintainability. I value clean, testable, and well-structured code, and I have a critical eye for refactoring and continuous improvement.\n\nI am self-taught, curious, and naturally driven. I learn by building, breaking, and improving systems, and I am comfortable navigating across different layers of an application—from backend to infrastructure, and occasionally frontend when needed. I work well independently, but I also collaborate effectively with multidisciplinary teams, especially in remote and agile environments.\n",
     "typedStrings": {
       "fullstack": "Fullstack Developer",
       "backend": "Backend Developer",
       "linux": "Linux Enthusiast",
-      "arch": "Arch Supremacist"
+      "arch": "Arch Supremacist",
+      "entrepreneur": "Entrepreneur",
+      "father": "Loving Father",
+      "thinker": "Critical free-thinker"
     },
     "connect": "Connect with me",
     "linkedin": {
