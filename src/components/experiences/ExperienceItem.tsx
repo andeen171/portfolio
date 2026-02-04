@@ -19,6 +19,12 @@ const ExperienceItem: React.FC<ExperienceProps> = ({ experience }) => {
 
   const title = getLocalizedValue(experience.title, locale as 'en-US' | 'pt-BR');
   const description = getLocalizedValue(experience.description, locale as 'en-US' | 'pt-BR') || '';
+  const normalizedDescription = description.replace(/\\n/g, '\n');
+  const descriptionParagraphs = normalizedDescription
+    .replace(/\r\n/g, '\n')
+    .split('\n\n')
+    .map((paragraph) => paragraph.trim())
+    .filter((paragraph) => paragraph.length > 0);
 
   const t = useTranslations('experiences');
 
@@ -81,7 +87,15 @@ const ExperienceItem: React.FC<ExperienceProps> = ({ experience }) => {
               isExpanded ? 'max-h-500 opacity-100' : 'max-h-18 opacity-90'
             }`}
           >
-            <p className="text-sm leading-relaxed text-ctp-text/90">{description}</p>
+            {descriptionParagraphs.length > 0 ? (
+              descriptionParagraphs.map((paragraph, index) => (
+                <p key={`${experience._id}-desc-${index}`} className="text-sm leading-relaxed text-ctp-text/90 mb-3 last:mb-0">
+                  {paragraph}
+                </p>
+              ))
+            ) : (
+              <p className="text-sm leading-relaxed text-ctp-text/90">{normalizedDescription}</p>
+            )}
           </div>
 
           {/* Fade overlay when collapsed */}

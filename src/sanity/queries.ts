@@ -17,11 +17,11 @@ export const previewProjectsQuery = defineQuery(`
 
 // Experiences
 export const listExperiencesQuery = defineQuery(`
-  *[_type == "experience"] | order(startDate desc)
+  *[_type == "experience"] | order(endDate desc)
 `);
 
 export const previewExperiencesQuery = defineQuery(`
-  *[_type == "experience"] | order(startDate desc)[0..2]
+  *[_type == "experience"] | order(endDate desc)[0..2]
 `);
 
 // Skills
