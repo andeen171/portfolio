@@ -51,7 +51,7 @@ body::-webkit-scrollbar {
 }
 
 .animated-gradient-text {
-  @apply animate-colorchange bg-linear-to-r from-ctp-teal via-ctp-lavender bg-clip-text text-transparent;
+  @apply animate-colorchange bg-linear-to-r from-ctp-teal via-ctp-lavender to-ctp-teal bg-clip-text text-transparent;
 }
 
 .nf {

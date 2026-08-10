@@ -1,8 +1,8 @@
-import type { Skill } from '@/sanity/types';
+import type { ListSkillsQueryResult } from '@/sanity/types';
 import SkillItem from './SkillItem';
 
 type Props = {
-  skills: Skill[];
+  skills: ListSkillsQueryResult;
 };
 
 const SkillList: React.FC<Props> = ({ skills }) => {

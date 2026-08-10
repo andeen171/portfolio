@@ -1,18 +1,23 @@
 'use client';
 
 import { useLocale } from 'next-intl';
-import CatppuccinGlareCard from '@/components/GlareCard';
-import type { Skill } from '@/sanity/types';
+import CatppuccinGlareCard, { type GlareCardAccent } from '@/components/GlareCard';
+import type { ListSkillsQueryResult } from '@/sanity/types';
 import { useLocalization } from '@/utils/localization';
 
 interface SkillItemProps {
-  skill: Skill;
+  skill: ListSkillsQueryResult[number];
 }
 
 const SkillItem: React.FC<SkillItemProps> = ({ skill }) => {
   const locale = useLocale();
   const { getLocalizedValue } = useLocalization();
   const description = getLocalizedValue(skill.description, locale as 'en-US' | 'pt-BR');
+  const categoryName = skill.category
+    ? getLocalizedValue(skill.category.name, locale as 'en-US' | 'pt-BR')
+    : undefined;
+  const accent = skill.category?.accentColor as GlareCardAccent | undefined;
+  const svgCode = skill.svgCode ?? skill.category?.fallbackSvgCode;
 
   return (
     <div className="group relative flex justify-center">
@@ -27,8 +32,8 @@ const SkillItem: React.FC<SkillItemProps> = ({ skill }) => {
         >
           {description}
         </div>
-        <CatppuccinGlareCard>
-          <div className="flex flex-col items-center justify-center h-full p-12 relative">
+        <CatppuccinGlareCard accent={accent}>
+          <div className="flex flex-col items-center justify-center h-full px-4 py-10 relative">
             {/* Definir gradiente SVG inline */}
             <svg width="0" height="0" style={{ position: 'absolute' }}>
               <title>Gradient</title>
@@ -41,16 +46,24 @@ const SkillItem: React.FC<SkillItemProps> = ({ skill }) => {
               </defs>
             </svg>
 
-            {/* Ícone da habilidade */}
-            <div className="flex h-20 w-20 items-center justify-center mb-4">
-              <div
-                className="h-full w-full flex items-center justify-center skill-svg-container"
-                // biome-ignore lint/security/noDangerouslySetInnerHtml: Sanity content
-                dangerouslySetInnerHTML={{ __html: skill.svgCode! }}
-              />
-            </div>
+            {categoryName && (
+              <span className="absolute top-3 right-3 text-[10px] uppercase tracking-wide text-ctp-subtext0 bg-ctp-crust/60 px-2 py-0.5 rounded-full">
+                {categoryName}
+              </span>
+            )}
 
-            <span className="animated-gradient-text text-lg font-semibold text-center leading-tight">
+            {/* Ícone da habilidade */}
+            {svgCode && (
+              <div className="flex h-20 w-20 items-center justify-center mb-4">
+                <div
+                  className="h-full w-full flex items-center justify-center skill-svg-container"
+                  // biome-ignore lint/security/noDangerouslySetInnerHtml: Sanity content
+                  dangerouslySetInnerHTML={{ __html: svgCode }}
+                />
+              </div>
+            )}
+
+            <span className="animated-gradient-text text-lg font-semibold text-center leading-tight break-words">
               {skill.name}
             </span>
           </div>

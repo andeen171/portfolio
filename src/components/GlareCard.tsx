@@ -5,12 +5,26 @@ import { useEffect, useRef, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { useCtpStore } from '@/store';
 
+export type GlareCardAccent = 'teal' | 'lavender' | 'pink' | 'peach' | 'green' | 'sky';
+
+// Static class strings (not built dynamically) so Tailwind's compiler can see them.
+const ACCENT_BORDER: Record<GlareCardAccent, string> = {
+  teal: 'border-ctp-teal/60 hover:shadow-ctp-teal/30',
+  lavender: 'border-ctp-lavender/60 hover:shadow-ctp-lavender/30',
+  pink: 'border-ctp-pink/60 hover:shadow-ctp-pink/30',
+  peach: 'border-ctp-peach/60 hover:shadow-ctp-peach/30',
+  green: 'border-ctp-green/60 hover:shadow-ctp-green/30',
+  sky: 'border-ctp-sky/60 hover:shadow-ctp-sky/30',
+};
+
 export const GlareCard = ({
   children,
   className,
+  accent,
 }: {
   children: React.ReactNode;
   className?: string;
+  accent?: GlareCardAccent;
 }) => {
   const flavor = useCtpStore((state) => state.flavor);
   const [colors, setColors] = useState<CatppuccinColors>(flavors[flavor].colors);
@@ -195,11 +209,14 @@ export const GlareCard = ({
     >
       <div
         data-active={isActive}
-        className={`h-full grid will-change-transform origin-center transition-transform duration-(--duration) ease-(--easing) transform-[rotateY(var(--r-x))_rotateX(var(--r-y))] rounded-(--radius) border border-ctp-surface0 [--opacity:0] hover:[--duration:150ms] hover:[--easing:linear] overflow-hidden shadow-lg ${
-          isLightTheme
-            ? 'hover:[--opacity:1.2] data-[active=true]:[--opacity:1.2]'
-            : 'hover:[--opacity:0.9] data-[active=true]:[--opacity:0.9]'
-        }`}
+        className={cn(
+          `h-full grid will-change-transform origin-center transition-transform duration-(--duration) ease-(--easing) transform-[rotateY(var(--r-x))_rotateX(var(--r-y))] rounded-(--radius) border [--opacity:0] hover:[--duration:150ms] hover:[--easing:linear] overflow-hidden shadow-lg hover:shadow-xl ${
+            isLightTheme
+              ? 'hover:[--opacity:1.2] data-[active=true]:[--opacity:1.2]'
+              : 'hover:[--opacity:0.9] data-[active=true]:[--opacity:0.9]'
+          }`,
+          accent ? ACCENT_BORDER[accent] : 'border-ctp-surface0'
+        )}
       >
         <div className="w-full h-full grid [grid-area:1/1] mix-blend-soft-light [clip-path:inset(0_0_0_0_round_var(--radius))]">
           <div className={cn('h-full w-full bg-ctp-mantle', className)}>{children}</div>
