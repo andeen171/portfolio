@@ -38,7 +38,7 @@ const GithubIcon = () => (
 const socialContacts = [
   {
     name: 'LinkedIn',
-    url: 'https://www.linkedin.com/in/andeen171',
+    url: 'https://www.linkedin.com/in/anderson-lopes-dev/',
     icon: LinkedInIcon,
     hoverColor: 'hover:text-ctp-sapphire',
   },
