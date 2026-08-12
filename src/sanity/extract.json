@@ -87,6 +87,39 @@
         },
         "optional": true
       },
+      "accentColor": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "union",
+          "of": [
+            {
+              "type": "string",
+              "value": "teal"
+            },
+            {
+              "type": "string",
+              "value": "lavender"
+            },
+            {
+              "type": "string",
+              "value": "pink"
+            },
+            {
+              "type": "string",
+              "value": "peach"
+            },
+            {
+              "type": "string",
+              "value": "green"
+            },
+            {
+              "type": "string",
+              "value": "sky"
+            }
+          ]
+        },
+        "optional": true
+      },
       "tags": {
         "type": "objectAttribute",
         "value": {

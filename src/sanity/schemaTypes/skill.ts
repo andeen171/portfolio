@@ -25,6 +25,22 @@ export const skill = defineType({
       validation: (Rule) => Rule.required(),
     }),
     defineField({
+      name: 'accentColor',
+      title: 'Accent Color',
+      type: 'string',
+      description: "Overrides the category accent color for this skill's card",
+      options: {
+        list: [
+          { title: 'Teal', value: 'teal' },
+          { title: 'Lavender', value: 'lavender' },
+          { title: 'Pink', value: 'pink' },
+          { title: 'Peach', value: 'peach' },
+          { title: 'Green', value: 'green' },
+          { title: 'Sky', value: 'sky' },
+        ],
+      },
+    }),
+    defineField({
       name: 'tags',
       title: 'Tags',
       type: 'array',

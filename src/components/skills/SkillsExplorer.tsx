@@ -2,26 +2,14 @@
 
 import { useLocale, useTranslations } from 'next-intl';
 import { useMemo, useState } from 'react';
-import { cn } from '@/lib/utils';
 import type { ListSkillCategoriesQueryResult, ListSkillsQueryResult } from '@/sanity/types';
 import { useLocalization } from '@/utils/localization';
+import CategoryChips from './CategoryChips';
 import SkillList from './SkillList';
 
 type Props = {
   skills: ListSkillsQueryResult;
   categories: ListSkillCategoriesQueryResult;
-};
-
-const ACCENT_CHIP: Record<string, string> = {
-  teal: 'data-[active=true]:bg-ctp-teal data-[active=true]:text-ctp-crust border-ctp-teal/50 text-ctp-teal',
-  lavender:
-    'data-[active=true]:bg-ctp-lavender data-[active=true]:text-ctp-crust border-ctp-lavender/50 text-ctp-lavender',
-  pink: 'data-[active=true]:bg-ctp-pink data-[active=true]:text-ctp-crust border-ctp-pink/50 text-ctp-pink',
-  peach:
-    'data-[active=true]:bg-ctp-peach data-[active=true]:text-ctp-crust border-ctp-peach/50 text-ctp-peach',
-  green:
-    'data-[active=true]:bg-ctp-green data-[active=true]:text-ctp-crust border-ctp-green/50 text-ctp-green',
-  sky: 'data-[active=true]:bg-ctp-sky data-[active=true]:text-ctp-crust border-ctp-sky/50 text-ctp-sky',
 };
 
 const SkillsExplorer: React.FC<Props> = ({ skills, categories }) => {
@@ -62,34 +50,12 @@ const SkillsExplorer: React.FC<Props> = ({ skills, categories }) => {
         />
       </div>
 
-      <div className="mt-6 flex flex-wrap justify-center gap-2">
-        <button
-          type="button"
-          data-active={activeCategory === null}
-          onClick={() => setActiveCategory(null)}
-          className="rounded-full border border-ctp-lavender/50 px-4 py-1.5 text-sm text-ctp-lavender transition-colors data-[active=true]:bg-ctp-lavender data-[active=true]:text-ctp-crust"
-        >
-          {t('allCategories')}
-        </button>
-        {categories.map((category) => {
-          const name = getLocalizedValue(category.name, locale as 'en-US' | 'pt-BR');
-          const accentClass = category.accentColor ? ACCENT_CHIP[category.accentColor] : '';
-          return (
-            <button
-              key={category._id}
-              type="button"
-              data-active={activeCategory === category._id}
-              onClick={() => setActiveCategory(category._id)}
-              className={cn(
-                'rounded-full border px-4 py-1.5 text-sm transition-colors',
-                accentClass
-              )}
-            >
-              {name}
-            </button>
-          );
-        })}
-      </div>
+      <CategoryChips
+        categories={categories}
+        activeCategory={activeCategory}
+        onSelect={setActiveCategory}
+        className="mt-6"
+      />
 
       <p className="mt-4 text-sm text-ctp-subtext0">
         {t('resultsCount', { count: filtered.length })}

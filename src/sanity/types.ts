@@ -29,6 +29,7 @@ export type Skill = {
   name?: string;
   description?: InternationalizedArrayString;
   category?: SkillCategoryReference;
+  accentColor?: 'teal' | 'lavender' | 'pink' | 'peach' | 'green' | 'sky';
   tags?: Array<string>;
   proficiency?: 'beginner' | 'intermediate' | 'advanced' | 'expert';
   svgCode?: string;
@@ -297,6 +298,7 @@ export type ListProjectsQueryResult = Array<{
     name?: string;
     description?: InternationalizedArrayString;
     category?: SkillCategoryReference;
+    accentColor?: 'green' | 'lavender' | 'peach' | 'pink' | 'sky' | 'teal';
     tags?: Array<string>;
     proficiency?: 'advanced' | 'beginner' | 'expert' | 'intermediate';
     svgCode?: string;
@@ -334,6 +336,7 @@ export type PreviewProjectsQueryResult = Array<{
     name?: string;
     description?: InternationalizedArrayString;
     category?: SkillCategoryReference;
+    accentColor?: 'green' | 'lavender' | 'peach' | 'pink' | 'sky' | 'teal';
     tags?: Array<string>;
     proficiency?: 'advanced' | 'beginner' | 'expert' | 'intermediate';
     svgCode?: string;
@@ -407,6 +410,7 @@ export type ListSkillsQueryResult = Array<{
     order?: number;
     fallbackSvgCode?: string;
   } | null;
+  accentColor?: 'green' | 'lavender' | 'peach' | 'pink' | 'sky' | 'teal';
   tags?: Array<string>;
   proficiency?: 'advanced' | 'beginner' | 'expert' | 'intermediate';
   svgCode?: string;
@@ -435,6 +439,7 @@ export type PreviewSkillsQueryResult = Array<{
     order?: number;
     fallbackSvgCode?: string;
   } | null;
+  accentColor?: 'green' | 'lavender' | 'peach' | 'pink' | 'sky' | 'teal';
   tags?: Array<string>;
   proficiency?: 'advanced' | 'beginner' | 'expert' | 'intermediate';
   svgCode?: string;

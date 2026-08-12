@@ -32,13 +32,6 @@ export const listSkillsQuery = defineQuery(`
   } | order(category->order asc, name asc)
 `);
 
-export const previewSkillsQuery = defineQuery(`
-  *[ _type == "skill"] {
-    ...,
-    category->
-  } | order(category->order asc, name asc)[0..4]
-`);
-
 export const listSkillCategoriesQuery = defineQuery(`
   *[ _type == "skillCategory"] | order(order asc)
 `);
