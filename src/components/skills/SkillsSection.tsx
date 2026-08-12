@@ -29,6 +29,21 @@ const SkillsSection: React.FC<Props> = ({ skills, categories }) => {
   // "there's more" hint; from lg up the full row fits, so it can be centered.
   const rowIsFull = filtered.length <= 4;
 
+  // Clip only the overflowing tail (beyond the visible cards), not the whole
+  // container — overflow-x:clip was cutting hover-scaled edge cards. A negative
+  // inset clip-path keeps the left/top/bottom edges open so cards can spill
+  // past the container bounds on hover while the tail stays on one line.
+  // Card width = (100% - totalGap)/N per breakpoint; the right inset goes one
+  // card + one gap past the container edge.
+  const clipTail =
+    filtered.length > 4
+      ? cn(
+          '[clip-path:inset(-50%_calc((2rem-100%)/2-2rem)_-50%_-50%)]',
+          'md:[clip-path:inset(-50%_calc((4rem-100%)/3-2rem)_-50%_-50%)]',
+          'xl:[clip-path:inset(-50%_calc((6rem-100%)/4-2rem)_-50%_-50%)]'
+        )
+      : undefined;
+
   return (
     <div className="py-24 sm:py-32">
       <div className="mx-auto max-w-7xl px-6 text-center lg:px-8">
@@ -66,10 +81,11 @@ const SkillsSection: React.FC<Props> = ({ skills, categories }) => {
           </div>
         </div>
 
-        {/* Desktop: one responsive row. overflow-x-clip keeps the tail to a single
-            line; overflow-y-visible + vertical padding let hover-scaled cards escape. */}
+        {/* Desktop: one responsive row. The tail is clipped with a clip-path
+            (negative insets on the other three sides) so hover-scaled edge
+            cards can spill past the container without being cut. */}
         <div className="mx-auto mt-12 hidden max-w-2xl sm:mt-14 sm:block lg:mt-16 lg:max-w-6xl">
-          <div className="overflow-x-clip overflow-y-visible px-1 py-10">
+          <div className={cn('px-1 py-10', clipTail)}>
             <div
               className={cn(
                 'flex flex-nowrap gap-8',
