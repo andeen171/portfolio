@@ -11,6 +11,8 @@ type Props = {
   onSelect: (categoryId: string | null) => void;
   /** Renders an "All" chip that selects null. */
   showAll?: boolean;
+  /** Renders pluralized category names (selector) instead of the singular card form. */
+  plural?: boolean;
   className?: string;
 };
 
@@ -30,15 +32,25 @@ const ACCENT_CHIP: Record<string, string> = {
 const CHIP_BASE =
   'cursor-pointer rounded-full border px-4 py-1.5 text-sm font-medium transition-colors duration-200 active:scale-95';
 
+// Plural chip labels keyed by category id (selector only; cards keep the singular name).
+const PLURAL_LABELS: Record<string, Record<'en-US' | 'pt-BR', string>> = {
+  'skillCategory-language': { 'en-US': 'Languages', 'pt-BR': 'Linguagens' },
+  'skillCategory-framework': { 'en-US': 'Frameworks', 'pt-BR': 'Frameworks' },
+  'skillCategory-database': { 'en-US': 'Databases', 'pt-BR': 'Bancos de Dados' },
+  'skillCategory-tool': { 'en-US': 'Tools', 'pt-BR': 'Ferramentas' },
+  'skillCategory-soft-skill': { 'en-US': 'Soft Skills', 'pt-BR': 'Interpessoais' },
+};
+
 const CategoryChips: React.FC<Props> = ({
   categories,
   activeCategory,
   onSelect,
   showAll = true,
+  plural = false,
   className,
 }) => {
   const t = useTranslations('skills');
-  const locale = useLocale();
+  const locale = useLocale() as 'en-US' | 'pt-BR';
   const { getLocalizedValue } = useLocalization();
 
   return (
@@ -57,7 +69,9 @@ const CategoryChips: React.FC<Props> = ({
         </button>
       )}
       {categories.map((category) => {
-        const name = getLocalizedValue(category.name, locale as 'en-US' | 'pt-BR');
+        const singular = getLocalizedValue(category.name, locale);
+        const pluralLabel = plural ? PLURAL_LABELS[category._id]?.[locale] : undefined;
+        const name = pluralLabel ?? singular;
         const accentClass = category.accentColor ? ACCENT_CHIP[category.accentColor] : '';
         return (
           <button

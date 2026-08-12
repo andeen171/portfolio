@@ -31,8 +31,8 @@ const SkillsSection: React.FC<Props> = ({ skills, categories }) => {
 
   return (
     <div className="py-24 sm:py-32">
-      <div className="mx-auto text-center max-w-7xl px-6 lg:px-8">
-        <div className="mx-auto max-w-2xl lg:text-center animated-gradient-text font-nf">
+      <div className="mx-auto max-w-7xl px-6 text-center lg:px-8">
+        <div className="animated-gradient-text mx-auto max-w-2xl font-nf lg:text-center">
           <h2 className="text-base font-semibold leading-7">{t('title')}</h2>
           <p className="py-2 text-3xl font-bold tracking-tight sm:text-4xl">{t('subtitle')}</p>
         </div>
@@ -42,13 +42,33 @@ const SkillsSection: React.FC<Props> = ({ skills, categories }) => {
           activeCategory={activeCategory}
           onSelect={setActiveCategory}
           showAll={false}
+          plural
           className="mt-10"
         />
 
-        <div className="mx-auto mt-12 max-w-2xl sm:mt-14 lg:mt-16 lg:max-w-6xl">
-          {/* One responsive row: nowrap + overflow-hidden clips the tail to a single
-              line. overflow-visible is required on the Y axis (and extra vertical
-              padding) so hover-scaled cards aren't clipped. */}
+        {/* Mobile: horizontal snap carousel ending in a "see all" card. */}
+        <div className="-mx-6 mt-12 sm:hidden">
+          <div className="flex snap-x snap-mandatory gap-6 overflow-x-auto px-6 pb-4 pt-10">
+            {filtered.map((skill) => (
+              <div key={skill._id} className="w-64 shrink-0 snap-center">
+                <SkillItem skill={skill} />
+              </div>
+            ))}
+            <Link
+              href="/skills"
+              className="flex h-80 w-40 shrink-0 snap-center flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-ctp-surface1 text-ctp-subtext0 transition-colors hover:border-ctp-lavender hover:text-ctp-lavender"
+            >
+              <span className="max-w-28 text-sm font-semibold">{t('seeMore')}</span>
+              <span className="text-2xl" aria-hidden>
+                &rarr;
+              </span>
+            </Link>
+          </div>
+        </div>
+
+        {/* Desktop: one responsive row. overflow-x-clip keeps the tail to a single
+            line; overflow-y-visible + vertical padding let hover-scaled cards escape. */}
+        <div className="mx-auto mt-12 hidden max-w-2xl sm:mt-14 sm:block lg:mt-16 lg:max-w-6xl">
           <div className="overflow-x-clip overflow-y-visible px-1 py-10">
             <div
               className={cn(
@@ -59,7 +79,7 @@ const SkillsSection: React.FC<Props> = ({ skills, categories }) => {
               {filtered.map((skill) => (
                 <div
                   key={skill._id}
-                  className="flex shrink-0 basis-[min(100%,16rem)] justify-center sm:basis-[calc((100%-2rem)/2)] md:basis-[calc((100%-4rem)/3)] xl:basis-[calc((100%-6rem)/4)]"
+                  className="flex shrink-0 basis-[calc((100%-2rem)/2)] justify-center md:basis-[calc((100%-4rem)/3)] xl:basis-[calc((100%-6rem)/4)]"
                 >
                   <SkillItem skill={skill} />
                 </div>
@@ -68,7 +88,7 @@ const SkillsSection: React.FC<Props> = ({ skills, categories }) => {
           </div>
         </div>
 
-        <div className="mt-12 text-center">
+        <div className="mt-12 hidden text-center sm:block">
           <Link className="text-lg font-semibold text-ctp-lavender" href="/skills">
             {t('seeMore')} &rarr;
           </Link>

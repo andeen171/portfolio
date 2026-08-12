@@ -40,26 +40,32 @@ const SkillsExplorer: React.FC<Props> = ({ skills, categories }) => {
 
   return (
     <div>
-      <div className="mx-auto max-w-xl">
-        <input
-          type="search"
-          value={query}
-          onChange={(event) => setQuery(event.target.value)}
-          placeholder={t('searchPlaceholder')}
-          className="w-full rounded-full border border-ctp-surface1 bg-ctp-mantle px-5 py-3 text-ctp-text placeholder:text-ctp-subtext0 focus:outline-none focus:ring-2 focus:ring-ctp-lavender"
+      {/* Sticky search + chips so they stay reachable while scrolling the grid.
+          Solid bg (not backdrop-blur) — the header's blur uses the static
+          backdrop root image, so scrolled content would show through. */}
+      <div className="sticky top-20 z-40 -mx-4 bg-ctp-base px-4 pb-2">
+        <div className="mx-auto max-w-xl">
+          <input
+            type="search"
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+            placeholder={t('searchPlaceholder')}
+            className="w-full rounded-full border border-ctp-surface1 bg-ctp-mantle px-5 py-3 text-ctp-text placeholder:text-ctp-subtext0 focus:outline-none focus:ring-2 focus:ring-ctp-lavender"
+          />
+        </div>
+
+        <CategoryChips
+          categories={categories}
+          activeCategory={activeCategory}
+          onSelect={setActiveCategory}
+          plural
+          className="mt-6"
         />
+
+        <p className="mt-4 text-center text-sm text-ctp-subtext0">
+          {t('resultsCount', { count: filtered.length })}
+        </p>
       </div>
-
-      <CategoryChips
-        categories={categories}
-        activeCategory={activeCategory}
-        onSelect={setActiveCategory}
-        className="mt-6"
-      />
-
-      <p className="mt-4 text-sm text-ctp-subtext0">
-        {t('resultsCount', { count: filtered.length })}
-      </p>
 
       <div className="mt-10">
         {filtered.length > 0 ? (
