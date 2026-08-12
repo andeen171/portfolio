@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import { useMemo, useState } from 'react';
+import { cn } from '@/lib/utils';
 import type { ListSkillCategoriesQueryResult, ListSkillsQueryResult } from '@/sanity/types';
 import CategoryChips from './CategoryChips';
 import SkillItem from './SkillItem';
@@ -14,12 +15,19 @@ type Props = {
 
 const SkillsSection: React.FC<Props> = ({ skills, categories }) => {
   const t = useTranslations('skills');
-  const [activeCategory, setActiveCategory] = useState<string | null>(null);
+  // No "All" here — the row is always a single category, defaulting to the first one.
+  const [activeCategory, setActiveCategory] = useState<string | null>(
+    () => categories[0]?._id ?? null
+  );
 
   const filtered = useMemo(() => {
     if (!activeCategory) return skills;
     return skills.filter((skill) => skill.category?._id === activeCategory);
   }, [skills, activeCategory]);
+
+  // The row is left-aligned below lg, where a clipped tail card doubles as a
+  // "there's more" hint; from lg up the full row fits, so it can be centered.
+  const rowIsFull = filtered.length <= 4;
 
   return (
     <div className="py-24 sm:py-32">
@@ -33,21 +41,30 @@ const SkillsSection: React.FC<Props> = ({ skills, categories }) => {
           categories={categories}
           activeCategory={activeCategory}
           onSelect={setActiveCategory}
+          showAll={false}
           className="mt-10"
         />
 
-        <div className="mx-auto mt-12 max-w-2xl sm:mt-14 lg:mt-16 lg:max-w-7xl">
-          {/* One responsive row: a nowrap flex row clips to a single line, and
-              nth-child rules hide any card beyond the count that fits per breakpoint. */}
-          <div className="flex flex-nowrap justify-start gap-8 overflow-hidden">
-            {filtered.map((skill) => (
-              <div
-                key={skill._id}
-                className="shrink-0 basis-full sm:basis-[calc((100%-2rem)/2)] md:basis-[calc((100%-4rem)/3)] lg:basis-[calc((100%-6rem)/4)] xl:basis-[calc((100%-8rem)/5)] flex justify-center"
-              >
-                <SkillItem skill={skill} />
-              </div>
-            ))}
+        <div className="mx-auto mt-12 max-w-2xl sm:mt-14 lg:mt-16 lg:max-w-6xl">
+          {/* One responsive row: nowrap + overflow-hidden clips the tail to a single
+              line. overflow-visible is required on the Y axis (and extra vertical
+              padding) so hover-scaled cards aren't clipped. */}
+          <div className="overflow-x-clip overflow-y-visible px-1 py-10">
+            <div
+              className={cn(
+                'flex flex-nowrap gap-8',
+                rowIsFull ? 'justify-center' : 'justify-start'
+              )}
+            >
+              {filtered.map((skill) => (
+                <div
+                  key={skill._id}
+                  className="flex shrink-0 basis-[min(100%,16rem)] justify-center sm:basis-[calc((100%-2rem)/2)] md:basis-[calc((100%-4rem)/3)] xl:basis-[calc((100%-6rem)/4)]"
+                >
+                  <SkillItem skill={skill} />
+                </div>
+              ))}
+            </div>
           </div>
         </div>
 

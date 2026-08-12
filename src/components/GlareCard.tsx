@@ -160,7 +160,7 @@ export const GlareCard = ({
   return (
     <div
       style={containerStyle}
-      className="relative isolate contain-[layout_style] perspective-[600px] transition-transform duration-(--duration) ease-(--easing) will-change-transform w-full aspect-4/5 max-w-50 h-70 touch-pan-y"
+      className="relative isolate contain-[layout_style] perspective-[600px] transition-transform duration-(--duration) ease-(--easing) will-change-transform w-full aspect-4/5 max-w-64 h-80 touch-pan-y"
       ref={refElement}
       onPointerMove={updateFromEvent}
       onPointerDown={(event) => {

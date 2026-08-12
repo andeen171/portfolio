@@ -46,27 +46,20 @@ const SkillItem: React.FC<SkillItemProps> = ({ skill }) => {
   return (
     <div className="group relative flex justify-center">
       {/* Lift the whole card toward the viewer on hover; transform-only so layout doesn't shift. */}
-      <div className="relative z-0 transform-gpu transition-transform duration-300 ease-out will-change-transform hover:z-30 hover:scale-[1.18]">
+      <div className="relative z-0 transform-gpu transition-transform duration-300 ease-out will-change-transform hover:z-30 hover:scale-[1.12]">
         <CatppuccinGlareCard accent={accent}>
           <div className="flex h-full flex-col">
             {/* Header / name bar */}
-            <div
-              className={cn(
-                'flex items-center justify-between gap-2 border-b bg-ctp-crust/50 px-3 py-2',
-                accentRule
-              )}
-            >
+            <div className={cn('flex items-center border-b bg-ctp-crust/50 px-3 py-2', accentRule)}>
               <span
-                className={cn('truncate text-[13px] font-bold leading-tight', accentText)}
+                className={cn(
+                  'w-full truncate text-center text-sm font-bold leading-tight',
+                  accentText
+                )}
                 title={skill.name}
               >
                 {skill.name}
               </span>
-              {categoryName && (
-                <span className="shrink-0 rounded-full bg-ctp-mantle/70 px-2 py-0.5 text-[8px] uppercase tracking-wide text-ctp-subtext0">
-                  {categoryName}
-                </span>
-              )}
             </div>
 
             {/* Art window */}
@@ -98,8 +91,23 @@ const SkillItem: React.FC<SkillItemProps> = ({ skill }) => {
               )}
             </div>
 
+            {/* Category badge — sits between the art window and the rules-text box */}
+            {categoryName && (
+              <div className="mt-2.5 flex justify-center">
+                <span
+                  className={cn(
+                    'rounded-full border bg-ctp-mantle/70 px-2.5 py-0.5 text-[9px] font-semibold uppercase tracking-wider',
+                    accentRule,
+                    accentText
+                  )}
+                >
+                  {categoryName}
+                </span>
+              </div>
+            )}
+
             {/* Rules-text box with the description */}
-            <div className="mx-3 mb-3 mt-3 flex flex-1 items-start rounded-md border border-ctp-surface0 bg-ctp-crust/60 px-2.5 py-2">
+            <div className="mx-3 mb-3 mt-2.5 flex flex-1 items-start rounded-md border border-ctp-surface0 bg-ctp-crust/60 px-2.5 py-2">
               <p className="line-clamp-4 text-left text-[10px] leading-snug text-ctp-subtext1">
                 {description}
               </p>

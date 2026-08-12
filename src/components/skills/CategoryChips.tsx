@@ -9,6 +9,8 @@ type Props = {
   categories: ListSkillCategoriesQueryResult;
   activeCategory: string | null;
   onSelect: (categoryId: string | null) => void;
+  /** Renders an "All" chip that selects null. */
+  showAll?: boolean;
   className?: string;
 };
 
@@ -28,24 +30,32 @@ const ACCENT_CHIP: Record<string, string> = {
 const CHIP_BASE =
   'cursor-pointer rounded-full border px-4 py-1.5 text-sm font-medium transition-colors duration-200 active:scale-95';
 
-const CategoryChips: React.FC<Props> = ({ categories, activeCategory, onSelect, className }) => {
+const CategoryChips: React.FC<Props> = ({
+  categories,
+  activeCategory,
+  onSelect,
+  showAll = true,
+  className,
+}) => {
   const t = useTranslations('skills');
   const locale = useLocale();
   const { getLocalizedValue } = useLocalization();
 
   return (
     <div className={cn('flex flex-wrap justify-center gap-2', className)}>
-      <button
-        type="button"
-        data-active={activeCategory === null}
-        onClick={() => onSelect(null)}
-        className={cn(
-          CHIP_BASE,
-          'border-ctp-lavender/50 text-ctp-lavender hover:border-ctp-lavender hover:bg-ctp-lavender/10 data-[active=true]:bg-ctp-lavender data-[active=true]:text-ctp-crust'
-        )}
-      >
-        {t('allCategories')}
-      </button>
+      {showAll && (
+        <button
+          type="button"
+          data-active={activeCategory === null}
+          onClick={() => onSelect(null)}
+          className={cn(
+            CHIP_BASE,
+            'border-ctp-lavender/50 text-ctp-lavender hover:border-ctp-lavender hover:bg-ctp-lavender/10 data-[active=true]:bg-ctp-lavender data-[active=true]:text-ctp-crust'
+          )}
+        >
+          {t('allCategories')}
+        </button>
+      )}
       {categories.map((category) => {
         const name = getLocalizedValue(category.name, locale as 'en-US' | 'pt-BR');
         const accentClass = category.accentColor ? ACCENT_CHIP[category.accentColor] : '';
