@@ -128,8 +128,8 @@ const SkillsSection: React.FC<Props> = ({ skills, categories }) => {
             </CarouselItem>
           </CarouselContent>
 
-          <CarouselPrevious />
-          <CarouselNext />
+          <CarouselPrevious label={t('previousSkills')} />
+          <CarouselNext label={t('nextSkills')} />
         </Carousel>
 
         <div className="mt-12 hidden text-center sm:block">

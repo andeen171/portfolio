@@ -138,7 +138,9 @@ const SkillItem: React.FC<SkillItemInnerProps> = ({ skill, active }) => {
               <div className="mt-2.5 flex max-h-11 flex-wrap justify-center gap-1 overflow-hidden px-3">
                 {tags.map((tag, i) => (
                   <span
-                    key={tag}
+                    // Sanity doesn't enforce tag uniqueness — index the key so
+                    // duplicate tags can't collide.
+                    key={`${i}-${tag}`}
                     className={cn(
                       'rounded-full border px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider',
                       TAG_STYLES[i % TAG_STYLES.length]

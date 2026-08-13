@@ -43,7 +43,9 @@
     "seeMore": "See all the skills",
     "searchPlaceholder": "Search skills or tags...",
     "allCategories": "All",
-    "noResults": "No skills match your search."
+    "noResults": "No skills match your search.",
+    "previousSkills": "Previous skills",
+    "nextSkills": "Next skills"
   },
   "projects": {
     "title": "Projects",

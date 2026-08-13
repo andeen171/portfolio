@@ -187,13 +187,19 @@ const CarouselItem = ({ className, ...props }: HTMLAttributes<HTMLDivElement>) =
   );
 };
 
-const CarouselPrevious = ({ className, ...props }: HTMLAttributes<HTMLButtonElement>) => {
+// Callers pass a localized `label`; it drives both aria-label and the
+// sr-only text so the two never disagree across locales.
+const CarouselPrevious = ({
+  className,
+  label,
+  ...props
+}: HTMLAttributes<HTMLButtonElement> & { label: string }) => {
   const { scrollPrev, canScrollPrev } = useCarousel();
 
   return (
     <button
       type="button"
-      aria-label="Previous slide"
+      aria-label={label}
       disabled={!canScrollPrev}
       onClick={scrollPrev}
       className={cn(
@@ -203,18 +209,22 @@ const CarouselPrevious = ({ className, ...props }: HTMLAttributes<HTMLButtonElem
       {...props}
     >
       <ChevronLeftIcon className="h-8 w-8 sm:h-10 sm:w-10" strokeWidth={1.5} />
-      <span className="sr-only">Previous slide</span>
+      <span className="sr-only">{label}</span>
     </button>
   );
 };
 
-const CarouselNext = ({ className, ...props }: HTMLAttributes<HTMLButtonElement>) => {
+const CarouselNext = ({
+  className,
+  label,
+  ...props
+}: HTMLAttributes<HTMLButtonElement> & { label: string }) => {
   const { scrollNext, canScrollNext } = useCarousel();
 
   return (
     <button
       type="button"
-      aria-label="Next slide"
+      aria-label={label}
       disabled={!canScrollNext}
       onClick={scrollNext}
       className={cn(
@@ -224,7 +234,7 @@ const CarouselNext = ({ className, ...props }: HTMLAttributes<HTMLButtonElement>
       {...props}
     >
       <ChevronRightIcon className="h-8 w-8 sm:h-10 sm:w-10" strokeWidth={1.5} />
-      <span className="sr-only">Next slide</span>
+      <span className="sr-only">{label}</span>
     </button>
   );
 };

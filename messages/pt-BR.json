@@ -43,7 +43,9 @@
     "seeMore": "Ver todas as habilidades",
     "searchPlaceholder": "Buscar habilidades ou tags...",
     "allCategories": "Todas",
-    "noResults": "Nenhuma habilidade corresponde à sua busca."
+    "noResults": "Nenhuma habilidade corresponde à sua busca.",
+    "previousSkills": "Habilidades anteriores",
+    "nextSkills": "Próximas habilidades"
   },
   "projects": {
     "title": "Projetos",
