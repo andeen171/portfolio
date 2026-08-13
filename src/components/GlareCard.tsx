@@ -21,10 +21,14 @@ export const GlareCard = ({
   children,
   className,
   accent,
+  active = false,
 }: {
   children: React.ReactNode;
   className?: string;
   accent?: GlareCardAccent;
+  /** Force the hovered/active visual state without a pointer hover — used for
+   *  tap-to-activate on touch devices. */
+  active?: boolean;
 }) => {
   const flavor = useCtpStore((state) => state.flavor);
   const [colors, setColors] = useState<CatppuccinColors>(flavors[flavor].colors);
@@ -161,7 +165,7 @@ export const GlareCard = ({
       }}
     >
       <div
-        data-active={isActive}
+        data-active={isActive || active}
         className={cn(
           `h-full grid will-change-transform origin-center transition-transform duration-(--duration) ease-(--easing) transform-[rotateY(var(--r-x))_rotateX(var(--r-y))] rounded-(--radius) border [--opacity:0] hover:[--duration:150ms] hover:[--easing:linear] overflow-hidden shadow-lg hover:shadow-xl ${
             isLightTheme

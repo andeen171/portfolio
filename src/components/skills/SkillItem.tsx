@@ -30,7 +30,25 @@ const ACCENT_RULE: Record<GlareCardAccent, string> = {
   sky: 'border-ctp-sky/40',
 };
 
-const SkillItem: React.FC<SkillItemProps> = ({ skill }) => {
+// Filled tag-pill styles, cycled by tag index. Static strings so Tailwind's
+// compiler can see them. The /20 fill + full-strength text + bold reads on
+// both latte and the dark flavors.
+const TAG_STYLES = [
+  'bg-ctp-teal/20 text-ctp-teal border-ctp-teal/40',
+  'bg-ctp-lavender/20 text-ctp-lavender border-ctp-lavender/40',
+  'bg-ctp-pink/20 text-ctp-pink border-ctp-pink/40',
+  'bg-ctp-peach/20 text-ctp-peach border-ctp-peach/40',
+  'bg-ctp-green/20 text-ctp-green border-ctp-green/40',
+  'bg-ctp-sky/20 text-ctp-sky border-ctp-sky/40',
+] as const;
+
+interface SkillItemInnerProps extends SkillItemProps {
+  /** When true, apply the full hover visuals even without a pointer hover
+   *  (used for tap-to-activate on touch devices). */
+  active?: boolean;
+}
+
+const SkillItem: React.FC<SkillItemInnerProps> = ({ skill, active }) => {
   const locale = useLocale();
   const { getLocalizedValue } = useLocalization();
   const description = getLocalizedValue(skill.description, locale as 'en-US' | 'pt-BR');
@@ -47,10 +65,16 @@ const SkillItem: React.FC<SkillItemProps> = ({ skill }) => {
   const tags = (skill.tags ?? []).slice(0, 3);
 
   return (
-    <div className="group relative flex justify-center">
-      {/* Lift the whole card toward the viewer on hover; transform-only so layout doesn't shift. */}
-      <div className="relative z-0 transform-gpu transition-transform duration-300 ease-out will-change-transform hover:z-30 hover:scale-[1.12]">
-        <CatppuccinGlareCard accent={accent}>
+    <div className="group relative flex justify-center" data-card data-active={active || undefined}>
+      {/* Lift the whole card toward the viewer on hover; transform-only so layout doesn't shift.
+          `data-active` mirrors :hover for touch tap-to-activate. */}
+      <div
+        className={cn(
+          'relative z-0 transform-gpu transition-transform duration-300 ease-out will-change-transform hover:z-30 hover:scale-[1.12]',
+          active && 'z-30 scale-[1.12]'
+        )}
+      >
+        <CatppuccinGlareCard accent={accent} active={active}>
           <div className="flex h-full flex-col">
             {/* Header / name bar — title with a tiny category line under it. The
                 accent colour already signals the category, so keep it small. */}
@@ -79,7 +103,7 @@ const SkillItem: React.FC<SkillItemProps> = ({ skill }) => {
                 accentRule
               )}
             >
-              <FoilLayer className="rounded-md" />
+              <FoilLayer className="rounded-md" seed={skill._id} />
 
               <svg width="0" height="0" style={{ position: 'absolute' }}>
                 <title>Gradient</title>
@@ -112,10 +136,13 @@ const SkillItem: React.FC<SkillItemProps> = ({ skill }) => {
                 rules-text box. Wrap to at most two lines. */}
             {tags.length > 0 && (
               <div className="mt-2.5 flex max-h-11 flex-wrap justify-center gap-1 overflow-hidden px-3">
-                {tags.map((tag) => (
+                {tags.map((tag, i) => (
                   <span
                     key={tag}
-                    className="rounded-full border border-ctp-surface1 bg-ctp-mantle/70 px-2 py-0.5 text-[9px] font-medium uppercase tracking-wider text-ctp-subtext0"
+                    className={cn(
+                      'rounded-full border px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider',
+                      TAG_STYLES[i % TAG_STYLES.length]
+                    )}
                   >
                     {tag}
                   </span>

@@ -27,6 +27,9 @@ const SkillsSection: React.FC<Props> = ({ skills, categories }) => {
     () => categories[0]?._id ?? null
   );
   const [api, setApi] = useState<CarouselApi>();
+  // On touch devices a tap activates a card's hover visuals; it stays active
+  // until another card is tapped or the user taps outside any card.
+  const [pressedCardId, setPressedCardId] = useState<string | null>(null);
 
   const filtered = useMemo(() => {
     if (!activeCategory) return skills;
@@ -37,6 +40,17 @@ const SkillsSection: React.FC<Props> = ({ skills, categories }) => {
   useEffect(() => {
     api?.scrollTo(0);
   }, [api]);
+
+  // Dismiss the tapped-active card when the user presses outside any card.
+  useEffect(() => {
+    if (!pressedCardId) return;
+    const onPointerDown = (e: PointerEvent) => {
+      const target = e.target as HTMLElement | null;
+      if (!target?.closest('[data-card]')) setPressedCardId(null);
+    };
+    document.addEventListener('pointerdown', onPointerDown);
+    return () => document.removeEventListener('pointerdown', onPointerDown);
+  }, [pressedCardId]);
 
   return (
     <div className="py-24 sm:py-32">
@@ -61,17 +75,40 @@ const SkillsSection: React.FC<Props> = ({ skills, categories }) => {
         <Carousel
           key={activeCategory ?? 'all'}
           setApi={setApi}
-          opts={{ align: 'start', containScroll: 'trimSnaps', slidesToScroll: 1 }}
+          opts={{
+            // Mobile centres one card at a time (no fade under the first card);
+            // sm+ keeps the multi-card start-aligned row.
+            align: 'center',
+            containScroll: 'trimSnaps',
+            slidesToScroll: 1,
+            breakpoints: {
+              '(min-width: 640px)': { align: 'start' },
+            },
+            // Let drags that begin on a card fall through to native vertical
+            // page scroll; only gaps/arrows drive the carousel. On desktop this
+            // is a no-op (pointer drags on cards just tilt them).
+            watchDrag: (_emblaApi, event) => {
+              const target = event.target as HTMLElement | null;
+              return !target?.closest('[data-card]');
+            },
+          }}
           className="-mx-6 mt-12 px-6 sm:mt-14 lg:mt-16"
         >
-          <CarouselContent className="py-10">
+          <CarouselContent className="py-14">
             {filtered.map((skill) => (
               <CarouselItem
                 key={skill._id}
                 className="basis-[70%] sm:basis-1/2 md:basis-1/3 xl:basis-1/4"
               >
-                <div className="flex justify-center">
-                  <SkillItem skill={skill} />
+                <div
+                  className="flex justify-center"
+                  onPointerUp={(e) => {
+                    // Tap-to-activate on coarse (touch) pointers only.
+                    if (e.pointerType !== 'touch') return;
+                    setPressedCardId((prev) => (prev === skill._id ? null : skill._id));
+                  }}
+                >
+                  <SkillItem skill={skill} active={pressedCardId === skill._id} />
                 </div>
               </CarouselItem>
             ))}
