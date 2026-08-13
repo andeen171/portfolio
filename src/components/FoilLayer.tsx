@@ -18,18 +18,42 @@ function hashString(input: string): number {
   return hash >>> 0;
 }
 
+/** Iridescent accent ramp we pick from. Ordered around the cool→warm arc so
+ *  adjacent indices are visually related and any 2–3 consecutive picks blend
+ *  smoothly rather than clashing. */
+const FOIL_KEYS = [
+  'teal',
+  'sky',
+  'sapphire',
+  'blue',
+  'lavender',
+  'mauve',
+  'pink',
+] as const satisfies readonly (keyof CatppuccinColors)[];
+
+type Rgb = { r: number; g: number; b: number };
+
+function rgba(c: Rgb, a: number): string {
+  return `rgba(${c.r}, ${c.g}, ${c.b}, ${a})`;
+}
+
 /**
  * A holographic "foil" shimmer layer driven by the pointer-tracked CSS custom
  * properties (`--bg-x` / `--bg-y`) set by the enclosing {@link GlareCard}.
  * Render it as an absolutely-positioned background behind content inside any
- * descendant of a GlareCard (e.g. the art window of a skill card). It reads the
- * live Catppuccin palette so the rainbow follows the active flavor, and it is
- * deliberately toned down on the light `latte` flavor to preserve legibility.
+ * descendant of a GlareCard (e.g. the art window of a skill card).
  *
- * `seed` (typically a skill `_id` or name) gives each card a distinct resting
- * shimmer position and gradient angle so a row of cards doesn't all glint from
- * the same spot. It is deterministic, so it is safe for SSR. Once the pointer
- * enters, GlareCard's live `--bg-x`/`--bg-y` take over.
+ * Rather than sliding one fixed rainbow around (which could land the visible
+ * window on a dark seam), the foil is COMPOSED per card: the seed deterministically
+ * selects 2–3 distinct accents from the active flavor's palette and blends them
+ * into a full-coverage diagonal gradient. By construction there is no dark gap to
+ * land on, so every seed renders a valid, visible, colourful window. A moving
+ * sheen band and the pointer-tracked `--bg-x`/`--bg-y` add the holographic shimmer.
+ *
+ * `seed` (typically a skill `_id` or name) gives each card a distinct colour trio,
+ * angle and sheen offset so a row of cards doesn't all glint the same. It is
+ * deterministic and SSR-safe. It reads the live palette so the foil follows the
+ * active flavor, and is dialled back on the light `latte` flavor for legibility.
  */
 export const FoilLayer = ({ className, seed }: { className?: string; seed?: string }) => {
   const flavor = useCtpStore((state) => state.flavor);
@@ -40,56 +64,52 @@ export const FoilLayer = ({ className, seed }: { className?: string; seed?: stri
   }, [flavor]);
 
   const isLightTheme = flavor === 'latte';
-  // Foil sits behind an icon here, so it can be richer than a full-card overlay
-  // — but on latte we still pull it back hard to keep icons crisp.
-  const rainbowMultiplier = isLightTheme ? 0.55 : 1;
 
-  // Derive a stable per-card offset from the seed: a background-position shift
-  // and a small gradient-angle wobble, so each card's resting foil differs.
   const h = seed ? hashString(seed) : 0;
-  const seedX = h % 100; // 0–99 %
-  const seedY = (h >> 7) % 100; // 0–99 %
-  const seedAngle = 35 + ((h >> 13) % 20); // 35–54deg
+
+  // Pick 3 distinct accents by walking the ramp from a seeded start with a
+  // seeded, coprime-ish stride so adjacent picks stay distinct but related.
+  const start = h % FOIL_KEYS.length;
+  const stride = 2 + ((h >> 5) % 2); // 2 or 3 — both coprime with 7 (ramp length)
+  const pick = (n: number): Rgb => {
+    const key = FOIL_KEYS[(start + n * stride) % FOIL_KEYS.length] ?? 'lavender';
+    return colors[key].rgb;
+  };
+  const cA = pick(0);
+  const cB = pick(1);
+  const cC = pick(2);
+
+  const seedAngle = 100 + ((h >> 9) % 80); // 100–179deg — diagonal, varied
+  // Per-card resting sheen offset so a row doesn't glint from the same spot.
+  const sheenSeed = (h >> 3) % 100; // 0–99 %
+
+  // Colour saturation of the blend. Rich on dark flavors; pulled back on latte
+  // so light icons stay crisp, but still clearly colourful.
+  const a = isLightTheme ? 0.5 : 0.85;
 
   const foilStyle = {
-    '--seed-x': `${seedX}%`,
-    '--seed-y': `${seedY}%`,
-    '--step': '4%',
-    '--catppuccin-rainbow': `repeating-linear-gradient( ${seedAngle}deg, rgba(${colors.teal.rgb.r}, ${
-      colors.teal.rgb.g
-    }, ${colors.teal.rgb.b}, ${0.8 * rainbowMultiplier}) calc(var(--step) * 1), rgba(${
-      colors.sky.rgb.r
-    }, ${colors.sky.rgb.g}, ${colors.sky.rgb.b}, ${
-      0.7 * rainbowMultiplier
-    }) calc(var(--step) * 2), rgba(${colors.sapphire.rgb.r}, ${colors.sapphire.rgb.g}, ${
-      colors.sapphire.rgb.b
-    }, ${0.8 * rainbowMultiplier}) calc(var(--step) * 3), rgba(${colors.blue.rgb.r}, ${
-      colors.blue.rgb.g
-    }, ${colors.blue.rgb.b}, ${0.7 * rainbowMultiplier}) calc(var(--step) * 4), rgba(${
-      colors.lavender.rgb.r
-    }, ${colors.lavender.rgb.g}, ${colors.lavender.rgb.b}, ${
-      0.9 * rainbowMultiplier
-    }) calc(var(--step) * 5), rgba(${colors.pink.rgb.r}, ${colors.pink.rgb.g}, ${
-      colors.pink.rgb.b
-    }, ${0.8 * rainbowMultiplier}) calc(var(--step) * 6), rgba(${colors.mauve.rgb.r}, ${
-      colors.mauve.rgb.g
-    }, ${colors.mauve.rgb.b}, ${
-      0.7 * rainbowMultiplier
-    }) calc(var(--step) * 7) ) var(--seed-x) calc(var(--seed-y) + var(--bg-y) - 50%)/200% 600% no-repeat`,
-    '--shine': `linear-gradient( 115deg, transparent 25%, rgba(${colors.text.rgb.r}, ${
-      colors.text.rgb.g
-    }, ${colors.text.rgb.b}, ${
-      isLightTheme ? 0.12 : 0.22
-    }) 48%, transparent 62% ) calc(var(--seed-x) + var(--bg-x) - 50%) calc(var(--seed-y) + var(--bg-y) - 50%)/250% 250% no-repeat`,
-    background: 'var(--catppuccin-rainbow), var(--shine)',
-    backgroundBlendMode: isLightTheme ? 'soft-light, overlay' : 'color-dodge, overlay',
-    // On latte the whole thing is dialled back so white/light icons stay legible.
-    opacity: isLightTheme ? 0.45 : 0.85,
+    // Full-coverage iridescent blend — no positional dark gap is possible.
+    '--foil-blend': `linear-gradient(${seedAngle}deg, ${rgba(cA, a)} 0%, ${rgba(cB, a * 0.95)} 45%, ${rgba(cC, a)} 100%)`,
+    // A soft radial hot-spot that follows the pointer for a lively shimmer.
+    '--foil-spot': `radial-gradient(120% 120% at calc(var(--bg-x, 50%)) calc(var(--bg-y, 50%)), ${rgba(
+      colors.text.rgb,
+      isLightTheme ? 0.18 : 0.32
+    )} 0%, transparent 55%)`,
+    // A diagonal moving sheen band tracked by the pointer for the holo streak.
+    '--foil-sheen': `linear-gradient(115deg, transparent 30%, ${rgba(
+      colors.text.rgb,
+      isLightTheme ? 0.14 : 0.28
+    )} 47%, ${rgba(colors.text.rgb, 0)} 60%) calc(${sheenSeed}% + var(--bg-x, 50%) - 50%) calc(${sheenSeed}% + var(--bg-y, 50%) - 50%)/250% 250% no-repeat`,
+    background: 'var(--foil-spot), var(--foil-sheen), var(--foil-blend)',
+    backgroundBlendMode: isLightTheme
+      ? 'soft-light, screen, normal'
+      : 'screen, color-dodge, normal',
+    opacity: isLightTheme ? 0.6 : 0.92,
   } as React.CSSProperties;
 
   return (
     <div aria-hidden className={cn('pointer-events-none absolute inset-0', className)}>
-      {/* A dark seat so light icons have contrast even where the foil is pale. */}
+      {/* A dark seat so light icons keep contrast even where the foil is pale. */}
       <div className="absolute inset-0 bg-ctp-crust/70" />
       <div className="absolute inset-0" style={foilStyle} />
     </div>
