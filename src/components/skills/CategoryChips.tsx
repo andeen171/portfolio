@@ -30,7 +30,7 @@ const ACCENT_CHIP: Record<string, string> = {
 };
 
 const CHIP_BASE =
-  'cursor-pointer rounded-full border px-4 py-1.5 text-sm font-medium transition-colors duration-200 active:scale-95';
+  'cursor-pointer rounded-full border bg-ctp-mantle/80 px-4 py-1.5 text-sm font-medium transition-colors duration-200 active:scale-95';
 
 // Plural chip labels keyed by category id (selector only; cards keep the singular name).
 const PLURAL_LABELS: Record<string, Record<'en-US' | 'pt-BR', string>> = {

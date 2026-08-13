@@ -41,16 +41,16 @@ const SkillsExplorer: React.FC<Props> = ({ skills, categories }) => {
   return (
     <div>
       {/* Sticky search + chips so they stay reachable while scrolling the grid.
-          Solid bg (not backdrop-blur) — the header's blur uses the static
-          backdrop root image, so scrolled content would show through. */}
-      <div className="sticky top-20 z-40 -mx-4 bg-ctp-base px-4 pb-2">
+          No background on the bar itself (a solid strip looked detached from
+          the navbar); the controls carry their own translucent bg instead. */}
+      <div className="sticky top-20 z-40 -mx-4 px-4 pb-2">
         <div className="mx-auto max-w-xl">
           <input
             type="search"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
             placeholder={t('searchPlaceholder')}
-            className="w-full rounded-full border border-ctp-surface1 bg-ctp-mantle px-5 py-3 text-ctp-text placeholder:text-ctp-subtext0 focus:outline-none focus:ring-2 focus:ring-ctp-lavender"
+            className="w-full rounded-full border border-ctp-surface1 bg-ctp-mantle/80 px-5 py-3 text-ctp-text placeholder:text-ctp-subtext0 focus:outline-none focus:ring-2 focus:ring-ctp-lavender"
           />
         </div>
 
