@@ -41,6 +41,8 @@
     "title": "Skills",
     "subtitle": "My technical skills",
     "seeMore": "See all the skills",
+    "previousSkills": "Previous skills",
+    "nextSkills": "Next skills",
     "searchPlaceholder": "Search skills or tags...",
     "allCategories": "All",
     "resultsCount": "{count, plural, =0 {No skills} one {# skill} other {# skills}} found",

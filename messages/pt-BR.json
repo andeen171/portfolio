@@ -41,6 +41,8 @@
     "title": "Habilidades",
     "subtitle": "Minhas habilidades técnicas",
     "seeMore": "Ver todas as habilidades",
+    "previousSkills": "Habilidades anteriores",
+    "nextSkills": "Próximas habilidades",
     "searchPlaceholder": "Buscar habilidades ou tags...",
     "allCategories": "Todas",
     "resultsCount": "{count, plural, =0 {Nenhuma habilidade} one {# habilidade} other {# habilidades}} encontrada(s)",
