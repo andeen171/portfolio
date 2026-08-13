@@ -1,58 +1,117 @@
 'use client';
 
 import { useLocale } from 'next-intl';
-import CatppuccinGlareCard from '@/components/GlareCard';
-import type { Skill } from '@/sanity/types';
+import CatppuccinGlareCard, { type GlareCardAccent } from '@/components/GlareCard';
+import { cn } from '@/lib/utils';
+import type { ListSkillsQueryResult } from '@/sanity/types';
 import { useLocalization } from '@/utils/localization';
 
 interface SkillItemProps {
-  skill: Skill;
+  skill: ListSkillsQueryResult[number];
 }
+
+// Accent-driven text tints for the name bar / badge (static so Tailwind sees them).
+const ACCENT_TEXT: Record<GlareCardAccent, string> = {
+  teal: 'text-ctp-teal',
+  lavender: 'text-ctp-lavender',
+  pink: 'text-ctp-pink',
+  peach: 'text-ctp-peach',
+  green: 'text-ctp-green',
+  sky: 'text-ctp-sky',
+};
+
+const ACCENT_RULE: Record<GlareCardAccent, string> = {
+  teal: 'border-ctp-teal/40',
+  lavender: 'border-ctp-lavender/40',
+  pink: 'border-ctp-pink/40',
+  peach: 'border-ctp-peach/40',
+  green: 'border-ctp-green/40',
+  sky: 'border-ctp-sky/40',
+};
 
 const SkillItem: React.FC<SkillItemProps> = ({ skill }) => {
   const locale = useLocale();
   const { getLocalizedValue } = useLocalization();
   const description = getLocalizedValue(skill.description, locale as 'en-US' | 'pt-BR');
+  const categoryName = skill.category
+    ? getLocalizedValue(skill.category.name, locale as 'en-US' | 'pt-BR')
+    : undefined;
+  // Prefer the skill's own accent, fall back to its category accent.
+  const accent = (skill.accentColor ?? skill.category?.accentColor) as GlareCardAccent | undefined;
+  const svgCode = skill.svgCode ?? skill.category?.fallbackSvgCode;
+
+  const accentText = accent ? ACCENT_TEXT[accent] : 'text-ctp-lavender';
+  const accentRule = accent ? ACCENT_RULE[accent] : 'border-ctp-surface1';
 
   return (
     <div className="group relative flex justify-center">
-      <div className="cursor-pointer transform transition-transform hover:scale-105">
-        {/* Tooltip - only show when not expanded */}
-        <div
-          className="absolute z-20 w-64 px-4 py-2 text-sm text-ctp-text bg-ctp-mantle rounded-lg shadow-lg
-                            opacity-0 group-hover:opacity-80 transition-opacity duration-300 pointer-events-none
-                            -translate-y-full -top-4 left-1/2 -translate-x-1/2 before:content-[''] before:absolute before:left-1/2
-                            before:-translate-x-1/2 before:-bottom-2 before:border-8 before:border-x-transparent
-                            before:border-b-transparent before:border-t-ctp-surface0"
-        >
-          {description}
-        </div>
-        <CatppuccinGlareCard>
-          <div className="flex flex-col items-center justify-center h-full p-12 relative">
-            {/* Definir gradiente SVG inline */}
-            <svg width="0" height="0" style={{ position: 'absolute' }}>
-              <title>Gradient</title>
-              <defs>
-                <linearGradient id="skillGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="rgb(var(--ctp-teal))" />
-                  <stop offset="50%" stopColor="rgb(var(--ctp-lavender))" />
-                  <stop offset="100%" stopColor="rgb(var(--ctp-pink))" />
-                </linearGradient>
-              </defs>
-            </svg>
-
-            {/* Ícone da habilidade */}
-            <div className="flex h-20 w-20 items-center justify-center mb-4">
-              <div
-                className="h-full w-full flex items-center justify-center skill-svg-container"
-                // biome-ignore lint/security/noDangerouslySetInnerHtml: Sanity content
-                dangerouslySetInnerHTML={{ __html: skill.svgCode! }}
-              />
+      {/* Lift the whole card toward the viewer on hover; transform-only so layout doesn't shift. */}
+      <div className="relative z-0 transform-gpu transition-transform duration-300 ease-out will-change-transform hover:z-30 hover:scale-[1.12]">
+        <CatppuccinGlareCard accent={accent}>
+          <div className="flex h-full flex-col">
+            {/* Header / name bar */}
+            <div className={cn('flex items-center border-b bg-ctp-crust/50 px-3 py-2', accentRule)}>
+              <span
+                className={cn(
+                  'w-full truncate text-center text-sm font-bold leading-tight',
+                  accentText
+                )}
+                title={skill.name}
+              >
+                {skill.name}
+              </span>
             </div>
 
-            <span className="animated-gradient-text text-lg font-semibold text-center leading-tight">
-              {skill.name}
-            </span>
+            {/* Art window */}
+            <div
+              className={cn(
+                'mx-3 mt-3 flex items-center justify-center rounded-md border bg-ctp-base/60 py-4',
+                accentRule
+              )}
+            >
+              <svg width="0" height="0" style={{ position: 'absolute' }}>
+                <title>Gradient</title>
+                <defs>
+                  <linearGradient id="skillGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="rgb(var(--ctp-teal))" />
+                    <stop offset="50%" stopColor="rgb(var(--ctp-lavender))" />
+                    <stop offset="100%" stopColor="rgb(var(--ctp-pink))" />
+                  </linearGradient>
+                </defs>
+              </svg>
+
+              {svgCode && (
+                <div className={cn('flex h-16 w-16 items-center justify-center', accentText)}>
+                  <div
+                    className="skill-svg-container flex h-full w-full items-center justify-center"
+                    // biome-ignore lint/security/noDangerouslySetInnerHtml: Sanity content
+                    dangerouslySetInnerHTML={{ __html: svgCode }}
+                  />
+                </div>
+              )}
+            </div>
+
+            {/* Category badge — sits between the art window and the rules-text box */}
+            {categoryName && (
+              <div className="mt-2.5 flex justify-center">
+                <span
+                  className={cn(
+                    'rounded-full border bg-ctp-mantle/70 px-2.5 py-0.5 text-[9px] font-semibold uppercase tracking-wider',
+                    accentRule,
+                    accentText
+                  )}
+                >
+                  {categoryName}
+                </span>
+              </div>
+            )}
+
+            {/* Rules-text box with the description */}
+            <div className="mx-3 mb-3 mt-2.5 flex flex-1 items-start rounded-md border border-ctp-surface0 bg-ctp-crust/60 px-2.5 py-2">
+              <p className="line-clamp-4 text-left text-[10px] leading-snug text-ctp-subtext1">
+                {description}
+              </p>
+            </div>
           </div>
         </CatppuccinGlareCard>
       </div>

@@ -12,7 +12,14 @@
  * ---------------------------------------------------------------------------------
  */
 
-// Source: schema.json
+// Source: src/sanity/extract.json
+export type SkillCategoryReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'skillCategory';
+};
+
 export type Skill = {
   _id: string;
   _type: 'skill';
@@ -20,12 +27,51 @@ export type Skill = {
   _updatedAt: string;
   _rev: string;
   name?: string;
-  description?: Array<
-    {
-      _key: string;
-    } & InternationalizedArrayStringValue
-  >;
+  description?: InternationalizedArrayString;
+  category?: SkillCategoryReference;
+  accentColor?: 'teal' | 'lavender' | 'pink' | 'peach' | 'green' | 'sky';
+  tags?: Array<string>;
+  proficiency?: 'beginner' | 'intermediate' | 'advanced' | 'expert';
   svgCode?: string;
+};
+
+export type SkillCategory = {
+  _id: string;
+  _type: 'skillCategory';
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  name?: InternationalizedArrayString;
+  slug?: Slug;
+  accentColor?: 'teal' | 'lavender' | 'pink' | 'peach' | 'green' | 'sky';
+  order?: number;
+  fallbackSvgCode?: string;
+};
+
+export type Slug = {
+  _type: 'slug';
+  current?: string;
+  source?: string;
+};
+
+export type InternationalizedArrayString = Array<
+  {
+    _key: string;
+  } & InternationalizedArrayStringValue
+>;
+
+export type SanityImageAssetReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'sanity.imageAsset';
+};
+
+export type SkillReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'skill';
 };
 
 export type Project = {
@@ -34,23 +80,10 @@ export type Project = {
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
-  name?: Array<
-    {
-      _key: string;
-    } & InternationalizedArrayStringValue
-  >;
-  description?: Array<
-    {
-      _key: string;
-    } & InternationalizedArrayStringValue
-  >;
+  name?: InternationalizedArrayString;
+  description?: InternationalizedArrayString;
   images?: Array<{
-    asset?: {
-      _ref: string;
-      _type: 'reference';
-      _weak?: boolean;
-      [internalGroqTypeReferenceTo]?: 'sanity.imageAsset';
-    };
+    asset?: SanityImageAssetReference;
     media?: unknown;
     hotspot?: SanityImageHotspot;
     crop?: SanityImageCrop;
@@ -60,13 +93,27 @@ export type Project = {
   url?: string;
   repo?: string;
   date?: string;
-  skills?: Array<{
-    _ref: string;
-    _type: 'reference';
-    _weak?: boolean;
-    _key: string;
-    [internalGroqTypeReferenceTo]?: 'skill';
-  }>;
+  skills?: Array<
+    {
+      _key: string;
+    } & SkillReference
+  >;
+};
+
+export type SanityImageCrop = {
+  _type: 'sanity.imageCrop';
+  top?: number;
+  bottom?: number;
+  left?: number;
+  right?: number;
+};
+
+export type SanityImageHotspot = {
+  _type: 'sanity.imageHotspot';
+  x?: number;
+  y?: number;
+  height?: number;
+  width?: number;
 };
 
 export type Experience = {
@@ -75,39 +122,23 @@ export type Experience = {
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
-  title?: Array<
-    {
-      _key: string;
-    } & InternationalizedArrayStringValue
-  >;
+  title?: InternationalizedArrayString;
   company?: string;
   location?: string;
   startDate?: string;
   endDate?: string;
-  description?: Array<
+  description?: InternationalizedArrayString;
+  skills?: Array<
     {
       _key: string;
-    } & InternationalizedArrayStringValue
+    } & SkillReference
   >;
-  skills?: Array<{
-    _ref: string;
-    _type: 'reference';
-    _weak?: boolean;
-    _key: string;
-    [internalGroqTypeReferenceTo]?: 'skill';
-  }>;
 };
 
 export type InternationalizedArrayStringValue = {
   _type: 'internationalizedArrayStringValue';
   value?: string;
 };
-
-export type InternationalizedArrayString = Array<
-  {
-    _key: string;
-  } & InternationalizedArrayStringValue
->;
 
 export type SanityImagePaletteSwatch = {
   _type: 'sanity.imagePaletteSwatch';
@@ -135,20 +166,16 @@ export type SanityImageDimensions = {
   aspectRatio?: number;
 };
 
-export type SanityImageHotspot = {
-  _type: 'sanity.imageHotspot';
-  x?: number;
-  y?: number;
-  height?: number;
-  width?: number;
-};
-
-export type SanityImageCrop = {
-  _type: 'sanity.imageCrop';
-  top?: number;
-  bottom?: number;
-  left?: number;
-  right?: number;
+export type SanityImageMetadata = {
+  _type: 'sanity.imageMetadata';
+  location?: Geopoint;
+  dimensions?: SanityImageDimensions;
+  palette?: SanityImagePalette;
+  lqip?: string;
+  blurHash?: string;
+  thumbHash?: string;
+  hasAlpha?: boolean;
+  isOpaque?: boolean;
 };
 
 export type SanityFileAsset = {
@@ -171,6 +198,13 @@ export type SanityFileAsset = {
   path?: string;
   url?: string;
   source?: SanityAssetSourceData;
+};
+
+export type SanityAssetSourceData = {
+  _type: 'sanity.assetSourceData';
+  name?: string;
+  id?: string;
+  url?: string;
 };
 
 export type SanityImageAsset = {
@@ -196,17 +230,6 @@ export type SanityImageAsset = {
   source?: SanityAssetSourceData;
 };
 
-export type SanityImageMetadata = {
-  _type: 'sanity.imageMetadata';
-  location?: Geopoint;
-  dimensions?: SanityImageDimensions;
-  palette?: SanityImagePalette;
-  lqip?: string;
-  blurHash?: string;
-  hasAlpha?: boolean;
-  isOpaque?: boolean;
-};
-
 export type Geopoint = {
   _type: 'geopoint';
   lat?: number;
@@ -214,38 +237,37 @@ export type Geopoint = {
   alt?: number;
 };
 
-export type Slug = {
-  _type: 'slug';
-  current?: string;
-  source?: string;
-};
-
-export type SanityAssetSourceData = {
-  _type: 'sanity.assetSourceData';
-  name?: string;
-  id?: string;
-  url?: string;
-};
-
 export type AllSanitySchemaTypes =
+  | SkillCategoryReference
   | Skill
+  | SkillCategory
+  | Slug
+  | InternationalizedArrayString
+  | SanityImageAssetReference
+  | SkillReference
   | Project
+  | SanityImageCrop
+  | SanityImageHotspot
   | Experience
   | InternationalizedArrayStringValue
-  | InternationalizedArrayString
   | SanityImagePaletteSwatch
   | SanityImagePalette
   | SanityImageDimensions
-  | SanityImageHotspot
-  | SanityImageCrop
-  | SanityFileAsset
-  | SanityImageAsset
   | SanityImageMetadata
-  | Geopoint
-  | Slug
-  | SanityAssetSourceData;
+  | SanityFileAsset
+  | SanityAssetSourceData
+  | SanityImageAsset
+  | Geopoint;
+
 export declare const internalGroqTypeReferenceTo: unique symbol;
-// Source: ./src/sanity/queries.ts
+
+type ArrayOf<T> = Array<
+  T & {
+    _key: string;
+  }
+>;
+
+// Source: src/sanity/queries.ts
 // Variable: listProjectsQuery
 // Query: *[_type == "project"] {     ...,    skills[]->  } | order(date desc)
 export type ListProjectsQueryResult = Array<{
@@ -254,23 +276,10 @@ export type ListProjectsQueryResult = Array<{
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
-  name?: Array<
-    {
-      _key: string;
-    } & InternationalizedArrayStringValue
-  >;
-  description?: Array<
-    {
-      _key: string;
-    } & InternationalizedArrayStringValue
-  >;
+  name?: InternationalizedArrayString;
+  description?: InternationalizedArrayString;
   images?: Array<{
-    asset?: {
-      _ref: string;
-      _type: 'reference';
-      _weak?: boolean;
-      [internalGroqTypeReferenceTo]?: 'sanity.imageAsset';
-    };
+    asset?: SanityImageAssetReference;
     media?: unknown;
     hotspot?: SanityImageHotspot;
     crop?: SanityImageCrop;
@@ -287,39 +296,28 @@ export type ListProjectsQueryResult = Array<{
     _updatedAt: string;
     _rev: string;
     name?: string;
-    description?: Array<
-      {
-        _key: string;
-      } & InternationalizedArrayStringValue
-    >;
+    description?: InternationalizedArrayString;
+    category?: SkillCategoryReference;
+    accentColor?: 'green' | 'lavender' | 'peach' | 'pink' | 'sky' | 'teal';
+    tags?: Array<string>;
+    proficiency?: 'advanced' | 'beginner' | 'expert' | 'intermediate';
     svgCode?: string;
   }> | null;
 }>;
+
+// Source: src/sanity/queries.ts
 // Variable: previewProjectsQuery
-// Query: *[_type == "project"] {     ...,    skills[]->  } | order(date desc)[0..3]
+// Query: *[_type == "project"] {     ...,    skills[]->  } | order(date desc)[0..1]
 export type PreviewProjectsQueryResult = Array<{
   _id: string;
   _type: 'project';
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
-  name?: Array<
-    {
-      _key: string;
-    } & InternationalizedArrayStringValue
-  >;
-  description?: Array<
-    {
-      _key: string;
-    } & InternationalizedArrayStringValue
-  >;
+  name?: InternationalizedArrayString;
+  description?: InternationalizedArrayString;
   images?: Array<{
-    asset?: {
-      _ref: string;
-      _type: 'reference';
-      _weak?: boolean;
-      [internalGroqTypeReferenceTo]?: 'sanity.imageAsset';
-    };
+    asset?: SanityImageAssetReference;
     media?: unknown;
     hotspot?: SanityImageHotspot;
     crop?: SanityImageCrop;
@@ -336,76 +334,62 @@ export type PreviewProjectsQueryResult = Array<{
     _updatedAt: string;
     _rev: string;
     name?: string;
-    description?: Array<
-      {
-        _key: string;
-      } & InternationalizedArrayStringValue
-    >;
+    description?: InternationalizedArrayString;
+    category?: SkillCategoryReference;
+    accentColor?: 'green' | 'lavender' | 'peach' | 'pink' | 'sky' | 'teal';
+    tags?: Array<string>;
+    proficiency?: 'advanced' | 'beginner' | 'expert' | 'intermediate';
     svgCode?: string;
   }> | null;
 }>;
+
+// Source: src/sanity/queries.ts
 // Variable: listExperiencesQuery
-// Query: *[_type == "experience"] | order(startDate desc)
+// Query: *[_type == "experience"] | order(endDate desc)
 export type ListExperiencesQueryResult = Array<{
   _id: string;
   _type: 'experience';
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
-  title?: Array<
-    {
-      _key: string;
-    } & InternationalizedArrayStringValue
-  >;
+  title?: InternationalizedArrayString;
   company?: string;
   location?: string;
   startDate?: string;
   endDate?: string;
-  description?: Array<
+  description?: InternationalizedArrayString;
+  skills?: Array<
     {
       _key: string;
-    } & InternationalizedArrayStringValue
+    } & SkillReference
   >;
-  skills?: Array<{
-    _ref: string;
-    _type: 'reference';
-    _weak?: boolean;
-    _key: string;
-    [internalGroqTypeReferenceTo]?: 'skill';
-  }>;
 }>;
+
+// Source: src/sanity/queries.ts
 // Variable: previewExperiencesQuery
-// Query: *[_type == "experience"] | order(startDate desc)[0..2]
+// Query: *[_type == "experience"] | order(endDate desc)[0..2]
 export type PreviewExperiencesQueryResult = Array<{
   _id: string;
   _type: 'experience';
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
-  title?: Array<
-    {
-      _key: string;
-    } & InternationalizedArrayStringValue
-  >;
+  title?: InternationalizedArrayString;
   company?: string;
   location?: string;
   startDate?: string;
   endDate?: string;
-  description?: Array<
+  description?: InternationalizedArrayString;
+  skills?: Array<
     {
       _key: string;
-    } & InternationalizedArrayStringValue
+    } & SkillReference
   >;
-  skills?: Array<{
-    _ref: string;
-    _type: 'reference';
-    _weak?: boolean;
-    _key: string;
-    [internalGroqTypeReferenceTo]?: 'skill';
-  }>;
 }>;
+
+// Source: src/sanity/queries.ts
 // Variable: listSkillsQuery
-// Query: *[ _type == "skill"]
+// Query: *[ _type == "skill"] {    ...,    category->  } | order(category->order asc, name asc)
 export type ListSkillsQueryResult = Array<{
   _id: string;
   _type: 'skill';
@@ -413,15 +397,28 @@ export type ListSkillsQueryResult = Array<{
   _updatedAt: string;
   _rev: string;
   name?: string;
-  description?: Array<
-    {
-      _key: string;
-    } & InternationalizedArrayStringValue
-  >;
+  description?: InternationalizedArrayString;
+  category: {
+    _id: string;
+    _type: 'skillCategory';
+    _createdAt: string;
+    _updatedAt: string;
+    _rev: string;
+    name?: InternationalizedArrayString;
+    slug?: Slug;
+    accentColor?: 'green' | 'lavender' | 'peach' | 'pink' | 'sky' | 'teal';
+    order?: number;
+    fallbackSvgCode?: string;
+  } | null;
+  accentColor?: 'green' | 'lavender' | 'peach' | 'pink' | 'sky' | 'teal';
+  tags?: Array<string>;
+  proficiency?: 'advanced' | 'beginner' | 'expert' | 'intermediate';
   svgCode?: string;
 }>;
+
+// Source: src/sanity/queries.ts
 // Variable: previewSkillsQuery
-// Query: *[ _type == "skill"][0..4]
+// Query: *[ _type == "skill"] {    ...,    category->  } | order(category->order asc, name asc)[0..4]
 export type PreviewSkillsQueryResult = Array<{
   _id: string;
   _type: 'skill';
@@ -429,12 +426,39 @@ export type PreviewSkillsQueryResult = Array<{
   _updatedAt: string;
   _rev: string;
   name?: string;
-  description?: Array<
-    {
-      _key: string;
-    } & InternationalizedArrayStringValue
-  >;
+  description?: InternationalizedArrayString;
+  category: {
+    _id: string;
+    _type: 'skillCategory';
+    _createdAt: string;
+    _updatedAt: string;
+    _rev: string;
+    name?: InternationalizedArrayString;
+    slug?: Slug;
+    accentColor?: 'green' | 'lavender' | 'peach' | 'pink' | 'sky' | 'teal';
+    order?: number;
+    fallbackSvgCode?: string;
+  } | null;
+  accentColor?: 'green' | 'lavender' | 'peach' | 'pink' | 'sky' | 'teal';
+  tags?: Array<string>;
+  proficiency?: 'advanced' | 'beginner' | 'expert' | 'intermediate';
   svgCode?: string;
+}>;
+
+// Source: src/sanity/queries.ts
+// Variable: listSkillCategoriesQuery
+// Query: *[ _type == "skillCategory"] | order(order asc)
+export type ListSkillCategoriesQueryResult = Array<{
+  _id: string;
+  _type: 'skillCategory';
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  name?: InternationalizedArrayString;
+  slug?: Slug;
+  accentColor?: 'green' | 'lavender' | 'peach' | 'pink' | 'sky' | 'teal';
+  order?: number;
+  fallbackSvgCode?: string;
 }>;
 
 // Query TypeMap
@@ -442,10 +466,11 @@ import '@sanity/client';
 declare module '@sanity/client' {
   interface SanityQueries {
     '\n  *[_type == "project"] { \n    ...,\n    skills[]->\n  } | order(date desc)\n': ListProjectsQueryResult;
-    '\n  *[_type == "project"] { \n    ...,\n    skills[]->\n  } | order(date desc)[0..3]\n': PreviewProjectsQueryResult;
-    '\n  *[_type == "experience"] | order(startDate desc)\n': ListExperiencesQueryResult;
-    '\n  *[_type == "experience"] | order(startDate desc)[0..2]\n': PreviewExperiencesQueryResult;
-    '\n  *[ _type == "skill"]\n': ListSkillsQueryResult;
-    '\n  *[ _type == "skill"][0..4]\n': PreviewSkillsQueryResult;
+    '\n  *[_type == "project"] { \n    ...,\n    skills[]->\n  } | order(date desc)[0..1]\n': PreviewProjectsQueryResult;
+    '\n  *[_type == "experience"] | order(endDate desc)\n': ListExperiencesQueryResult;
+    '\n  *[_type == "experience"] | order(endDate desc)[0..2]\n': PreviewExperiencesQueryResult;
+    '\n  *[ _type == "skill"] {\n    ...,\n    category->\n  } | order(category->order asc, name asc)\n': ListSkillsQueryResult;
+    '\n  *[ _type == "skill"] {\n    ...,\n    category->\n  } | order(category->order asc, name asc)[0..4]\n': PreviewSkillsQueryResult;
+    '\n  *[ _type == "skillCategory"] | order(order asc)\n': ListSkillCategoriesQueryResult;
   }
 }

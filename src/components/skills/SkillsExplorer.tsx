@@ -1,0 +1,81 @@
+'use client';
+
+import { useLocale, useTranslations } from 'next-intl';
+import { useMemo, useState } from 'react';
+import type { ListSkillCategoriesQueryResult, ListSkillsQueryResult } from '@/sanity/types';
+import { useLocalization } from '@/utils/localization';
+import CategoryChips from './CategoryChips';
+import SkillList from './SkillList';
+
+type Props = {
+  skills: ListSkillsQueryResult;
+  categories: ListSkillCategoriesQueryResult;
+};
+
+const SkillsExplorer: React.FC<Props> = ({ skills, categories }) => {
+  const t = useTranslations('skills');
+  const locale = useLocale();
+  const { getLocalizedValue } = useLocalization();
+  const [query, setQuery] = useState('');
+  const [activeCategory, setActiveCategory] = useState<string | null>(null);
+
+  const filtered = useMemo(() => {
+    const normalizedQuery = query.trim().toLowerCase();
+
+    return skills.filter((skill) => {
+      if (activeCategory && skill.category?._id !== activeCategory) {
+        return false;
+      }
+
+      if (!normalizedQuery) {
+        return true;
+      }
+
+      const description = getLocalizedValue(skill.description, locale as 'en-US' | 'pt-BR');
+      const haystack = [skill.name, description, ...(skill.tags ?? [])].join(' ').toLowerCase();
+
+      return haystack.includes(normalizedQuery);
+    });
+  }, [skills, query, activeCategory, locale, getLocalizedValue]);
+
+  return (
+    <div>
+      {/* Sticky search + chips so they stay reachable while scrolling the grid.
+          Solid bg (not backdrop-blur) — the header's blur uses the static
+          backdrop root image, so scrolled content would show through. */}
+      <div className="sticky top-20 z-40 -mx-4 bg-ctp-base px-4 pb-2">
+        <div className="mx-auto max-w-xl">
+          <input
+            type="search"
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+            placeholder={t('searchPlaceholder')}
+            className="w-full rounded-full border border-ctp-surface1 bg-ctp-mantle px-5 py-3 text-ctp-text placeholder:text-ctp-subtext0 focus:outline-none focus:ring-2 focus:ring-ctp-lavender"
+          />
+        </div>
+
+        <CategoryChips
+          categories={categories}
+          activeCategory={activeCategory}
+          onSelect={setActiveCategory}
+          plural
+          className="mt-6"
+        />
+
+        <p className="mt-4 text-center text-sm text-ctp-subtext0">
+          {t('resultsCount', { count: filtered.length })}
+        </p>
+      </div>
+
+      <div className="mt-10">
+        {filtered.length > 0 ? (
+          <SkillList skills={filtered} />
+        ) : (
+          <p className="text-ctp-subtext0">{t('noResults')}</p>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default SkillsExplorer;

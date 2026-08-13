@@ -40,7 +40,11 @@
   "skills": {
     "title": "Skills",
     "subtitle": "My technical skills",
-    "seeMore": "See all the skills"
+    "seeMore": "See all the skills",
+    "searchPlaceholder": "Search skills or tags...",
+    "allCategories": "All",
+    "resultsCount": "{count, plural, =0 {No skills} one {# skill} other {# skills}} found",
+    "noResults": "No skills match your search."
   },
   "projects": {
     "title": "Projects",

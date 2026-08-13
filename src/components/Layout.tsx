@@ -22,7 +22,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
   return (
     <main
-      className={`${flavor} min-h-screen w-full max-w-[100vw] overflow-x-hidden bg-ctp-base relative`}
+      className={`${flavor} min-h-screen w-full max-w-[100vw] overflow-x-clip bg-ctp-base relative`}
     >
       {/* Background Stars */}
       <div className="fixed inset-0 z-0">

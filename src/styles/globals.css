@@ -33,7 +33,9 @@
 html,
 body {
   max-width: 100vw;
-  overflow-x: hidden;
+  /* clip (not hidden) keeps position:sticky working — hidden computes
+     overflow-y:auto, turning the element into a scroll container. */
+  overflow-x: clip;
   margin: 0;
   padding: 0;
   /* Hide scrollbar */
@@ -51,7 +53,7 @@ body::-webkit-scrollbar {
 }
 
 .animated-gradient-text {
-  @apply animate-colorchange bg-linear-to-r from-ctp-teal via-ctp-lavender bg-clip-text text-transparent;
+  @apply animate-colorchange bg-linear-to-r from-ctp-teal via-ctp-lavender to-ctp-teal bg-clip-text text-transparent;
 }
 
 .nf {

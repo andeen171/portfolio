@@ -89,7 +89,10 @@ const ExperienceItem: React.FC<ExperienceProps> = ({ experience }) => {
           >
             {descriptionParagraphs.length > 0 ? (
               descriptionParagraphs.map((paragraph, index) => (
-                <p key={`${experience._id}-desc-${index}`} className="text-sm leading-relaxed text-ctp-text/90 mb-3 last:mb-0">
+                <p
+                  key={`${experience._id}-desc-${index}`}
+                  className="text-sm leading-relaxed text-ctp-text/90 mb-3 last:mb-0"
+                >
                   {paragraph}
                 </p>
               ))

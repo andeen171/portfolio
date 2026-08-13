@@ -1,13 +1,15 @@
 import { getTranslations } from 'next-intl/server';
-import SkillList from '@/components/skills/SkillList';
+import SkillsExplorer from '@/components/skills/SkillsExplorer';
 import { client } from '@/sanity/lib/client';
-import { listSkillsQuery } from '@/sanity/queries';
-import type { Skill } from '@/sanity/types';
+import { listSkillCategoriesQuery, listSkillsQuery } from '@/sanity/queries';
 
 const options = { next: { revalidate: 16800 } };
 
 export default async function SkillsPage() {
-  const skills = await client.fetch<Skill[]>(listSkillsQuery, {}, options);
+  const [skills, categories] = await Promise.all([
+    client.fetch(listSkillsQuery, {}, options),
+    client.fetch(listSkillCategoriesQuery, {}, options),
+  ]);
   const t = await getTranslations('skills');
 
   return (
@@ -18,7 +20,7 @@ export default async function SkillsPage() {
           <p className="py-2 text-3xl font-bold tracking-tight sm:text-4xl">{t('subtitle')}</p>
         </div>
         <div className="mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-7xl">
-          <SkillList skills={skills} />
+          <SkillsExplorer skills={skills} categories={categories} />
         </div>
       </div>
     </div>
