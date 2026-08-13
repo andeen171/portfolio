@@ -51,7 +51,9 @@ export const GlareCard = ({
   }, [flavor]);
 
   const isLightTheme = flavor === 'latte';
-  const opacityMultiplier = isLightTheme ? 1.5 : 1;
+  // The full-card glare highlight is kept faint, and fainter still on latte so
+  // the card content behind it stays readable at all times.
+  const glareMultiplier = isLightTheme ? 0.4 : 0.7;
 
   const containerStyle = {
     '--m-x': '50%',
@@ -65,55 +67,6 @@ export const GlareCard = ({
     '--radius': '16px',
     '--easing': 'ease',
     '--transition': 'var(--duration) var(--easing)',
-  } as React.CSSProperties;
-
-  const backgroundStyle = {
-    '--step': '4%',
-    '--subtle-pattern': `url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='20' cy='20' r='1' fill='${colors.lavender.hex.replace(
-      '#',
-      '%23'
-    )}' fill-opacity='${isLightTheme ? '0.3' : '0.1'}'/%3E%3C/svg%3E")`,
-    '--pattern': 'var(--subtle-pattern) center/80px 80px repeat',
-    '--catppuccin-rainbow': `repeating-linear-gradient( 45deg, rgba(${colors.teal.rgb.r}, ${
-      colors.teal.rgb.g
-    }, ${colors.teal.rgb.b}, ${0.8 * opacityMultiplier}) calc(var(--step) * 1), rgba(${
-      colors.sky.rgb.r
-    }, ${colors.sky.rgb.g}, ${colors.sky.rgb.b}, ${
-      0.7 * opacityMultiplier
-    }) calc(var(--step) * 2), rgba(${colors.sapphire.rgb.r}, ${colors.sapphire.rgb.g}, ${
-      colors.sapphire.rgb.b
-    }, ${0.8 * opacityMultiplier}) calc(var(--step) * 3), rgba(${colors.blue.rgb.r}, ${
-      colors.blue.rgb.g
-    }, ${colors.blue.rgb.b}, ${0.7 * opacityMultiplier}) calc(var(--step) * 4), rgba(${
-      colors.lavender.rgb.r
-    }, ${colors.lavender.rgb.g}, ${colors.lavender.rgb.b}, ${
-      0.9 * opacityMultiplier
-    }) calc(var(--step) * 5), rgba(${colors.pink.rgb.r}, ${colors.pink.rgb.g}, ${
-      colors.pink.rgb.b
-    }, ${0.8 * opacityMultiplier}) calc(var(--step) * 6), rgba(${colors.mauve.rgb.r}, ${
-      colors.mauve.rgb.g
-    }, ${colors.mauve.rgb.b}, ${
-      0.7 * opacityMultiplier
-    }) calc(var(--step) * 7) ) 0% var(--bg-y)/200% 600% no-repeat`,
-    '--diagonal': `repeating-linear-gradient( 135deg, rgba(${colors.surface0.rgb.r}, ${
-      colors.surface0.rgb.g
-    }, ${colors.surface0.rgb.b}, ${0.4 * opacityMultiplier}) 0%, rgba(${colors.surface1.rgb.r}, ${
-      colors.surface1.rgb.g
-    }, ${colors.surface1.rgb.b}, ${0.6 * opacityMultiplier}) 2px, rgba(${colors.surface0.rgb.r}, ${
-      colors.surface0.rgb.g
-    }, ${colors.surface0.rgb.b}, ${0.4 * opacityMultiplier}) 4px, rgba(${colors.mantle.rgb.r}, ${
-      colors.mantle.rgb.g
-    }, ${colors.mantle.rgb.b}, ${
-      0.3 * opacityMultiplier
-    }) 8px ) var(--bg-x) var(--bg-y)/150% 150% no-repeat`,
-    '--shine': `linear-gradient( 45deg, transparent 30%, rgba(${colors.lavender.rgb.r}, ${
-      colors.lavender.rgb.g
-    }, ${colors.lavender.rgb.b}, ${
-      0.15 * opacityMultiplier
-    }) 50%, transparent 70% ) var(--bg-x) var(--bg-y)/200% 200% no-repeat`,
-    backgroundBlendMode: isLightTheme
-      ? 'multiply, overlay, soft-light'
-      : 'soft-light, hue, multiply, overlay',
   } as React.CSSProperties;
 
   const updateStyles = () => {
@@ -212,38 +165,28 @@ export const GlareCard = ({
         className={cn(
           `h-full grid will-change-transform origin-center transition-transform duration-(--duration) ease-(--easing) transform-[rotateY(var(--r-x))_rotateX(var(--r-y))] rounded-(--radius) border [--opacity:0] hover:[--duration:150ms] hover:[--easing:linear] overflow-hidden shadow-lg hover:shadow-xl ${
             isLightTheme
-              ? 'hover:[--opacity:1.2] data-[active=true]:[--opacity:1.2]'
-              : 'hover:[--opacity:0.9] data-[active=true]:[--opacity:0.9]'
+              ? 'hover:[--opacity:0.5] data-[active=true]:[--opacity:0.5]'
+              : 'hover:[--opacity:0.8] data-[active=true]:[--opacity:0.8]'
           }`,
           accent ? ACCENT_BORDER[accent] : 'border-ctp-surface0'
         )}
       >
-        <div className="w-full h-full grid [grid-area:1/1] mix-blend-soft-light [clip-path:inset(0_0_0_0_round_var(--radius))]">
+        {/* Card face — the foil now lives inside the art window (see SkillItem),
+            so the full face stays clean and legible. */}
+        <div className="w-full h-full grid [grid-area:1/1] [clip-path:inset(0_0_0_0_round_var(--radius))]">
           <div className={cn('h-full w-full bg-ctp-mantle', className)}>{children}</div>
         </div>
+        {/* Subtle pointer-tracked glare highlight, kept faint on all themes. */}
         <div
-          className="w-full h-full grid [grid-area:1/1] mix-blend-soft-light [clip-path:inset(0_0_1px_0_round_var(--radius))] opacity-(--opacity) transition-opacity duration-(--duration) ease-(--easing) will-change-background"
+          className="w-full h-full grid [grid-area:1/1] pointer-events-none mix-blend-soft-light [clip-path:inset(0_0_1px_0_round_var(--radius))] opacity-(--opacity) transition-opacity duration-(--duration) ease-(--easing) will-change-background"
           style={{
             background: `radial-gradient(farthest-corner_circle_at_var(--m-x)_var(--m-y), rgba(${
-              colors.lavender.rgb.r
-            }, ${colors.lavender.rgb.g}, ${colors.lavender.rgb.b}, ${
-              0.9 * opacityMultiplier
-            }) 5%, rgba(${colors.teal.rgb.r}, ${colors.teal.rgb.g}, ${colors.teal.rgb.b}, ${
-              0.7 * opacityMultiplier
-            }) 15%, rgba(${colors.pink.rgb.r}, ${colors.pink.rgb.g}, ${colors.pink.rgb.b}, ${
-              0.5 * opacityMultiplier
-            }) 30%, rgba(${colors.sky.rgb.r}, ${colors.sky.rgb.g}, ${colors.sky.rgb.b}, ${
-              0.3 * opacityMultiplier
-            }) 50%, transparent 90%)`,
-          }}
-        />
-        <div
-          className="w-full h-full grid [grid-area:1/1] mix-blend-color-dodge opacity-(--opacity) will-change-background transition-opacity [clip-path:inset(0_0_1px_0_round_var(--radius))] relative after:content-[''] after:absolute after:inset-0 after:bg-linear-to-br after:from-transparent after:via-white/5 after:to-transparent after:mix-blend-overlay"
-          style={{
-            background: 'var(--catppuccin-rainbow), var(--diagonal), var(--shine)',
-            backgroundSize: '200% 600%, 150% 150%, 200% 200%',
-            backgroundPosition: '0% var(--bg-y), var(--bg-x) var(--bg-y), var(--bg-x) var(--bg-y)',
-            ...backgroundStyle,
+              colors.text.rgb.r
+            }, ${colors.text.rgb.g}, ${colors.text.rgb.b}, ${
+              0.7 * glareMultiplier
+            }) 5%, rgba(${colors.lavender.rgb.r}, ${colors.lavender.rgb.g}, ${
+              colors.lavender.rgb.b
+            }, ${0.35 * glareMultiplier}) 25%, transparent 70%)`,
           }}
         />
       </div>

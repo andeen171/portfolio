@@ -1,6 +1,7 @@
 'use client';
 
 import { useLocale } from 'next-intl';
+import FoilLayer from '@/components/FoilLayer';
 import CatppuccinGlareCard, { type GlareCardAccent } from '@/components/GlareCard';
 import { cn } from '@/lib/utils';
 import type { ListSkillsQueryResult } from '@/sanity/types';
@@ -42,6 +43,8 @@ const SkillItem: React.FC<SkillItemProps> = ({ skill }) => {
 
   const accentText = accent ? ACCENT_TEXT[accent] : 'text-ctp-lavender';
   const accentRule = accent ? ACCENT_RULE[accent] : 'border-ctp-surface1';
+  // Tags are metadata — keep them neutral so they don't compete with the accent.
+  const tags = (skill.tags ?? []).slice(0, 3);
 
   return (
     <div className="group relative flex justify-center">
@@ -49,26 +52,35 @@ const SkillItem: React.FC<SkillItemProps> = ({ skill }) => {
       <div className="relative z-0 transform-gpu transition-transform duration-300 ease-out will-change-transform hover:z-30 hover:scale-[1.12]">
         <CatppuccinGlareCard accent={accent}>
           <div className="flex h-full flex-col">
-            {/* Header / name bar */}
-            <div className={cn('flex items-center border-b bg-ctp-crust/50 px-3 py-2', accentRule)}>
+            {/* Header / name bar — title with a tiny category line under it. The
+                accent colour already signals the category, so keep it small. */}
+            <div className={cn('border-b bg-ctp-crust/50 px-3 py-2', accentRule)}>
               <span
                 className={cn(
-                  'w-full truncate text-center text-sm font-bold leading-tight',
+                  'block w-full truncate text-center text-sm font-bold leading-tight',
                   accentText
                 )}
                 title={skill.name}
               >
                 {skill.name}
               </span>
+              {categoryName && (
+                <span className="mt-0.5 block truncate text-center text-[9px] uppercase tracking-wider text-ctp-subtext0">
+                  {categoryName}
+                </span>
+              )}
             </div>
 
-            {/* Art window */}
+            {/* Art window — the foil shimmer sits behind the icon so light icons
+                pop against it. */}
             <div
               className={cn(
-                'mx-3 mt-3 flex items-center justify-center rounded-md border bg-ctp-base/60 py-4',
+                'relative mx-3 mt-3 flex items-center justify-center overflow-hidden rounded-md border py-4',
                 accentRule
               )}
             >
+              <FoilLayer className="rounded-md" />
+
               <svg width="0" height="0" style={{ position: 'absolute' }}>
                 <title>Gradient</title>
                 <defs>
@@ -81,7 +93,12 @@ const SkillItem: React.FC<SkillItemProps> = ({ skill }) => {
               </svg>
 
               {svgCode && (
-                <div className={cn('flex h-16 w-16 items-center justify-center', accentText)}>
+                <div
+                  className={cn(
+                    'relative z-10 flex h-16 w-16 items-center justify-center',
+                    accentText
+                  )}
+                >
                   <div
                     className="skill-svg-container flex h-full w-full items-center justify-center"
                     // biome-ignore lint/security/noDangerouslySetInnerHtml: Sanity content
@@ -91,18 +108,18 @@ const SkillItem: React.FC<SkillItemProps> = ({ skill }) => {
               )}
             </div>
 
-            {/* Category badge — sits between the art window and the rules-text box */}
-            {categoryName && (
-              <div className="mt-2.5 flex justify-center">
-                <span
-                  className={cn(
-                    'rounded-full border bg-ctp-mantle/70 px-2.5 py-0.5 text-[9px] font-semibold uppercase tracking-wider',
-                    accentRule,
-                    accentText
-                  )}
-                >
-                  {categoryName}
-                </span>
+            {/* Tags — neutral metadata pills between the art window and the
+                rules-text box. Wrap to at most two lines. */}
+            {tags.length > 0 && (
+              <div className="mt-2.5 flex max-h-11 flex-wrap justify-center gap-1 overflow-hidden px-3">
+                {tags.map((tag) => (
+                  <span
+                    key={tag}
+                    className="rounded-full border border-ctp-surface1 bg-ctp-mantle/70 px-2 py-0.5 text-[9px] font-medium uppercase tracking-wider text-ctp-subtext0"
+                  >
+                    {tag}
+                  </span>
+                ))}
               </div>
             )}
 

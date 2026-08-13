@@ -61,10 +61,6 @@ const SkillsExplorer: React.FC<Props> = ({ skills, categories }) => {
           plural
           className="mt-6"
         />
-
-        <p className="mt-4 text-center text-sm text-ctp-subtext0">
-          {t('resultsCount', { count: filtered.length })}
-        </p>
       </div>
 
       <div className="mt-10">
