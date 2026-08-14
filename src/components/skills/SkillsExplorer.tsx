@@ -42,8 +42,14 @@ const SkillsExplorer: React.FC<Props> = ({ skills, categories }) => {
     <div>
       {/* Sticky search + chips so they stay reachable while scrolling the grid.
           No background on the bar itself (a solid strip looked detached from
-          the navbar); the controls carry their own translucent bg instead. */}
-      <div className="sticky top-20 z-40 -mx-4 px-4 pb-2">
+          the navbar); a radial veil behind it does the hiding instead. */}
+      <div className="sticky top-20 z-40 -mx-4 px-4 pb-2 isolate">
+        {/* Bleeds past the bar on every side so the fade finishes in open space
+            rather than at a visible edge. Behind the controls, never over them. */}
+        <div
+          aria-hidden
+          className="skills-bar-veil pointer-events-none absolute -inset-x-24 -top-10 -bottom-8 -z-10"
+        />
         <div className="mx-auto max-w-xl">
           <input
             type="search"

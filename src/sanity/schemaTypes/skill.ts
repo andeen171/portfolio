@@ -63,6 +63,14 @@ export const skill = defineType({
       },
     }),
     defineField({
+      name: 'yearsOfExperience',
+      title: 'Years of Experience',
+      type: 'number',
+      description:
+        'Optional; leave unset for skills where it does not apply (e.g. soft skills). Drives the experience badge on the card.',
+      validation: (Rule) => Rule.integer().min(0).max(50),
+    }),
+    defineField({
       name: 'svgCode',
       title: 'SVG Code',
       type: 'text',

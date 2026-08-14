@@ -2,21 +2,9 @@
 
 import { type CatppuccinColors, flavors } from '@catppuccin/palette';
 import { useEffect, useState } from 'react';
+import { hashString } from '@/lib/hash';
 import { cn } from '@/lib/utils';
 import { useCtpStore } from '@/store';
-
-/**
- * Cheap deterministic string hash (djb2). Same input always yields the same
- * number, so seeds are stable across SSR and client renders — no hydration
- * mismatch and no `Math.random` at render time.
- */
-function hashString(input: string): number {
-  let hash = 5381;
-  for (let i = 0; i < input.length; i++) {
-    hash = (hash * 33) ^ input.charCodeAt(i);
-  }
-  return hash >>> 0;
-}
 
 /** Iridescent accent ramp we pick from. Ordered around the cool→warm arc so
  *  adjacent indices are visually related and any 2–3 consecutive picks blend
@@ -40,8 +28,11 @@ function rgba(c: Rgb, a: number): string {
 /**
  * A holographic "foil" shimmer layer driven by the pointer-tracked CSS custom
  * properties (`--bg-x` / `--bg-y`) set by the enclosing {@link GlareCard}.
- * Render it as an absolutely-positioned background behind content inside any
- * descendant of a GlareCard (e.g. the art window of a skill card).
+ *
+ * This is now the **fallback** path: skill cards render `FoilShader` (a real
+ * thin-film interference shader) and drop back to this when WebGL is
+ * unavailable. It is kept deliberately convincing rather than minimal, since
+ * it's what anyone with a blocked GPU actually sees.
  *
  * Rather than sliding one fixed rainbow around (which could land the visible
  * window on a dark seam), the foil is COMPOSED per card: the seed deterministically

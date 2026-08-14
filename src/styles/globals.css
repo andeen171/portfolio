@@ -60,10 +60,380 @@ body::-webkit-scrollbar {
   font-family: "FiraCode NF", monospace;
 }
 
+/*
+  Veil behind the sticky search + category chips on /skills.
+
+  The bar itself has no background — a solid strip read as detached from the
+  navbar. But the controls are translucent, so cards scrolling underneath used
+  to slide right through the search field. An elliptical wash of the page
+  background solves both: opaque where the controls are, gone by the edges, so
+  it never reads as a bar with hard borders.
+
+  The last stop is `color-mix(... 0%, transparent)` rather than the bare
+  `transparent` keyword: that keyword is `rgb(0 0 0 / 0)`, so an engine
+  interpolating non-premultiplied would fade the ends through grey.
+
+  It reads `--catppuccin-color-base`, not Tailwind's `--color-ctp-base`. The
+  theme block is `@theme inline`, so `--color-ctp-base` is substituted where
+  it's declared — at `:root` — and hand-written CSS using it inherits the
+  root's flavor, not the one on the `.mocha`/`.latte` element in Layout. The
+  Catppuccin token is re-declared by each flavor class and inherits properly.
+*/
+.skills-bar-veil {
+  background: radial-gradient(
+    115% 118% at 50% 40%,
+    var(--catppuccin-color-base) 0%,
+    color-mix(in oklab, var(--catppuccin-color-base) 92%, transparent) 40%,
+    color-mix(in oklab, var(--catppuccin-color-base) 55%, transparent) 66%,
+    color-mix(in oklab, var(--catppuccin-color-base) 0%, transparent) 84%
+  );
+}
+
 .skill-svg-container svg,
 .skill-svg-container-modal svg {
   width: 100%;
   height: 100%;
+}
+
+/*
+  ── Rarity foils ────────────────────────────────────────────────────────────
+  Trading-card rarity treatments, adapted from pokemon-cards-css (MIT) and the
+  ygo-ocg-secret-rare CSS technique. The rainbow stops come from the active
+  Catppuccin flavor via `--sunpillar-1..6` (set in RarityFoil.tsx), and every
+  layer is positioned from the pointer variables published by GlareCard.
+
+  Layout: `.rarity-foil` stacks `.rarity-shine` (the holo itself) and
+  `.rarity-glare` (the specular highlight) in a single grid area. Both are
+  inert until the card is hovered — `--card-opacity` gates them, so an
+  un-hovered grid of 66 cards paints nothing.
+*/
+
+.rarity-foil {
+  display: grid;
+  overflow: hidden;
+  isolation: isolate;
+  border-radius: inherit;
+  /* Ramped by the hover rules below; 0 means the foil is fully idle. */
+  --card-opacity: 0;
+
+  /* Scanline pair for the holo tier. Dark by default; latte overrides both,
+     because near-black scanlines over a pale card read as dirt, not foil.
+     The two stops sit close together on purpose — the shader underneath already
+     supplies structure, and a black/grey pair on top of it turned the window
+     into hard corduroy that outshouted the tiers above holo. */
+  --scan-dark: hsl(0, 0%, 34%);
+  --scan-light: hsl(0, 0%, 46%);
+  /* Darkest stop of the radiant banding — same reasoning. */
+  --band-dark: hsl(230, 45%, 12%);
+}
+
+.rarity-foil[data-light] {
+  /* Far tighter than the dark pair. Latte multiplies the shine, so a 34-point
+     spread here became hard corduroy that read *louder* than `radiant` and
+     `secret` above it — the ladder inverted. 13 points still shows the scanline
+     texture without turning the window into a barcode. */
+  --scan-dark: hsl(0, 0%, 84%);
+  --scan-light: hsl(0, 0%, 97%);
+  --band-dark: hsl(230, 22%, 72%);
+}
+
+.rarity-foil > * {
+  grid-area: 1 / 1;
+  border-radius: inherit;
+}
+
+/* Hovering (or tap-activating) the card lights the foil. The card-wide scope
+   stays dimmer than the icon window so it reads as an accent, not a wash. */
+[data-card]:hover .rarity-foil,
+[data-card][data-active] .rarity-foil {
+  --card-opacity: 1;
+}
+
+.rarity-foil[data-scope="card"] {
+  --card-opacity: 0;
+}
+
+[data-card]:hover .rarity-foil[data-scope="card"],
+[data-card][data-active] .rarity-foil[data-scope="card"] {
+  --card-opacity: 0.55;
+}
+
+/* ── Uncommon — a plain specular flare, no holo. ───────────────────────────*/
+
+.rarity-foil[data-rarity="uncommon"] .rarity-shine {
+  background-image: radial-gradient(
+    farthest-corner circle at var(--m-x, 50%) var(--m-y, 50%),
+    hsla(0, 0%, 100%, 0.55) 5%,
+    hsla(0, 0%, 100%, 0.12) 35%,
+    transparent 70%
+  );
+  mix-blend-mode: overlay;
+  opacity: calc(var(--card-opacity) * 0.9);
+  transition: opacity 0.3s ease;
+}
+
+.rarity-foil[data-rarity="uncommon"] .rarity-glare {
+  background-image: linear-gradient(
+    115deg,
+    transparent 35%,
+    hsla(0, 0%, 100%, 0.35) 48%,
+    transparent 60%
+  );
+  background-size: 250% 250%;
+  background-position: calc(var(--bg-x, 50%) * 1.6) calc(var(--bg-y, 50%) * 1.6);
+  mix-blend-mode: soft-light;
+  opacity: var(--card-opacity);
+  transition: opacity 0.3s ease;
+}
+
+/* ── Holo — rainbow bands crossed with scanlines, the classic Ultra Rare. ──*/
+
+.rarity-foil[data-rarity="holo"] .rarity-shine {
+  /* A wider scanline breaks the rainbow into a softer sheen. At 2px the bands
+     read as hard vertical stripes that shout louder than `radiant` above it,
+     which inverts the ladder. */
+  --scanline: 6px;
+
+  background-image:
+    repeating-linear-gradient(
+      110deg,
+      var(--sunpillar-1),
+      var(--sunpillar-2),
+      var(--sunpillar-3),
+      var(--sunpillar-4),
+      var(--sunpillar-5),
+      var(--sunpillar-6),
+      var(--sunpillar-1),
+      var(--sunpillar-2),
+      var(--sunpillar-3),
+      var(--sunpillar-4),
+      var(--sunpillar-5),
+      var(--sunpillar-6)
+    ),
+    repeating-linear-gradient(
+      90deg,
+      var(--scan-dark) 0px,
+      var(--scan-dark) var(--scanline),
+      var(--scan-light) var(--scanline),
+      var(--scan-light) calc(var(--scanline) * 2)
+    );
+
+  background-position:
+    calc(((50% - var(--bg-x, 50%)) * 2.6) + 50%) calc(((50% - var(--bg-y, 50%)) * 3.5) + 50%),
+    center center;
+  background-size:
+    400% 400%,
+    cover;
+  background-blend-mode: overlay;
+
+  /* Held below `radiant` on brightness and coverage, but the rainbow has to
+     survive — drop the saturation much further and it turns into grey
+     corduroy, which is worse than being loud. `soft-light` rather than
+     `color-dodge`: dodging on top of the shader's own sheen clipped the window
+     to a flat stripe pattern with no image left underneath. */
+  filter: brightness(1.05) contrast(1.05) saturate(1.3);
+  mix-blend-mode: soft-light;
+  opacity: calc(var(--card-opacity) * 0.6);
+  transition: opacity 0.3s ease;
+}
+
+.rarity-foil[data-rarity="holo"] .rarity-glare {
+  background-image: radial-gradient(
+    farthest-corner circle at var(--m-x, 50%) var(--m-y, 50%),
+    hsla(180, 90%, 92%, 0.75) 5%,
+    hsla(0, 0%, 40%, 0.25) 55%,
+    hsla(0, 0%, 0%, 0.35) 110%
+  );
+  mix-blend-mode: overlay;
+  filter: brightness(0.75) contrast(2.2);
+  opacity: calc(var(--card-opacity) * 0.7);
+  transition: opacity 0.3s ease;
+}
+
+/* ── Radiant — the diagonal banded holo of a Pokémon V card. ───────────────*/
+
+.rarity-foil[data-rarity="radiant"] .rarity-shine {
+  --space: 5%;
+  --angle: 133deg;
+
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      var(--sunpillar-1) calc(var(--space) * 1),
+      var(--sunpillar-2) calc(var(--space) * 2),
+      var(--sunpillar-3) calc(var(--space) * 3),
+      var(--sunpillar-4) calc(var(--space) * 4),
+      var(--sunpillar-5) calc(var(--space) * 5),
+      var(--sunpillar-6) calc(var(--space) * 6),
+      var(--sunpillar-1) calc(var(--space) * 7)
+    ),
+    repeating-linear-gradient(
+      var(--angle),
+      var(--band-dark) 0%,
+      hsl(180, 10%, 60%) 3.8%,
+      hsl(180, 29%, 66%) 4.5%,
+      hsl(180, 10%, 60%) 5.2%,
+      var(--band-dark) 10%,
+      var(--band-dark) 12%
+    ),
+    radial-gradient(
+      farthest-corner circle at var(--m-x, 50%) var(--m-y, 50%),
+      hsla(0, 0%, 0%, 0.1) 12%,
+      hsla(0, 0%, 0%, 0.15) 20%,
+      hsla(0, 0%, 0%, 0.25) 120%
+    );
+
+  background-position:
+    0% var(--bg-y, 50%),
+    calc(var(--bg-x, 50%) + (var(--bg-y, 50%) * 0.2)) var(--bg-y, 50%),
+    var(--bg-x, 50%) var(--bg-y, 50%);
+  background-size:
+    200% 700%,
+    300% 100%,
+    200% 100%;
+  background-blend-mode: hue, hard-light;
+
+  /* Brighter and more saturated than `holo` by design — this is the step where
+     the ladder has to be visible at a glance, not on close inspection. It keeps
+     `color-dodge` (holo dropped to `soft-light`), and that difference in blend
+     is most of what separates the two tiers now: radiant's diagonal bands cut
+     through the shader, holo's only tint it. */
+  filter: brightness(calc((var(--pointer-from-center, 0) * 0.35) + 0.72)) contrast(1.35)
+    saturate(1.9);
+  mix-blend-mode: color-dodge;
+  opacity: calc(var(--card-opacity) * 0.9);
+  transition: opacity 0.3s ease;
+}
+
+.rarity-foil[data-rarity="radiant"] .rarity-glare {
+  background-image: radial-gradient(
+    farthest-corner circle at var(--m-x, 50%) var(--m-y, 50%),
+    hsl(0, 0%, 92%) 5%,
+    hsl(200, 8%, 50%) 80%,
+    hsl(320, 40%, 12%) 150%
+  );
+  background-size: 120% 140%;
+  background-position: center center;
+  mix-blend-mode: overlay;
+  filter: brightness(0.9) contrast(2) saturate(0.8);
+  opacity: calc(var(--card-opacity) * var(--pointer-from-center, 0) * 0.7);
+  transition: opacity 0.3s ease;
+}
+
+/* ── Secret — OCG Secret Rare, card-wide. ──────────────────────────────────*/
+
+.rarity-foil[data-rarity="secret"] .rarity-shine {
+  --glitter: 3px;
+
+  /* Fine sparkle lattice, standing in for the OCG glitter texture. */
+  background-image:
+    radial-gradient(circle at 50% 50%, hsla(0, 0%, 100%, 0.9) 0.5px, transparent 1px),
+    radial-gradient(circle at 20% 80%, hsla(0, 0%, 100%, 0.6) 0.5px, transparent 1px),
+    conic-gradient(
+      from calc(var(--pointer-from-left, 0.5) * 120deg),
+      var(--sunpillar-4),
+      var(--sunpillar-5),
+      var(--sunpillar-6),
+      var(--sunpillar-1),
+      var(--sunpillar-2),
+      var(--sunpillar-3),
+      var(--sunpillar-4)
+    ),
+    radial-gradient(
+      farthest-corner circle at var(--m-x, 50%) var(--m-y, 50%),
+      hsla(0, 0%, 0%, 0.95) 10%,
+      hsla(0, 0%, 95%, 0.18) 90%
+    );
+
+  background-size:
+    var(--glitter) var(--glitter),
+    calc(var(--glitter) * 1.7) calc(var(--glitter) * 1.7),
+    cover,
+    cover;
+  background-position:
+    calc(50% - (2px * var(--pointer-from-left, 0.5)))
+    calc(50% - (2px * var(--pointer-from-top, 0.5))),
+    calc(50% + (2px * var(--pointer-from-left, 0.5)))
+    calc(50% + (2px * var(--pointer-from-top, 0.5))),
+    center center,
+    center center;
+  background-blend-mode: soft-light, hard-light, overlay;
+
+  filter: brightness(calc(0.45 + (var(--pointer-from-center, 0) * 0.2))) contrast(1.1) saturate(2.4);
+  mix-blend-mode: color-dodge;
+  opacity: var(--card-opacity);
+  transition: opacity 0.35s ease;
+}
+
+.rarity-foil[data-rarity="secret"] .rarity-glare {
+  background-image: radial-gradient(
+    farthest-corner circle at var(--m-x, 50%) var(--m-y, 50%),
+    hsla(45, 20%, 82%, 0.3) 0%,
+    hsl(22, 15%, 12%) 180%
+  );
+  mix-blend-mode: hard-light;
+  filter: brightness(1.25) contrast(1.4);
+  opacity: calc(var(--card-opacity) * 0.8);
+  transition: opacity 0.35s ease;
+}
+
+/*
+  Latte is a light theme: color-dodge over pale surfaces blows out to white, so
+  every tier drops to a gentler blend there.
+
+  The filters stay per-tier rather than collapsing to one shared value — a
+  single `filter` for all four would make the ladder read as "same shine,
+  different colour" on latte, which is the failure this whole tier system
+  exists to avoid. `multiply` keeps colour on pale ground where `color-dodge`
+  would only wash out.
+*/
+.rarity-foil[data-light] .rarity-shine {
+  mix-blend-mode: multiply;
+}
+
+.rarity-foil[data-light][data-rarity="uncommon"] .rarity-shine {
+  mix-blend-mode: soft-light;
+  filter: brightness(1) contrast(1.02) saturate(1);
+}
+
+.rarity-foil[data-light][data-rarity="holo"] .rarity-shine {
+  filter: brightness(1.12) contrast(0.92) saturate(1.15);
+  opacity: calc(var(--card-opacity) * 0.5);
+}
+
+.rarity-foil[data-light][data-rarity="radiant"] .rarity-shine {
+  filter: brightness(1.05) contrast(1) saturate(1.5);
+  opacity: calc(var(--card-opacity) * 0.72);
+}
+
+.rarity-foil[data-light][data-rarity="secret"] .rarity-shine {
+  /* Top of the ladder, so it needs the most colour of the four — but it's also
+     the only card-wide tier on latte, where the wash sits under body text.
+     Saturation carries the rarity here; opacity stays modest for that reason. */
+  filter: brightness(1.06) contrast(1) saturate(2.1);
+  opacity: calc(var(--card-opacity) * 0.95);
+}
+
+.rarity-foil[data-light] .rarity-glare {
+  mix-blend-mode: soft-light;
+}
+
+.rarity-foil[data-light][data-scope="card"] {
+  --card-opacity: 0;
+}
+
+[data-card]:hover .rarity-foil[data-light][data-scope="card"],
+[data-card][data-active] .rarity-foil[data-light][data-scope="card"] {
+  /* Low enough that the translucent tag pills keep their text contrast — on
+     latte the card-wide wash is what eats legibility first. */
+  --card-opacity: 0.2;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rarity-foil .rarity-shine,
+  .rarity-foil .rarity-glare {
+    transition: none;
+  }
 }
 
 .skill-svg-container-modal path,

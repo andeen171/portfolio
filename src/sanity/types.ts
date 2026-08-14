@@ -32,6 +32,7 @@ export type Skill = {
   accentColor?: 'teal' | 'lavender' | 'pink' | 'peach' | 'green' | 'sky';
   tags?: Array<string>;
   proficiency?: 'beginner' | 'intermediate' | 'advanced' | 'expert';
+  yearsOfExperience?: number;
   svgCode?: string;
 };
 
@@ -301,6 +302,7 @@ export type ListProjectsQueryResult = Array<{
     accentColor?: 'green' | 'lavender' | 'peach' | 'pink' | 'sky' | 'teal';
     tags?: Array<string>;
     proficiency?: 'advanced' | 'beginner' | 'expert' | 'intermediate';
+    yearsOfExperience?: number;
     svgCode?: string;
   }> | null;
 }>;
@@ -339,6 +341,7 @@ export type PreviewProjectsQueryResult = Array<{
     accentColor?: 'green' | 'lavender' | 'peach' | 'pink' | 'sky' | 'teal';
     tags?: Array<string>;
     proficiency?: 'advanced' | 'beginner' | 'expert' | 'intermediate';
+    yearsOfExperience?: number;
     svgCode?: string;
   }> | null;
 }>;
@@ -413,35 +416,7 @@ export type ListSkillsQueryResult = Array<{
   accentColor?: 'green' | 'lavender' | 'peach' | 'pink' | 'sky' | 'teal';
   tags?: Array<string>;
   proficiency?: 'advanced' | 'beginner' | 'expert' | 'intermediate';
-  svgCode?: string;
-}>;
-
-// Source: src/sanity/queries.ts
-// Variable: previewSkillsQuery
-// Query: *[ _type == "skill"] {    ...,    category->  } | order(category->order asc, name asc)[0..4]
-export type PreviewSkillsQueryResult = Array<{
-  _id: string;
-  _type: 'skill';
-  _createdAt: string;
-  _updatedAt: string;
-  _rev: string;
-  name?: string;
-  description?: InternationalizedArrayString;
-  category: {
-    _id: string;
-    _type: 'skillCategory';
-    _createdAt: string;
-    _updatedAt: string;
-    _rev: string;
-    name?: InternationalizedArrayString;
-    slug?: Slug;
-    accentColor?: 'green' | 'lavender' | 'peach' | 'pink' | 'sky' | 'teal';
-    order?: number;
-    fallbackSvgCode?: string;
-  } | null;
-  accentColor?: 'green' | 'lavender' | 'peach' | 'pink' | 'sky' | 'teal';
-  tags?: Array<string>;
-  proficiency?: 'advanced' | 'beginner' | 'expert' | 'intermediate';
+  yearsOfExperience?: number;
   svgCode?: string;
 }>;
 
@@ -470,7 +445,6 @@ declare module '@sanity/client' {
     '\n  *[_type == "experience"] | order(endDate desc)\n': ListExperiencesQueryResult;
     '\n  *[_type == "experience"] | order(endDate desc)[0..2]\n': PreviewExperiencesQueryResult;
     '\n  *[ _type == "skill"] {\n    ...,\n    category->\n  } | order(category->order asc, name asc)\n': ListSkillsQueryResult;
-    '\n  *[ _type == "skill"] {\n    ...,\n    category->\n  } | order(category->order asc, name asc)[0..4]\n': PreviewSkillsQueryResult;
     '\n  *[ _type == "skillCategory"] | order(order asc)\n': ListSkillCategoriesQueryResult;
   }
 }
