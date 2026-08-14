@@ -1,4 +1,5 @@
-# My Dynamic Portfolio built with NextJs and Sanity [Check it out!](https://portfolio-andeen171.vercel.app/)
+# My Dynamic Portfolio built with NextJs and Sanity
+### [Check it out!](https://anderson-lopes.dev.br/)
 
 ### How do i contribute to this?
 ### First clone or fork the repository to your desired enviroment
