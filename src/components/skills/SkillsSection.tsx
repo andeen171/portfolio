@@ -2,8 +2,15 @@
 
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
-import { useCallback, useMemo, useRef, useState } from 'react';
-import { cn } from '@/lib/utils';
+import { useEffect, useMemo, useState } from 'react';
+import {
+  Carousel,
+  type CarouselApi,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from '@/components/ui/carousel';
 import type { ListSkillCategoriesQueryResult, ListSkillsQueryResult } from '@/sanity/types';
 import CategoryChips from './CategoryChips';
 import SkillItem from './SkillItem';
@@ -13,44 +20,37 @@ type Props = {
   categories: ListSkillCategoriesQueryResult;
 };
 
-// Shared arrow button styling for the carousel.
-const ARROW_CLASSES =
-  'flex size-10 shrink-0 items-center justify-center rounded-full border border-ctp-surface1 bg-ctp-mantle text-xl text-ctp-subtext0 transition-colors hover:border-ctp-lavender hover:text-ctp-lavender disabled:pointer-events-none disabled:opacity-30';
-
 const SkillsSection: React.FC<Props> = ({ skills, categories }) => {
   const t = useTranslations('skills');
   // No "All" here — the carousel is always a single category, defaulting to the first one.
   const [activeCategory, setActiveCategory] = useState<string | null>(
     () => categories[0]?._id ?? null
   );
-  const trackRef = useRef<HTMLDivElement>(null);
-  const [canPrev, setCanPrev] = useState(false);
-  const [canNext, setCanNext] = useState(true);
+  const [api, setApi] = useState<CarouselApi>();
+  // On touch devices a tap activates a card's hover visuals; it stays active
+  // until another card is tapped or the user taps outside any card.
+  const [pressedCardId, setPressedCardId] = useState<string | null>(null);
 
   const filtered = useMemo(() => {
     if (!activeCategory) return skills;
     return skills.filter((skill) => skill.category?._id === activeCategory);
   }, [skills, activeCategory]);
 
-  const updateArrows = useCallback(() => {
-    const track = trackRef.current;
-    if (!track) return;
-    const { scrollLeft, clientWidth, scrollWidth } = track;
-    setCanPrev(scrollLeft > 2);
-    setCanNext(scrollLeft + clientWidth < scrollWidth - 2);
-  }, []);
+  // Switching category resets the carousel to the start.
+  useEffect(() => {
+    api?.scrollTo(0);
+  }, [api]);
 
-  // Scroll by a full "page" of cards. Card width derives from the first item
-  // so it tracks the responsive basis classes instead of hardcoding a number.
-  const scrollByPage = useCallback((direction: 1 | -1) => {
-    const track = trackRef.current;
-    const first = track?.firstElementChild;
-    if (!track || !first) return;
-    track.scrollBy({
-      left: direction * (first.clientWidth + 32),
-      behavior: 'smooth',
-    });
-  }, []);
+  // Dismiss the tapped-active card when the user presses outside any card.
+  useEffect(() => {
+    if (!pressedCardId) return;
+    const onPointerDown = (e: PointerEvent) => {
+      const target = e.target as HTMLElement | null;
+      if (!target?.closest('[data-card]')) setPressedCardId(null);
+    };
+    document.addEventListener('pointerdown', onPointerDown);
+    return () => document.removeEventListener('pointerdown', onPointerDown);
+  }, [pressedCardId]);
 
   return (
     <div className="py-24 sm:py-32">
@@ -63,67 +63,76 @@ const SkillsSection: React.FC<Props> = ({ skills, categories }) => {
         <CategoryChips
           categories={categories}
           activeCategory={activeCategory}
-          onSelect={(id) => {
-            setActiveCategory(id);
-            trackRef.current?.scrollTo({ left: 0 });
-            // The track remounts items; let layout settle before reading widths.
-            requestAnimationFrame(updateArrows);
-          }}
+          onSelect={(id) => setActiveCategory(id)}
           showAll={false}
           plural
           className="mt-10"
         />
 
-        {/* Carousel with arrow controls on every viewport. snap-proximity keeps
-            swipe scrolling natural on touch without yanking the track, and
-            touch-pan-y on the cards lets vertical page scroll win over drag. */}
-        <div className="mt-12 flex items-center gap-3 sm:mt-14 sm:gap-4 lg:mt-16">
-          <button
-            type="button"
-            aria-label={t('previousSkills')}
-            className={ARROW_CLASSES}
-            disabled={!canPrev}
-            onClick={() => scrollByPage(-1)}
-          >
-            <span aria-hidden>&larr;</span>
-          </button>
-
-          <div
-            ref={trackRef}
-            onScroll={updateArrows}
-            className="flex flex-1 snap-x snap-proximity gap-8 overflow-x-auto px-1 py-10 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-          >
+        {/* Embla carousel. Re-keyed on category so it re-inits at slide 0.
+            Viewport bleeds into the page padding via negative margins so cards
+            can extend past the container edge under the fade mask. */}
+        <Carousel
+          key={activeCategory ?? 'all'}
+          setApi={setApi}
+          opts={{
+            // Mobile centres one card at a time (no fade under the first card);
+            // sm+ keeps the multi-card start-aligned row.
+            align: 'center',
+            containScroll: 'trimSnaps',
+            slidesToScroll: 1,
+            breakpoints: {
+              '(min-width: 640px)': { align: 'start' },
+            },
+            // Let drags that begin on a card fall through to native vertical
+            // page scroll; only gaps/arrows drive the carousel. On desktop this
+            // is a no-op (pointer drags on cards just tilt them).
+            watchDrag: (_emblaApi, event) => {
+              const target = event.target as HTMLElement | null;
+              return !target?.closest('[data-card]');
+            },
+          }}
+          className="-mx-6 mt-12 px-6 sm:mt-14 lg:mt-16"
+        >
+          <CarouselContent className="py-14">
             {filtered.map((skill) => (
-              <div
+              <CarouselItem
                 key={skill._id}
-                className="flex w-64 shrink-0 snap-center justify-center sm:w-auto sm:basis-[calc((100%-2rem)/2)] md:basis-[calc((100%-4rem)/3)] xl:basis-[calc((100%-6rem)/4)]"
+                className="basis-[70%] sm:basis-1/2 md:basis-1/3 xl:basis-1/4"
               >
-                <SkillItem skill={skill} />
-              </div>
+                <div
+                  className="flex justify-center"
+                  onPointerUp={(e) => {
+                    // Tap-to-activate on coarse (touch) pointers only.
+                    if (e.pointerType !== 'touch') return;
+                    setPressedCardId((prev) => (prev === skill._id ? null : skill._id));
+                  }}
+                >
+                  <SkillItem skill={skill} active={pressedCardId === skill._id} />
+                </div>
+              </CarouselItem>
             ))}
-            <Link
-              href="/skills"
-              className="flex h-80 w-40 shrink-0 snap-center flex-col items-center justify-center gap-3 self-center rounded-2xl border border-dashed border-ctp-surface1 text-ctp-subtext0 transition-colors hover:border-ctp-lavender hover:text-ctp-lavender"
-            >
-              <span className="max-w-28 text-sm font-semibold">{t('seeMore')}</span>
-              <span className="text-2xl" aria-hidden>
-                &rarr;
-              </span>
-            </Link>
-          </div>
 
-          <button
-            type="button"
-            aria-label={t('nextSkills')}
-            className={ARROW_CLASSES}
-            disabled={!canNext}
-            onClick={() => scrollByPage(1)}
-          >
-            <span aria-hidden>&rarr;</span>
-          </button>
-        </div>
+            <CarouselItem className="basis-[70%] sm:basis-1/2 md:basis-1/3 xl:basis-1/4">
+              <div className="flex justify-center">
+                <Link
+                  href="/skills"
+                  className="flex h-80 w-40 flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-ctp-surface1 text-ctp-subtext0 transition-colors hover:border-ctp-lavender hover:text-ctp-lavender"
+                >
+                  <span className="max-w-28 text-sm font-semibold">{t('seeMore')}</span>
+                  <span className="text-2xl" aria-hidden>
+                    &rarr;
+                  </span>
+                </Link>
+              </div>
+            </CarouselItem>
+          </CarouselContent>
 
-        <div className="mt-4 text-center">
+          <CarouselPrevious label={t('previousSkills')} />
+          <CarouselNext label={t('nextSkills')} />
+        </Carousel>
+
+        <div className="mt-12 hidden text-center sm:block">
           <Link className="text-lg font-semibold text-ctp-lavender" href="/skills">
             {t('seeMore')} &rarr;
           </Link>
