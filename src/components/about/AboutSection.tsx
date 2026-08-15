@@ -105,8 +105,15 @@ const AboutSection: React.FC = () => {
 
               {/* Description with collapsible functionality */}
               <div className="mt-4 sm:mt-8 relative">
-                {/* Hidden measurement divs */}
-                <div className="absolute opacity-0 pointer-events-none -z-10">
+                {/* Hidden measurement divs.
+                    `invisible` (visibility: hidden), not just `opacity-0`: an
+                    ancestor carries `.animated-gradient-text`, whose
+                    `background-clip: text` clips its gradient to the glyphs of
+                    its whole subtree. That paints these copies from the
+                    ancestor, so the wrapper's own opacity never applies to them.
+                    `visibility: hidden` still reserves layout, so scrollHeight
+                    below stays measurable. */}
+                <div className="absolute invisible opacity-0 pointer-events-none -z-10">
                   {/* Measure collapsed height (2 paragraphs on desktop, fixed on mobile) */}
                   <div ref={collapsedRef}>
                     {descriptionParagraphs.slice(0, 2).map((paragraph, index) => (
@@ -154,12 +161,17 @@ const AboutSection: React.FC = () => {
                   <div className="absolute bottom-0 left-0 right-0 h-12 bg-linear-to-t from-ctp-base via-ctp-base/80 to-transparent pointer-events-none" />
                 )}
 
-                {/* Expand/collapse button */}
+                {/* Expand/collapse button.
+                    `relative`: the fade overlay above is absolutely positioned
+                    and so paints after this in-flow button regardless of DOM
+                    order, veiling it with ~92% opaque ctp-base while collapsed.
+                    Making the button positioned too puts it in the same paint
+                    step, where tree order wins and it lands on top. */}
                 {showToggle && (
                   <button
                     type="button"
                     onClick={() => setIsExpanded((v) => !v)}
-                    className="mt-4 flex items-center gap-2 text-sm text-ctp-lavender hover:text-ctp-mauve transition-colors duration-200"
+                    className="relative mt-4 flex items-center gap-2 text-sm text-ctp-lavender hover:text-ctp-mauve transition-colors duration-200"
                   >
                     <span>{isExpanded ? tExp('collapse') : tExp('expand')}</span>
                     <svg
