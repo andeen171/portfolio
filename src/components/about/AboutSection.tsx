@@ -162,12 +162,17 @@ const AboutSection: React.FC = () => {
                   <div className="absolute bottom-0 left-0 right-0 h-12 bg-linear-to-t from-ctp-base via-ctp-base/80 to-transparent pointer-events-none" />
                 )}
 
-                {/* Expand/collapse button */}
+                {/* Expand/collapse button.
+                    `relative`: the fade overlay above is absolutely positioned
+                    and so paints after this in-flow button regardless of DOM
+                    order, veiling it with ~92% opaque ctp-base while collapsed.
+                    Making the button positioned too puts it in the same paint
+                    step, where tree order wins and it lands on top. */}
                 {showToggle && (
                   <button
                     type="button"
                     onClick={() => setIsExpanded((v) => !v)}
-                    className="mt-4 flex items-center gap-2 text-sm text-ctp-lavender hover:text-ctp-mauve transition-colors duration-200"
+                    className="relative mt-4 flex items-center gap-2 text-sm text-ctp-lavender hover:text-ctp-mauve transition-colors duration-200"
                   >
                     <span>{isExpanded ? tExp('collapse') : tExp('expand')}</span>
                     <svg
