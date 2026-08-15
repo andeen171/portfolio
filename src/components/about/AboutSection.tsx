@@ -26,7 +26,6 @@ const AboutSection: React.FC = () => {
         t('typedStrings.linux'),
         t('typedStrings.backend'),
         t('typedStrings.entrepreneur'),
-        t('typedStrings.arch'),
         t('typedStrings.father'),
         t('typedStrings.thinker'),
       ],
