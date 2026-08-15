@@ -106,8 +106,15 @@ const AboutSection: React.FC = () => {
 
               {/* Description with collapsible functionality */}
               <div className="mt-4 sm:mt-8 relative">
-                {/* Hidden measurement divs */}
-                <div className="absolute opacity-0 pointer-events-none -z-10">
+                {/* Hidden measurement divs.
+                    `invisible` (visibility: hidden), not just `opacity-0`: an
+                    ancestor carries `.animated-gradient-text`, whose
+                    `background-clip: text` clips its gradient to the glyphs of
+                    its whole subtree. That paints these copies from the
+                    ancestor, so the wrapper's own opacity never applies to them.
+                    `visibility: hidden` still reserves layout, so scrollHeight
+                    below stays measurable. */}
+                <div className="absolute invisible opacity-0 pointer-events-none -z-10">
                   {/* Measure collapsed height (2 paragraphs on desktop, fixed on mobile) */}
                   <div ref={collapsedRef}>
                     {descriptionParagraphs.slice(0, 2).map((paragraph, index) => (
