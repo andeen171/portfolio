@@ -104,9 +104,40 @@ body::-webkit-scrollbar {
 
   Layout: `.rarity-foil` stacks `.rarity-shine` (the holo itself) and
   `.rarity-glare` (the specular highlight) in a single grid area. Both are
-  inert until the card is hovered — `--card-opacity` gates them, so an
-  un-hovered grid of 66 cards paints nothing.
+  inert until the card is hovered or pressed — `--card-opacity` gates them, so
+  an un-hovered grid of 66 cards paints nothing.
 */
+
+/*
+  The art-window foil (FoilLayer) shares the same state: `--foil-resting`
+  keeps a subtle gradient tint under the icon at all times, and hovering or
+  pressing the card ramps it to full strength while `--foil-lit` brings the
+  pointer-tracked spot + sheen in. `data-pressed` mirrors the hover state so
+  tapping a card (touch) triggers exactly the same visuals as hovering it.
+*/
+.foil-layer {
+  --foil-resting: 0.3;
+  --foil-lit: 0;
+}
+
+.foil-resting,
+.foil-lit {
+  transition: opacity 0.4s ease;
+}
+
+[data-card]:hover .foil-layer,
+[data-card][data-active] .foil-layer,
+[data-card]:has([data-pressed]) .foil-layer {
+  --foil-resting: 1;
+  --foil-lit: 0.92;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .foil-resting,
+  .foil-lit {
+    transition: none;
+  }
+}
 
 .rarity-foil {
   display: grid;
@@ -116,19 +147,20 @@ body::-webkit-scrollbar {
   /* Ramped by the hover rules below; 0 means the foil is fully idle. */
   --card-opacity: 0;
 
-  /* Scanline pair for the holo tier. Dark by default; latte overrides both,
-     because near-black scanlines over a pale card read as dirt, not foil.
-     The two stops sit close together on purpose — the shader underneath already
-     supplies structure, and a black/grey pair on top of it turned the window
+  /* Scanline pair for the holo tier. Near-black scanlines over a pale card
+     read as dirt rather than foil, so both stops sit in the mid greys; on
+     latte the [data-light] override pulls them tighter still. The two stops
+     sit close together on purpose — the window already has structure from the
+     foil underneath, and a black/grey pair on top of it turned the window
      into hard corduroy that outshouted the tiers above holo. */
-  --scan-dark: hsl(0, 0%, 34%);
-  --scan-light: hsl(0, 0%, 46%);
+  --scan-dark: hsl(0, 0%, 42%);
+  --scan-light: hsl(0, 0%, 56%);
   /* Darkest stop of the radiant banding — same reasoning. */
-  --band-dark: hsl(230, 45%, 12%);
+  --band-dark: hsl(230, 45%, 26%);
 }
 
 .rarity-foil[data-light] {
-  /* Far tighter than the dark pair. Latte multiplies the shine, so a 34-point
+  /* Far tighter than the dark pair. Latte multiplies the shine, so a wide
      spread here became hard corduroy that read *louder* than `radiant` and
      `secret` above it — the ladder inverted. 13 points still shows the scanline
      texture without turning the window into a barcode. */
@@ -142,10 +174,13 @@ body::-webkit-scrollbar {
   border-radius: inherit;
 }
 
-/* Hovering (or tap-activating) the card lights the foil. The card-wide scope
-   stays dimmer than the icon window so it reads as an accent, not a wash. */
+/* Hovering (or tap-activating/pressing) the card lights the foil. The
+   card-wide scope stays dimmer than the icon window so it reads as an accent,
+   not a wash. `data-pressed` (set by GlareCard on pointer-down/enter) mirrors
+   the hover state so clicking/tapping a card triggers the same visuals. */
 [data-card]:hover .rarity-foil,
-[data-card][data-active] .rarity-foil {
+[data-card][data-active] .rarity-foil,
+[data-card]:has([data-pressed]) .rarity-foil {
   --card-opacity: 1;
 }
 
@@ -154,7 +189,8 @@ body::-webkit-scrollbar {
 }
 
 [data-card]:hover .rarity-foil[data-scope="card"],
-[data-card][data-active] .rarity-foil[data-scope="card"] {
+[data-card][data-active] .rarity-foil[data-scope="card"],
+[data-card]:has([data-pressed]) .rarity-foil[data-scope="card"] {
   --card-opacity: 0.55;
 }
 
@@ -229,7 +265,7 @@ body::-webkit-scrollbar {
   /* Held below `radiant` on brightness and coverage, but the rainbow has to
      survive — drop the saturation much further and it turns into grey
      corduroy, which is worse than being loud. `soft-light` rather than
-     `color-dodge`: dodging on top of the shader's own sheen clipped the window
+     `color-dodge`: dodging on top of the foil's own sheen clipped the window
      to a flat stripe pattern with no image left underneath. */
   filter: brightness(1.05) contrast(1.05) saturate(1.3);
   mix-blend-mode: soft-light;
@@ -250,104 +286,153 @@ body::-webkit-scrollbar {
   transition: opacity 0.3s ease;
 }
 
-/* ── Radiant — the diagonal banded holo of a Pokémon V card. ───────────────*/
+/* ── Radiant — true crossed-diagonal Radiant Rare. ──────────────────────────
+   Two perpendicular diagonal bar gradients crossed over each other (after
+   pokemon-cards-css `radiant-holo.css`). The earlier V-card build ran one
+   band set over a near-black radial and color-dodged the lot, which blacked
+   out the whole window on hover — crossing bright bars at ±45° keeps the
+   pattern luminous everywhere instead. */
 
 .rarity-foil[data-rarity="radiant"] .rarity-shine {
-  --space: 5%;
-  --angle: 133deg;
+  /* 1.2% per bar, 10 bars per cycle — one full light→dark sweep per ~12%. */
+  --barwidth: 1.2%;
 
   background-image:
-    repeating-linear-gradient(
-      0deg,
-      var(--sunpillar-1) calc(var(--space) * 1),
-      var(--sunpillar-2) calc(var(--space) * 2),
-      var(--sunpillar-3) calc(var(--space) * 3),
-      var(--sunpillar-4) calc(var(--space) * 4),
-      var(--sunpillar-5) calc(var(--space) * 5),
-      var(--sunpillar-6) calc(var(--space) * 6),
-      var(--sunpillar-1) calc(var(--space) * 7)
-    ),
-    repeating-linear-gradient(
-      var(--angle),
-      var(--band-dark) 0%,
-      hsl(180, 10%, 60%) 3.8%,
-      hsl(180, 29%, 66%) 4.5%,
-      hsl(180, 10%, 60%) 5.2%,
-      var(--band-dark) 10%,
-      var(--band-dark) 12%
-    ),
     radial-gradient(
-      farthest-corner circle at var(--m-x, 50%) var(--m-y, 50%),
-      hsla(0, 0%, 0%, 0.1) 12%,
-      hsla(0, 0%, 0%, 0.15) 20%,
-      hsla(0, 0%, 0%, 0.25) 120%
+      farthest-corner ellipse at var(--m-x, 50%) var(--m-y, 50%),
+      hsla(0, 0%, 95%, 0.5) 20%,
+      transparent 130%
+    ),
+    repeating-linear-gradient(
+      45deg,
+      hsl(0, 0%, 10%) 0%,
+      hsl(0, 0%, 10%) var(--barwidth),
+      hsl(0, 0%, 20%) calc(var(--barwidth) + 0.01%),
+      hsl(0, 0%, 20%) calc(var(--barwidth) * 2),
+      hsl(0, 0%, 35%) calc(var(--barwidth) * 2 + 0.01%),
+      hsl(0, 0%, 35%) calc(var(--barwidth) * 3),
+      hsl(0, 0%, 42.5%) calc(var(--barwidth) * 3 + 0.01%),
+      hsl(0, 0%, 42.5%) calc(var(--barwidth) * 4),
+      hsl(0, 0%, 50%) calc(var(--barwidth) * 4 + 0.01%),
+      hsl(0, 0%, 50%) calc(var(--barwidth) * 5),
+      hsl(0, 0%, 42.5%) calc(var(--barwidth) * 5 + 0.01%),
+      hsl(0, 0%, 42.5%) calc(var(--barwidth) * 6),
+      hsl(0, 0%, 35%) calc(var(--barwidth) * 6 + 0.01%),
+      hsl(0, 0%, 35%) calc(var(--barwidth) * 7),
+      hsl(0, 0%, 20%) calc(var(--barwidth) * 7 + 0.01%),
+      hsl(0, 0%, 20%) calc(var(--barwidth) * 8),
+      hsl(0, 0%, 10%) calc(var(--barwidth) * 8 + 0.01%),
+      hsl(0, 0%, 10%) calc(var(--barwidth) * 9),
+      hsl(0, 0%, 0%) calc(var(--barwidth) * 9 + 0.01%),
+      hsl(0, 0%, 0%) calc(var(--barwidth) * 10)
+    ),
+    repeating-linear-gradient(
+      -45deg,
+      hsl(0, 0%, 10%) 0%,
+      hsl(0, 0%, 10%) var(--barwidth),
+      hsl(0, 0%, 20%) calc(var(--barwidth) + 0.01%),
+      hsl(0, 0%, 20%) calc(var(--barwidth) * 2),
+      hsl(0, 0%, 35%) calc(var(--barwidth) * 2 + 0.01%),
+      hsl(0, 0%, 35%) calc(var(--barwidth) * 3),
+      hsl(0, 0%, 42.5%) calc(var(--barwidth) * 3 + 0.01%),
+      hsl(0, 0%, 42.5%) calc(var(--barwidth) * 4),
+      hsl(0, 0%, 50%) calc(var(--barwidth) * 4 + 0.01%),
+      hsl(0, 0%, 50%) calc(var(--barwidth) * 5),
+      hsl(0, 0%, 42.5%) calc(var(--barwidth) * 5 + 0.01%),
+      hsl(0, 0%, 42.5%) calc(var(--barwidth) * 6),
+      hsl(0, 0%, 35%) calc(var(--barwidth) * 6 + 0.01%),
+      hsl(0, 0%, 35%) calc(var(--barwidth) * 7),
+      hsl(0, 0%, 20%) calc(var(--barwidth) * 7 + 0.01%),
+      hsl(0, 0%, 20%) calc(var(--barwidth) * 8),
+      hsl(0, 0%, 10%) calc(var(--barwidth) * 8 + 0.01%),
+      hsl(0, 0%, 10%) calc(var(--barwidth) * 9),
+      hsl(0, 0%, 0%) calc(var(--barwidth) * 9 + 0.01%),
+      hsl(0, 0%, 0%) calc(var(--barwidth) * 10)
     );
 
-  background-position:
-    0% var(--bg-y, 50%),
-    calc(var(--bg-x, 50%) + (var(--bg-y, 50%) * 0.2)) var(--bg-y, 50%),
-    var(--bg-x, 50%) var(--bg-y, 50%);
   background-size:
-    200% 700%,
-    300% 100%,
-    200% 100%;
-  background-blend-mode: hue, hard-light;
+    cover,
+    210% 210%,
+    210% 210%;
+  background-position:
+    center,
+    calc(((var(--bg-x, 50%) - 50%) * 1.5) + 50%) calc(((var(--bg-y, 50%) - 50%) * 1.5) + 50%),
+    calc(((var(--bg-x, 50%) - 50%) * 1.5) + 50%) calc(((var(--bg-y, 50%) - 50%) * 1.5) + 50%);
 
-  /* Brighter and more saturated than `holo` by design — this is the step where
-     the ladder has to be visible at a glance, not on close inspection. It keeps
-     `color-dodge` (holo dropped to `soft-light`), and that difference in blend
-     is most of what separates the two tiers now: radiant's diagonal bands cut
-     through the shader, holo's only tint it. */
-  filter: brightness(calc((var(--pointer-from-center, 0) * 0.35) + 0.72)) contrast(1.35)
-    saturate(1.9);
+  background-blend-mode: exclusion, darken;
+
+  /* Brighter and more structured than `holo` by design — this is the step
+     where the ladder has to be visible at a glance. `color-dodge` lifts the
+     crossed bars into iridescence; the luminance only swings between grey
+     bars, so the window can no longer crush to black the way the old build
+     did. */
+  filter: brightness(0.8) contrast(1.9) saturate(1.6);
   mix-blend-mode: color-dodge;
-  opacity: calc(var(--card-opacity) * 0.9);
+  opacity: calc(var(--card-opacity) * 0.85);
   transition: opacity 0.3s ease;
 }
 
 .rarity-foil[data-rarity="radiant"] .rarity-glare {
   background-image: radial-gradient(
     farthest-corner circle at var(--m-x, 50%) var(--m-y, 50%),
-    hsl(0, 0%, 92%) 5%,
-    hsl(200, 8%, 50%) 80%,
-    hsl(320, 40%, 12%) 150%
+    hsla(0, 0%, 100%, 0.33) 0%,
+    hsl(0, 0%, 25%) 110%
   );
-  background-size: 120% 140%;
-  background-position: center center;
-  mix-blend-mode: overlay;
-  filter: brightness(0.9) contrast(2) saturate(0.8);
-  opacity: calc(var(--card-opacity) * var(--pointer-from-center, 0) * 0.7);
+  mix-blend-mode: hard-light;
+  filter: brightness(1) contrast(1.5);
+  opacity: calc(var(--card-opacity) * 0.7);
   transition: opacity 0.3s ease;
 }
 
-/* ── Secret — OCG Secret Rare, card-wide. ──────────────────────────────────*/
+/* ── Secret — OCG Secret Rare, card-wide. ───────────────────────────────────
+   Real OCG secret rares are a *parallel* diagonal hatch: one set of fine
+   lines runs corner-to-corner and the rainbow plays along those same lines.
+   The earlier build rotated a conic gradient around the pointer, which made
+   the colours swirl radially instead of lying parallel to the hatch. Here the
+   rainbow and the hatch both run at 45° and slide together with the pointer,
+   and the layers use `cover`/percentage sizing on an `inset-0` layer so the
+   foil always spans the whole card face. */
 
 .rarity-foil[data-rarity="secret"] .rarity-shine {
   --glitter: 3px;
+  /* 6px cycle: a 1.5px bright line + a 0.75px hairline over a dark bed. */
+  --hatch: 6px;
 
   /* Fine sparkle lattice, standing in for the OCG glitter texture. */
   background-image:
     radial-gradient(circle at 50% 50%, hsla(0, 0%, 100%, 0.9) 0.5px, transparent 1px),
     radial-gradient(circle at 20% 80%, hsla(0, 0%, 100%, 0.6) 0.5px, transparent 1px),
-    conic-gradient(
-      from calc(var(--pointer-from-left, 0.5) * 120deg),
-      var(--sunpillar-4),
-      var(--sunpillar-5),
-      var(--sunpillar-6),
-      var(--sunpillar-1),
-      var(--sunpillar-2),
-      var(--sunpillar-3),
-      var(--sunpillar-4)
+    repeating-linear-gradient(
+      45deg,
+      var(--sunpillar-1) 0%,
+      var(--sunpillar-2) 16%,
+      var(--sunpillar-3) 33%,
+      var(--sunpillar-4) 50%,
+      var(--sunpillar-5) 66%,
+      var(--sunpillar-6) 83%,
+      var(--sunpillar-1) 100%
+    ),
+    repeating-linear-gradient(
+      45deg,
+      hsla(0, 0%, 100%, 0.6) 0px,
+      hsla(0, 0%, 100%, 0.6) 1.5px,
+      transparent 1.5px,
+      transparent calc(var(--hatch) / 2),
+      hsla(0, 0%, 100%, 0.3) calc(var(--hatch) / 2),
+      hsla(0, 0%, 100%, 0.3) calc(var(--hatch) / 2 + 0.75px),
+      hsla(0, 0%, 10%, 0.5) calc(var(--hatch) / 2 + 0.75px),
+      hsla(0, 0%, 10%, 0.5) var(--hatch)
     ),
     radial-gradient(
       farthest-corner circle at var(--m-x, 50%) var(--m-y, 50%),
-      hsla(0, 0%, 0%, 0.95) 10%,
+      hsla(0, 0%, 0%, 0.55) 10%,
       hsla(0, 0%, 95%, 0.18) 90%
     );
 
   background-size:
     var(--glitter) var(--glitter),
     calc(var(--glitter) * 1.7) calc(var(--glitter) * 1.7),
+    220% 220%,
     cover,
     cover;
   background-position:
@@ -355,11 +440,13 @@ body::-webkit-scrollbar {
     calc(50% - (2px * var(--pointer-from-top, 0.5))),
     calc(50% + (2px * var(--pointer-from-left, 0.5)))
     calc(50% + (2px * var(--pointer-from-top, 0.5))),
+    calc(var(--bg-x, 50%) * 1.2) calc(var(--bg-y, 50%) * 1.2),
     center center,
     center center;
-  background-blend-mode: soft-light, hard-light, overlay;
+  /* Rainbow sits under the hatch (multiply), glitter softens the top. */
+  background-blend-mode: soft-light, multiply, overlay, normal;
 
-  filter: brightness(calc(0.45 + (var(--pointer-from-center, 0) * 0.2))) contrast(1.1) saturate(2.4);
+  filter: brightness(calc(0.5 + (var(--pointer-from-center, 0) * 0.2))) contrast(1.1) saturate(2.2);
   mix-blend-mode: color-dodge;
   opacity: var(--card-opacity);
   transition: opacity 0.35s ease;
@@ -402,7 +489,10 @@ body::-webkit-scrollbar {
 }
 
 .rarity-foil[data-light][data-rarity="radiant"] .rarity-shine {
-  filter: brightness(1.05) contrast(1) saturate(1.5);
+  /* Latte multiplies the shine, and the crossed bars are mostly mid-grey — a
+     plain multiply would grey the window out. Lifting brightness keeps the
+     bar structure legible on the pale surface without crushing to mud. */
+  filter: brightness(1.4) contrast(1.2) saturate(1.4);
   opacity: calc(var(--card-opacity) * 0.72);
 }
 
@@ -423,7 +513,8 @@ body::-webkit-scrollbar {
 }
 
 [data-card]:hover .rarity-foil[data-light][data-scope="card"],
-[data-card][data-active] .rarity-foil[data-light][data-scope="card"] {
+[data-card][data-active] .rarity-foil[data-light][data-scope="card"],
+[data-card]:has([data-pressed]) .rarity-foil[data-light][data-scope="card"] {
   /* Low enough that the translucent tag pills keep their text contrast — on
      latte the card-wide wash is what eats legibility first. */
   --card-opacity: 0.2;

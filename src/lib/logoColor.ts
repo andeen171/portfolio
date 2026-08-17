@@ -7,8 +7,9 @@
  * agrees with the logo sitting on it.
  *
  * Roughly 40% of the icons in the dataset are `currentColor`-only (soft skills
- * and monochrome wordmarks); those have no colour to read and fall back to the
- * skill's Catppuccin accent.
+ * and monochrome wordmarks); those have no colour to read. For them
+ * {@link logoGradient} returns `undefined` and the card falls back to its flat
+ * mantle background (see GlareCard's `faceBackground`).
  *
  * Everything here is pure and deterministic so SSR and client renders agree.
  */
@@ -17,16 +18,27 @@ export type Hsl = { h: number; s: number; l: number };
 
 const HEX_PATTERN = /#([0-9a-fA-F]{3,8})\b/g;
 
-/** Expands `#abc` / `#abcd` shorthand and drops any alpha channel. */
-function normalizeHex(raw: string): string | null {
+/** Expands `#abc` / `#abcd` shorthand. Returns `null` when the colour is
+ *  (nearly) fully transparent — an invisible paint says nothing about the
+ *  brand, so it must not count as the logo's dominant colour. */
+function normalizeHex(raw: string): { hex: string; alpha: number } | null {
   const hex = raw.replace('#', '');
+
   if (hex.length === 3 || hex.length === 4) {
-    const [r, g, b] = [hex[0], hex[1], hex[2]];
-    return `${r}${r}${g}${g}${b}${b}`.toLowerCase();
+    const r = hex[0];
+    const g = hex[1];
+    const b = hex[2];
+    const a = hex.length === 4 ? Number.parseInt(`${hex[3]}${hex[3]}`, 16) / 255 : 1;
+    if (a < 0.15) return null;
+    return { hex: `${r}${r}${g}${g}${b}${b}`.toLowerCase(), alpha: a };
   }
+
   if (hex.length === 6 || hex.length === 8) {
-    return hex.slice(0, 6).toLowerCase();
+    const a = hex.length === 8 ? Number.parseInt(hex.slice(6, 8), 16) / 255 : 1;
+    if (a < 0.15) return null;
+    return { hex: hex.slice(0, 6).toLowerCase(), alpha: a };
   }
+
   return null;
 }
 
@@ -96,8 +108,10 @@ function isCarryingColor({ s, l }: Hsl): boolean {
 }
 
 /**
- * Picks the dominant colour of an SVG source. Ties break toward first
- * appearance, which keeps the result stable for a given input.
+ * Picks the dominant colour of an SVG source. Counts are weighted by the
+ * paint's alpha (so a barely-visible fill can't outvote the visible ones),
+ * and ties break toward first appearance, which keeps the result stable for a
+ * given input.
  *
  * Returns `null` when the icon carries no colour of its own.
  */
@@ -108,19 +122,19 @@ export function dominantLogoHsl(svgCode?: string | null): Hsl | null {
   let index = 0;
 
   for (const match of svgCode.matchAll(HEX_PATTERN)) {
-    const hex = normalizeHex(match[0]);
+    const parsed = normalizeHex(match[0]);
     index += 1;
-    if (!hex) continue;
+    if (!parsed) continue;
 
-    const { r, g, b } = hexToRgb(hex);
+    const { r, g, b } = hexToRgb(parsed.hex);
     const hsl = rgbToHsl(r, g, b);
     if (!isCarryingColor(hsl)) continue;
 
-    const existing = counts.get(hex);
+    const existing = counts.get(parsed.hex);
     if (existing) {
-      existing.count += 1;
+      existing.count += parsed.alpha;
     } else {
-      counts.set(hex, { hsl, count: 1, firstAt: index });
+      counts.set(parsed.hex, { hsl, count: parsed.alpha, firstAt: index });
     }
   }
 

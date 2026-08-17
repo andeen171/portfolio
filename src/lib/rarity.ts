@@ -4,8 +4,9 @@
  * Rare effect.
  *
  * Skills with no `proficiency` set get no tier at all: the card renders in its
- * plain form. Most of the dataset is unset, so "no tier" is the common case and
- * must stay visually calm.
+ * plain form. The published dataset has been fully patched with `proficiency`,
+ * so this is a defensive default for future/draft documents rather than the
+ * common case — keep "no tier" visually calm either way.
  */
 
 export type Proficiency = 'beginner' | 'intermediate' | 'advanced' | 'expert';

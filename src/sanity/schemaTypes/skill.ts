@@ -67,7 +67,7 @@ export const skill = defineType({
       title: 'Years of Experience',
       type: 'number',
       description:
-        'Optional; leave unset for skills where it does not apply (e.g. soft skills). Drives the experience badge on the card.',
+        'Optional. Stored explicitly as null for skills where it does not apply (e.g. soft skills), so consumers must handle null. Reserved for future card metadata; nothing renders it yet.',
       validation: (Rule) => Rule.integer().min(0).max(50),
     }),
     defineField({

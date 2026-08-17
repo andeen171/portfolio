@@ -32,7 +32,7 @@ export type Skill = {
   accentColor?: 'teal' | 'lavender' | 'pink' | 'peach' | 'green' | 'sky';
   tags?: Array<string>;
   proficiency?: 'beginner' | 'intermediate' | 'advanced' | 'expert';
-  yearsOfExperience?: number;
+  yearsOfExperience?: number | null;
   svgCode?: string;
 };
 
@@ -302,7 +302,7 @@ export type ListProjectsQueryResult = Array<{
     accentColor?: 'green' | 'lavender' | 'peach' | 'pink' | 'sky' | 'teal';
     tags?: Array<string>;
     proficiency?: 'advanced' | 'beginner' | 'expert' | 'intermediate';
-    yearsOfExperience?: number;
+    yearsOfExperience?: number | null;
     svgCode?: string;
   }> | null;
 }>;
@@ -341,7 +341,7 @@ export type PreviewProjectsQueryResult = Array<{
     accentColor?: 'green' | 'lavender' | 'peach' | 'pink' | 'sky' | 'teal';
     tags?: Array<string>;
     proficiency?: 'advanced' | 'beginner' | 'expert' | 'intermediate';
-    yearsOfExperience?: number;
+    yearsOfExperience?: number | null;
     svgCode?: string;
   }> | null;
 }>;
@@ -416,7 +416,7 @@ export type ListSkillsQueryResult = Array<{
   accentColor?: 'green' | 'lavender' | 'peach' | 'pink' | 'sky' | 'teal';
   tags?: Array<string>;
   proficiency?: 'advanced' | 'beginner' | 'expert' | 'intermediate';
-  yearsOfExperience?: number;
+  yearsOfExperience?: number | null;
   svgCode?: string;
 }>;
 

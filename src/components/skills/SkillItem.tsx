@@ -2,7 +2,7 @@
 
 import { useLocale } from 'next-intl';
 import { useMemo } from 'react';
-import FoilShader from '@/components/FoilShader';
+import FoilLayer from '@/components/FoilLayer';
 import CatppuccinGlareCard, { type GlareCardAccent } from '@/components/GlareCard';
 import RarityFoil from '@/components/RarityFoil';
 import { dominantLogoHsl, logoGradient } from '@/lib/logoColor';
@@ -126,7 +126,7 @@ const SkillItem: React.FC<SkillItemInnerProps> = ({ skill, active }) => {
                 accentRule
               )}
             >
-              <FoilShader className="rounded-md" seed={skill._id} logoHsl={logoHsl} />
+              <FoilLayer className="rounded-md" seed={skill._id} logoHsl={logoHsl} />
               {/* Rarity treatment rides on top of the foil. The top tier is
                   handled card-wide by GlareCard instead. */}
               {tier && !cardWide && (

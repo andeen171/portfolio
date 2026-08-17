@@ -137,24 +137,24 @@ export const GlareCard = ({
   return (
     <div
       style={containerStyle}
-      className="relative isolate contain-[layout_style] perspective-[600px] transition-transform duration-(--duration) ease-(--easing) will-change-transform w-full aspect-4/5 max-w-64 h-80 touch-pan-y"
+      className="relative isolate contain-[layout_style] perspective-[600px] transition-transform duration-(--duration) ease-(--easing) will-change-transform w-full aspect-4/5 max-w-[15rem] min-[400px]:max-w-64 h-80 touch-pan-y"
       ref={refElement}
       onPointerMove={updateFromEvent}
+      onPointerEnter={(event) => {
+        isPointerInside.current = true;
+        // Mark pressed for the same tilt/foil state as click. Mouse drags are
+        // excluded so click-dragging (e.g. the carousel) doesn't leave the
+        // card stuck in the pressed visual state.
+        if (event.pointerType !== 'mouse') {
+          setIsActive(true);
+          refElement.current?.style.setProperty('--duration', '0s');
+        }
+      }}
       onPointerDown={(event) => {
         isPointerInside.current = true;
         setIsActive(true);
         refElement.current?.style.setProperty('--duration', '0s');
         updateFromEvent(event);
-      }}
-      onPointerEnter={() => {
-        isPointerInside.current = true;
-        if (refElement.current) {
-          setTimeout(() => {
-            if (isPointerInside.current) {
-              refElement.current?.style.setProperty('--duration', '0s');
-            }
-          }, 300);
-        }
       }}
       onPointerLeave={() => {
         isPointerInside.current = false;
@@ -186,6 +186,7 @@ export const GlareCard = ({
     >
       <div
         data-active={isActive || active}
+        data-pressed={isActive || active || undefined}
         className={cn(
           `h-full grid will-change-transform origin-center transition-transform duration-(--duration) ease-(--easing) transform-[rotateY(var(--r-x))_rotateX(var(--r-y))] rounded-(--radius) border [--opacity:0] hover:[--duration:150ms] hover:[--easing:linear] overflow-hidden shadow-lg hover:shadow-xl ${
             isLightTheme
@@ -195,8 +196,8 @@ export const GlareCard = ({
           accent ? ACCENT_BORDER[accent] : 'border-ctp-surface0'
         )}
       >
-        {/* Card face — the shader foil lives inside the art window (see
-            SkillItem), so the full face stays clean and legible. */}
+        {/* Card face — the foil lives inside the art window (see SkillItem),
+            so the full face stays clean and legible. */}
         <div className="w-full h-full grid [grid-area:1/1] [clip-path:inset(0_0_0_0_round_var(--radius))]">
           <div
             className={cn('h-full w-full grid', !faceBackground && 'bg-ctp-mantle', className)}

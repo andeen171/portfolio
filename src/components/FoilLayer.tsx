@@ -2,7 +2,7 @@
 
 import { type CatppuccinColors, flavors } from '@catppuccin/palette';
 import { useEffect, useState } from 'react';
-import { hashString } from '@/lib/hash';
+import { type Hsl, hslToRgbUnit } from '@/lib/logoColor';
 import { cn } from '@/lib/utils';
 import { useCtpStore } from '@/store';
 
@@ -25,28 +25,53 @@ function rgba(c: Rgb, a: number): string {
   return `rgba(${c.r}, ${c.g}, ${c.b}, ${a})`;
 }
 
+/** Cheap deterministic hash (djb2). Varies the resting angle/sheen per card so
+ *  a row of cards doesn't all glint the same. Deterministic and SSR-safe — no
+ *  `Math.random` at render time. */
+function hashString(input: string): number {
+  let hash = 5381;
+  for (let i = 0; i < input.length; i++) {
+    hash = (hash * 33) ^ input.charCodeAt(i);
+  }
+  return hash >>> 0;
+}
+
 /**
- * A holographic "foil" shimmer layer driven by the pointer-tracked CSS custom
- * properties (`--bg-x` / `--bg-y`) set by the enclosing {@link GlareCard}.
+ * The holographic foil layer inside a skill card's art window.
  *
- * This is now the **fallback** path: skill cards render `FoilShader` (a real
- * thin-film interference shader) and drop back to this when WebGL is
- * unavailable. It is kept deliberately convincing rather than minimal, since
- * it's what anyone with a blocked GPU actually sees.
+ * This is the only foil renderer: CSS gradients driven by the pointer-tracked
+ * custom properties (`--bg-x` / `--bg-y`, `--m-x` / `--m-y`) published by the
+ * enclosing {@link GlareCard}. (An earlier WebGL shader build of this layer was
+ * dropped — the effect reads the same in CSS for a fraction of the cost, and
+ * there is nothing left to lose to a context reset.)
  *
- * Rather than sliding one fixed rainbow around (which could land the visible
- * window on a dark seam), the foil is COMPOSED per card: the seed deterministically
- * selects 2–3 distinct accents from the active flavor's palette and blends them
- * into a full-coverage diagonal gradient. By construction there is no dark gap to
- * land on, so every seed renders a valid, visible, colourful window. A moving
- * sheen band and the pointer-tracked `--bg-x`/`--bg-y` add the holographic shimmer.
+ * The layer has three states, expressed with the `--foil-resting` /
+ * `--foil-lit` custom properties (defined in `globals.css`):
  *
- * `seed` (typically a skill `_id` or name) gives each card a distinct colour trio,
- * angle and sheen offset so a row of cards doesn't all glint the same. It is
- * deterministic and SSR-safe. It reads the live palette so the foil follows the
- * active flavor, and is dialled back on the light `latte` flavor for legibility.
+ * - **Resting** — a full-coverage diagonal gradient fills the window, dimmed
+ *   to a subtle sheen so an idle grid of 66 cards stays calm.
+ * - **Hover / tap-active** — the resting gradient brightens to full strength
+ *   and the pointer-tracked spot + sheen join in, so the foil shimmers as the
+ *   card is tilted. `data-pressed` mirrors the hover state, so tapping a card
+ *   on touch triggers exactly the same visuals as hovering it.
+ *
+ * The colours come from the logo when it has one (`logoHsl`) and otherwise
+ * from a seeded pick of palette accents, so every card's foil belongs to the
+ * icon sitting on it. It reads the live Catppuccin palette so the foil follows
+ * the active flavor, and is dialled back on the light `latte` flavor for
+ * legibility.
  */
-export const FoilLayer = ({ className, seed }: { className?: string; seed?: string }) => {
+export const FoilLayer = ({
+  className,
+  seed,
+  logoHsl,
+}: {
+  className?: string;
+  /** Stable per-skill string — usually the document `_id`. */
+  seed?: string;
+  /** Dominant logo colour, when the logo has one; the foil is biased toward it. */
+  logoHsl?: Hsl | null;
+}) => {
   const flavor = useCtpStore((state) => state.flavor);
   const [colors, setColors] = useState<CatppuccinColors>(flavors[flavor].colors);
 
@@ -58,19 +83,29 @@ export const FoilLayer = ({ className, seed }: { className?: string; seed?: stri
 
   const h = seed ? hashString(seed) : 0;
 
-  // Pick 3 distinct accents by walking the ramp from a seeded start with a
-  // seeded, coprime-ish stride so adjacent picks stay distinct but related.
-  const start = h % FOIL_KEYS.length;
-  const stride = 2 + ((h >> 5) % 2); // 2 or 3 — both coprime with 7 (ramp length)
-  const pick = (n: number): Rgb => {
-    const key = FOIL_KEYS[(start + n * stride) % FOIL_KEYS.length] ?? 'lavender';
-    return colors[key].rgb;
-  };
-  const cA = pick(0);
-  const cB = pick(1);
-  const cC = pick(2);
+  // The blend colours come from the logo itself when it carries one. The hue
+  // is the logo's; the other stops are nudged around the wheel so the gradient
+  // doesn't read flat. Without a logo colour we pick palette accents by seed.
+  const tint = logoHsl
+    ? hslToRgbUnit({ h: logoHsl.h, s: Math.min(1, logoHsl.s + 0.15), l: 0.6 })
+    : null;
+  const tintA = logoHsl
+    ? hslToRgbUnit({ h: logoHsl.h, s: Math.min(1, logoHsl.s + 0.05), l: 0.55 })
+    : null;
+  const tintC = logoHsl
+    ? hslToRgbUnit({ h: (logoHsl.h + 30) % 360, s: Math.min(1, logoHsl.s + 0.1), l: 0.62 })
+    : null;
+  const toRgb = (unit: [number, number, number]): Rgb => ({
+    r: Math.round(unit[0] * 255),
+    g: Math.round(unit[1] * 255),
+    b: Math.round(unit[2] * 255),
+  });
 
-  const seedAngle = 100 + ((h >> 9) % 80); // 100–179deg — diagonal, varied
+  const cA = tintA ? toRgb(tintA) : colors[FOIL_KEYS[h % FOIL_KEYS.length] ?? 'lavender'].rgb;
+  const cB = tint ? toRgb(tint) : colors[FOIL_KEYS[(h + 2) % FOIL_KEYS.length] ?? 'sky'].rgb;
+  const cC = tintC ? toRgb(tintC) : colors[FOIL_KEYS[(h + 4) % FOIL_KEYS.length] ?? 'teal'].rgb;
+
+  const seedAngle = 115 + ((h >> 9) % 60); // 115–174deg — diagonal, varied
   // Per-card resting sheen offset so a row doesn't glint from the same spot.
   const sheenSeed = (h >> 3) % 100; // 0–99 %
 
@@ -79,30 +114,42 @@ export const FoilLayer = ({ className, seed }: { className?: string; seed?: stri
   const a = isLightTheme ? 0.5 : 0.85;
 
   const foilStyle = {
-    // Full-coverage iridescent blend — no positional dark gap is possible.
+    // Full-coverage iridescent blend — always present, so there is no dark gap
+    // to land on; its visibility is ramped by --foil-resting / --foil-lit.
     '--foil-blend': `linear-gradient(${seedAngle}deg, ${rgba(cA, a)} 0%, ${rgba(cB, a * 0.95)} 45%, ${rgba(cC, a)} 100%)`,
     // A soft radial hot-spot that follows the pointer for a lively shimmer.
-    '--foil-spot': `radial-gradient(120% 120% at calc(var(--bg-x, 50%)) calc(var(--bg-y, 50%)), ${rgba(
+    '--foil-spot': `radial-gradient(120% 120% at var(--m-x, 50%) var(--m-y, 50%), ${rgba(
       colors.text.rgb,
       isLightTheme ? 0.18 : 0.32
     )} 0%, transparent 55%)`,
-    // A diagonal moving sheen band tracked by the pointer for the holo streak.
+    // A diagonal sheen band tracked by the pointer for the holo streak.
     '--foil-sheen': `linear-gradient(115deg, transparent 30%, ${rgba(
       colors.text.rgb,
       isLightTheme ? 0.14 : 0.28
     )} 47%, ${rgba(colors.text.rgb, 0)} 60%) calc(${sheenSeed}% + var(--bg-x, 50%) - 50%) calc(${sheenSeed}% + var(--bg-y, 50%) - 50%)/250% 250% no-repeat`,
-    background: 'var(--foil-spot), var(--foil-sheen), var(--foil-blend)',
-    backgroundBlendMode: isLightTheme
-      ? 'soft-light, screen, normal'
-      : 'screen, color-dodge, normal',
-    opacity: isLightTheme ? 0.6 : 0.92,
   } as React.CSSProperties;
 
   return (
-    <div aria-hidden className={cn('pointer-events-none absolute inset-0', className)}>
+    <div aria-hidden className={cn('foil-layer pointer-events-none absolute inset-0', className)}>
       {/* A dark seat so light icons keep contrast even where the foil is pale. */}
       <div className="absolute inset-0 bg-ctp-crust/70" />
-      <div className="absolute inset-0" style={foilStyle} />
+      {/* Resting tint: always on, ramps from a subtle sheen to full strength
+          when the card is hovered/pressed (see .foil-layer in globals.css). */}
+      <div
+        className="foil-resting absolute inset-0"
+        style={{ background: 'var(--foil-blend)', opacity: 'var(--foil-resting, 0.3)' }}
+      />
+      {/* Lit layers: only visible while hovered/pressed, tracked to the pointer. */}
+      <div
+        className="foil-lit absolute inset-0"
+        style={{
+          background: 'var(--foil-spot), var(--foil-sheen), var(--foil-blend)',
+          backgroundBlendMode: isLightTheme
+            ? 'soft-light, screen, normal'
+            : 'screen, color-dodge, normal',
+          opacity: 'var(--foil-lit, 0)',
+        }}
+      />
     </div>
   );
 };
