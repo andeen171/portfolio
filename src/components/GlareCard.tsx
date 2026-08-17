@@ -140,14 +140,14 @@ export const GlareCard = ({
       className="relative isolate contain-[layout_style] perspective-[600px] transition-transform duration-(--duration) ease-(--easing) will-change-transform w-full aspect-4/5 max-w-[15rem] min-[400px]:max-w-64 h-80 touch-pan-y"
       ref={refElement}
       onPointerMove={updateFromEvent}
-      onPointerEnter={(event) => {
+      onPointerEnter={() => {
         isPointerInside.current = true;
-        // Mark pressed for the same tilt/foil state as click. Mouse drags are
-        // excluded so click-dragging (e.g. the carousel) doesn't leave the
-        // card stuck in the pressed visual state.
-        if (event.pointerType !== 'mouse') {
-          setIsActive(true);
-          refElement.current?.style.setProperty('--duration', '0s');
+        if (refElement.current) {
+          setTimeout(() => {
+            if (isPointerInside.current) {
+              refElement.current?.style.setProperty('--duration', '0s');
+            }
+          }, 300);
         }
       }}
       onPointerDown={(event) => {
