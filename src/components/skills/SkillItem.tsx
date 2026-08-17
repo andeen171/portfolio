@@ -1,10 +1,15 @@
 'use client';
 
 import { useLocale } from 'next-intl';
+import { useMemo } from 'react';
 import FoilLayer from '@/components/FoilLayer';
 import CatppuccinGlareCard, { type GlareCardAccent } from '@/components/GlareCard';
+import RarityFoil from '@/components/RarityFoil';
+import { dominantLogoHsl, logoGradient } from '@/lib/logoColor';
+import { isCardWideTier, rarityTier } from '@/lib/rarity';
 import { cn } from '@/lib/utils';
 import type { ListSkillsQueryResult } from '@/sanity/types';
+import { useCtpStore } from '@/store';
 import { useLocalization } from '@/utils/localization';
 
 interface SkillItemProps {
@@ -64,6 +69,19 @@ const SkillItem: React.FC<SkillItemInnerProps> = ({ skill, active }) => {
   // Tags are metadata — keep them neutral so they don't compete with the accent.
   const tags = (skill.tags ?? []).slice(0, 3);
 
+  const flavor = useCtpStore((state) => state.flavor);
+  const isLightTheme = flavor === 'latte';
+
+  // Scanning the SVG source is cheap but not free, and the source never changes
+  // for a given skill — memo keeps it off every re-render.
+  const logoHsl = useMemo(() => dominantLogoHsl(svgCode), [svgCode]);
+  // Roughly half the icons are `currentColor`-only and yield nothing; those keep
+  // the flat mantle background the card has always had.
+  const cardBackground = logoGradient(logoHsl, isLightTheme);
+
+  const tier = rarityTier(skill.proficiency);
+  const cardWide = isCardWideTier(tier);
+
   return (
     <div className="group relative flex justify-center" data-card data-active={active || undefined}>
       {/* Lift the whole card toward the viewer on hover; transform-only so layout doesn't shift.
@@ -74,7 +92,12 @@ const SkillItem: React.FC<SkillItemInnerProps> = ({ skill, active }) => {
           active && 'z-30 scale-[1.12]'
         )}
       >
-        <CatppuccinGlareCard accent={accent} active={active}>
+        <CatppuccinGlareCard
+          accent={accent}
+          active={active}
+          rarity={tier}
+          faceBackground={cardBackground}
+        >
           <div className="flex h-full flex-col">
             {/* Header / name bar — title with a tiny category line under it. The
                 accent colour already signals the category, so keep it small. */}
@@ -103,7 +126,12 @@ const SkillItem: React.FC<SkillItemInnerProps> = ({ skill, active }) => {
                 accentRule
               )}
             >
-              <FoilLayer className="rounded-md" seed={skill._id} />
+              <FoilLayer className="rounded-md" seed={skill._id} logoHsl={logoHsl} />
+              {/* Rarity treatment rides on top of the foil. The top tier is
+                  handled card-wide by GlareCard instead. */}
+              {tier && !cardWide && (
+                <RarityFoil tier={tier} scope="window" className="rounded-md" />
+              )}
 
               <svg width="0" height="0" style={{ position: 'absolute' }}>
                 <title>Gradient</title>

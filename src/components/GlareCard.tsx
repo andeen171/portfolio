@@ -2,8 +2,10 @@
 
 import { type CatppuccinColors, flavors } from '@catppuccin/palette';
 import { useEffect, useRef, useState } from 'react';
+import { isCardWideTier, type RarityTier } from '@/lib/rarity';
 import { cn } from '@/lib/utils';
 import { useCtpStore } from '@/store';
+import RarityFoil from './RarityFoil';
 
 export type GlareCardAccent = 'teal' | 'lavender' | 'pink' | 'peach' | 'green' | 'sky';
 
@@ -22,6 +24,8 @@ export const GlareCard = ({
   className,
   accent,
   active = false,
+  rarity,
+  faceBackground,
 }: {
   children: React.ReactNode;
   className?: string;
@@ -29,6 +33,11 @@ export const GlareCard = ({
   /** Force the hovered/active visual state without a pointer hover — used for
    *  tap-to-activate on touch devices. */
   active?: boolean;
+  /** Drives the card-wide rarity treatment via `data-rarity`. */
+  rarity?: RarityTier;
+  /** CSS `background` for the card face. Falls back to the flat mantle when
+   *  omitted — e.g. a logo with no colour to derive a gradient from. */
+  faceBackground?: string;
 }) => {
   const flavor = useCtpStore((state) => state.flavor);
   const [colors, setColors] = useState<CatppuccinColors>(flavors[flavor].colors);
@@ -66,6 +75,11 @@ export const GlareCard = ({
     '--r-y': '0deg',
     '--bg-x': '50%',
     '--bg-y': '50%',
+    // Normalised pointer metrics (0–1) the rarity foils modulate brightness and
+    // opacity with — see the pokemon-cards-css shine layers.
+    '--pointer-from-center': '0',
+    '--pointer-from-top': '0.5',
+    '--pointer-from-left': '0.5',
     '--duration': '300ms',
     '--foil-size': '100%',
     '--radius': '16px',
@@ -82,6 +96,12 @@ export const GlareCard = ({
       refElement.current?.style.setProperty('--r-y', `${rotate.y}deg`);
       refElement.current?.style.setProperty('--bg-x', `${background.x}%`);
       refElement.current?.style.setProperty('--bg-y', `${background.y}%`);
+      // Distance of the pointer from the card centre, normalised to 0–1 and
+      // clamped at the inscribed circle so corners don't overshoot.
+      const fromCenter = Math.min(1, Math.hypot(glare.x - 50, glare.y - 50) / 50);
+      refElement.current?.style.setProperty('--pointer-from-center', `${fromCenter}`);
+      refElement.current?.style.setProperty('--pointer-from-top', `${glare.y / 100}`);
+      refElement.current?.style.setProperty('--pointer-from-left', `${glare.x / 100}`);
     }
   };
 
@@ -117,15 +137,9 @@ export const GlareCard = ({
   return (
     <div
       style={containerStyle}
-      className="relative isolate contain-[layout_style] perspective-[600px] transition-transform duration-(--duration) ease-(--easing) will-change-transform w-full aspect-4/5 max-w-64 h-80 touch-pan-y"
+      className="relative isolate contain-[layout_style] perspective-[600px] transition-transform duration-(--duration) ease-(--easing) will-change-transform w-full aspect-4/5 max-w-[15rem] min-[400px]:max-w-64 h-80 touch-pan-y"
       ref={refElement}
       onPointerMove={updateFromEvent}
-      onPointerDown={(event) => {
-        isPointerInside.current = true;
-        setIsActive(true);
-        refElement.current?.style.setProperty('--duration', '0s');
-        updateFromEvent(event);
-      }}
       onPointerEnter={() => {
         isPointerInside.current = true;
         if (refElement.current) {
@@ -135,6 +149,12 @@ export const GlareCard = ({
             }
           }, 300);
         }
+      }}
+      onPointerDown={(event) => {
+        isPointerInside.current = true;
+        setIsActive(true);
+        refElement.current?.style.setProperty('--duration', '0s');
+        updateFromEvent(event);
       }}
       onPointerLeave={() => {
         isPointerInside.current = false;
@@ -166,6 +186,7 @@ export const GlareCard = ({
     >
       <div
         data-active={isActive || active}
+        data-pressed={isActive || active || undefined}
         className={cn(
           `h-full grid will-change-transform origin-center transition-transform duration-(--duration) ease-(--easing) transform-[rotateY(var(--r-x))_rotateX(var(--r-y))] rounded-(--radius) border [--opacity:0] hover:[--duration:150ms] hover:[--easing:linear] overflow-hidden shadow-lg hover:shadow-xl ${
             isLightTheme
@@ -175,10 +196,25 @@ export const GlareCard = ({
           accent ? ACCENT_BORDER[accent] : 'border-ctp-surface0'
         )}
       >
-        {/* Card face — the foil now lives inside the art window (see SkillItem),
+        {/* Card face — the foil lives inside the art window (see SkillItem),
             so the full face stays clean and legible. */}
         <div className="w-full h-full grid [grid-area:1/1] [clip-path:inset(0_0_0_0_round_var(--radius))]">
-          <div className={cn('h-full w-full bg-ctp-mantle', className)}>{children}</div>
+          <div
+            className={cn('h-full w-full grid', !faceBackground && 'bg-ctp-mantle', className)}
+            style={faceBackground ? { background: faceBackground } : undefined}
+          >
+            {/* Top-tier (Secret Rare) treatment covers the whole face. It sits
+                between the background and the content — layered above it, the
+                blend modes wash over the title and body copy and cost more
+                legibility than the effect is worth. Every other tier is
+                confined to the art window and rendered by SkillItem. */}
+            {isCardWideTier(rarity) && rarity && (
+              <div className="[grid-area:1/1] w-full h-full pointer-events-none">
+                <RarityFoil tier={rarity} scope="card" />
+              </div>
+            )}
+            <div className="[grid-area:1/1] relative z-10">{children}</div>
+          </div>
         </div>
         {/* Subtle pointer-tracked glare highlight, kept faint on all themes. */}
         <div

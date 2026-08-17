@@ -71,7 +71,10 @@ const SkillsSection: React.FC<Props> = ({ skills, categories }) => {
 
         {/* Embla carousel. Re-keyed on category so it re-inits at slide 0.
             Viewport bleeds into the page padding via negative margins so cards
-            can extend past the container edge under the fade mask. */}
+            can extend past the container edge under the fade mask. Cards scale
+            up on hover/tap, so the slide gets matching horizontal padding to
+            keep the scaled card inside the viewport instead of clipping at the
+            carousel edge on narrow screens. */}
         <Carousel
           key={activeCategory ?? 'all'}
           setApi={setApi}
@@ -94,11 +97,11 @@ const SkillsSection: React.FC<Props> = ({ skills, categories }) => {
           }}
           className="-mx-6 mt-12 px-6 sm:mt-14 lg:mt-16"
         >
-          <CarouselContent className="py-14">
+          <CarouselContent className="-ml-4 px-4 py-14 sm:-ml-6 sm:px-6">
             {filtered.map((skill) => (
               <CarouselItem
                 key={skill._id}
-                className="basis-[70%] sm:basis-1/2 md:basis-1/3 xl:basis-1/4"
+                className="basis-[74%] pl-0 min-[400px]:basis-[68%] sm:basis-1/2 md:basis-1/3 xl:basis-1/4"
               >
                 <div
                   className="flex justify-center"
@@ -113,7 +116,7 @@ const SkillsSection: React.FC<Props> = ({ skills, categories }) => {
               </CarouselItem>
             ))}
 
-            <CarouselItem className="basis-[70%] sm:basis-1/2 md:basis-1/3 xl:basis-1/4">
+            <CarouselItem className="basis-[74%] pl-0 min-[400px]:basis-[68%] sm:basis-1/2 md:basis-1/3 xl:basis-1/4">
               <div className="flex justify-center">
                 <Link
                   href="/skills"
