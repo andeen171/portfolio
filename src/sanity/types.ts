@@ -28,6 +28,7 @@ export type Skill = {
   _rev: string;
   name?: string;
   description?: InternationalizedArrayString;
+  flavorText?: InternationalizedArrayString;
   category?: SkillCategoryReference;
   accentColor?: 'teal' | 'lavender' | 'pink' | 'peach' | 'green' | 'sky';
   tags?: Array<string>;
@@ -270,7 +271,7 @@ type ArrayOf<T> = Array<
 
 // Source: src/sanity/queries.ts
 // Variable: listProjectsQuery
-// Query: *[_type == "project"] {     ...,    skills[]->  } | order(date desc)
+// Query: *[_type == "project"] {    ...,    skills[]->  } | order(date desc)
 export type ListProjectsQueryResult = Array<{
   _id: string;
   _type: 'project';
@@ -298,6 +299,7 @@ export type ListProjectsQueryResult = Array<{
     _rev: string;
     name?: string;
     description?: InternationalizedArrayString;
+    flavorText?: InternationalizedArrayString;
     category?: SkillCategoryReference;
     accentColor?: 'green' | 'lavender' | 'peach' | 'pink' | 'sky' | 'teal';
     tags?: Array<string>;
@@ -309,7 +311,7 @@ export type ListProjectsQueryResult = Array<{
 
 // Source: src/sanity/queries.ts
 // Variable: previewProjectsQuery
-// Query: *[_type == "project"] {     ...,    skills[]->  } | order(date desc)[0..1]
+// Query: *[_type == "project"] {    ...,    skills[]->  } | order(date desc)[0..1]
 export type PreviewProjectsQueryResult = Array<{
   _id: string;
   _type: 'project';
@@ -337,6 +339,7 @@ export type PreviewProjectsQueryResult = Array<{
     _rev: string;
     name?: string;
     description?: InternationalizedArrayString;
+    flavorText?: InternationalizedArrayString;
     category?: SkillCategoryReference;
     accentColor?: 'green' | 'lavender' | 'peach' | 'pink' | 'sky' | 'teal';
     tags?: Array<string>;
@@ -348,7 +351,7 @@ export type PreviewProjectsQueryResult = Array<{
 
 // Source: src/sanity/queries.ts
 // Variable: listExperiencesQuery
-// Query: *[_type == "experience"] | order(endDate desc)
+// Query: *[_type == "experience"] {    ...,    skills[]->{ _id, name }  } | order(endDate desc)
 export type ListExperiencesQueryResult = Array<{
   _id: string;
   _type: 'experience';
@@ -361,16 +364,15 @@ export type ListExperiencesQueryResult = Array<{
   startDate?: string;
   endDate?: string;
   description?: InternationalizedArrayString;
-  skills?: Array<
-    {
-      _key: string;
-    } & SkillReference
-  >;
+  skills: Array<{
+    _id: string;
+    name: string | null;
+  }> | null;
 }>;
 
 // Source: src/sanity/queries.ts
 // Variable: previewExperiencesQuery
-// Query: *[_type == "experience"] | order(endDate desc)[0..2]
+// Query: *[_type == "experience"] {    ...,    skills[]->{ _id, name }  } | order(endDate desc)[0..2]
 export type PreviewExperiencesQueryResult = Array<{
   _id: string;
   _type: 'experience';
@@ -383,12 +385,25 @@ export type PreviewExperiencesQueryResult = Array<{
   startDate?: string;
   endDate?: string;
   description?: InternationalizedArrayString;
-  skills?: Array<
-    {
-      _key: string;
-    } & SkillReference
-  >;
+  skills: Array<{
+    _id: string;
+    name: string | null;
+  }> | null;
 }>;
+
+// Source: src/sanity/queries.ts
+// Variable: heroQuery
+// Query: {    "current": *[_type == "experience" && !defined(endDate)] | order(startDate desc)[0] {      title,      company    },    "careerStart": *[_type == "experience"] | order(startDate asc)[0].startDate,    "projectCount": count(*[_type == "project"]),    "skillCount": count(*[_type == "skill"]),    "companyCount": count(array::unique(*[_type == "experience"].company))  }
+export type HeroQueryResult = {
+  current: {
+    title: InternationalizedArrayString | null;
+    company: string | null;
+  } | null;
+  careerStart: string | null;
+  projectCount: number;
+  skillCount: number;
+  companyCount: number;
+};
 
 // Source: src/sanity/queries.ts
 // Variable: listSkillsQuery
@@ -401,6 +416,7 @@ export type ListSkillsQueryResult = Array<{
   _rev: string;
   name?: string;
   description?: InternationalizedArrayString;
+  flavorText?: InternationalizedArrayString;
   category: {
     _id: string;
     _type: 'skillCategory';
@@ -440,10 +456,11 @@ export type ListSkillCategoriesQueryResult = Array<{
 import '@sanity/client';
 declare module '@sanity/client' {
   interface SanityQueries {
-    '\n  *[_type == "project"] { \n    ...,\n    skills[]->\n  } | order(date desc)\n': ListProjectsQueryResult;
-    '\n  *[_type == "project"] { \n    ...,\n    skills[]->\n  } | order(date desc)[0..1]\n': PreviewProjectsQueryResult;
-    '\n  *[_type == "experience"] | order(endDate desc)\n': ListExperiencesQueryResult;
-    '\n  *[_type == "experience"] | order(endDate desc)[0..2]\n': PreviewExperiencesQueryResult;
+    '\n  *[_type == "project"] {\n    ...,\n    skills[]->\n  } | order(date desc)\n': ListProjectsQueryResult;
+    '\n  *[_type == "project"] {\n    ...,\n    skills[]->\n  } | order(date desc)[0..1]\n': PreviewProjectsQueryResult;
+    '\n  *[_type == "experience"] {\n    ...,\n    skills[]->{ _id, name }\n  } | order(endDate desc)\n': ListExperiencesQueryResult;
+    '\n  *[_type == "experience"] {\n    ...,\n    skills[]->{ _id, name }\n  } | order(endDate desc)[0..2]\n': PreviewExperiencesQueryResult;
+    '\n  {\n    "current": *[_type == "experience" && !defined(endDate)] | order(startDate desc)[0] {\n      title,\n      company\n    },\n    "careerStart": *[_type == "experience"] | order(startDate asc)[0].startDate,\n    "projectCount": count(*[_type == "project"]),\n    "skillCount": count(*[_type == "skill"]),\n    "companyCount": count(array::unique(*[_type == "experience"].company))\n  }\n': HeroQueryResult;
     '\n  *[ _type == "skill"] {\n    ...,\n    category->\n  } | order(category->order asc, name asc)\n': ListSkillsQueryResult;
     '\n  *[ _type == "skillCategory"] | order(order asc)\n': ListSkillCategoriesQueryResult;
   }
