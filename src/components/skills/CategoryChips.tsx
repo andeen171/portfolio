@@ -30,7 +30,7 @@ const ACCENT_CHIP: Record<string, string> = {
 };
 
 const CHIP_BASE =
-  'cursor-pointer rounded-full border bg-ctp-mantle/80 px-4 py-1.5 text-sm font-medium transition-colors duration-200 active:scale-95';
+  'cursor-pointer rounded-full border bg-ctp-mantle/80 px-4 py-1.5 text-sm font-medium transition-colors duration-200 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ctp-lavender focus-visible:ring-offset-2 focus-visible:ring-offset-ctp-base';
 
 // Plural chip labels keyed by category id (selector only; cards keep the singular name).
 const PLURAL_LABELS: Record<string, Record<'en-US' | 'pt-BR', string>> = {
@@ -39,6 +39,7 @@ const PLURAL_LABELS: Record<string, Record<'en-US' | 'pt-BR', string>> = {
   'skillCategory-database': { 'en-US': 'Databases', 'pt-BR': 'Bancos de Dados' },
   'skillCategory-tool': { 'en-US': 'Tools', 'pt-BR': 'Ferramentas' },
   'skillCategory-soft-skill': { 'en-US': 'Soft Skills', 'pt-BR': 'Interpessoais' },
+  'skillCategory-concepts': { 'en-US': 'Concepts', 'pt-BR': 'Conceitos' },
 };
 
 type Category = ListSkillCategoriesQueryResult[number];

@@ -10,6 +10,7 @@ import {
   CarouselPrevious,
   CarouselProgress,
 } from '@/components/ui/carousel';
+import SectionHeading from '@/components/ui/SectionHeading';
 import { Link } from '@/i18n/routing';
 import type { ListSkillCategoriesQueryResult, ListSkillsQueryResult } from '@/sanity/types';
 import CategoryChips from './CategoryChips';
@@ -39,10 +40,8 @@ const SkillsSection: React.FC<Props> = ({ skills, categories }) => {
   return (
     <div className="py-24 sm:py-32">
       <div className="mx-auto max-w-7xl px-6 text-center lg:px-8">
-        <div className="animated-gradient-text mx-auto max-w-2xl font-nf lg:text-center">
-          <h2 className="text-base font-semibold leading-7">{t('title')}</h2>
-          <p className="py-2 text-3xl font-bold tracking-tight sm:text-4xl">{t('subtitle')}</p>
-        </div>
+        <SectionHeading index="04" eyebrow={t('eyebrow')} title={t('subtitle')} />
+        <p className="mx-auto mt-4 max-w-2xl text-pretty text-ctp-subtext1">{t('lede')}</p>
 
         <CategoryChips
           categories={categories}
@@ -97,7 +96,7 @@ const SkillsSection: React.FC<Props> = ({ skills, categories }) => {
             <CarouselProgress className="max-w-md" />
             <Link
               href="/skills"
-              className="group col-span-2 inline-flex items-center gap-1.5 justify-self-center font-semibold text-ctp-lavender transition-colors hover:text-ctp-pink sm:col-span-1 sm:justify-self-end"
+              className="group col-span-2 inline-flex items-center gap-1.5 justify-self-center rounded-sm font-semibold text-ctp-lavender transition-colors hover:text-ctp-pink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ctp-lavender sm:col-span-1 sm:justify-self-end"
             >
               {t('seeMore')}
               <span

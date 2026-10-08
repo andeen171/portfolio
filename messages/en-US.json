@@ -38,8 +38,8 @@
   },
   "skills": {
     "title": "Skills",
-    "subtitle": "My technical skills",
-    "seeMore": "See all the skills",
+    "subtitle": "The cards in my deck",
+    "seeMore": "Browse the full deck",
     "searchPlaceholder": "Search skills or tags...",
     "allCategories": "All",
     "noResults": "No skills match your search.",
@@ -65,7 +65,17 @@
     "backToFilters": "Search & filters",
     "showDetails": "Show details: {name}",
     "close": "Close",
-    "moreTags": "{count, plural, one {# more tag} other {# more tags}}"
+    "moreTags": "{count, plural, one {# more tag} other {# more tags}}",
+    "eyebrow": "skills",
+    "lede": "Languages, frameworks, databases, tools and soft skills, each dealt as a card. The rarer the foil, the deeper the know-how. Open any card to read it in full.",
+    "metaTitle": "Skills",
+    "metaDescription": "The languages, frameworks, databases and tools of Anderson Ribeiro Lopes, a backend-leaning full-stack developer from Belo Horizonte, Brazil, dealt as a deck of trading cards."
+  },
+  "og": {
+    "role": "Backend-leaning full-stack developer",
+    "tagline": "Payments and microservices by day, Rust side quests on Arch Linux by night.",
+    "location": "Belo Horizonte, Brazil",
+    "language": "Language"
   },
   "projects": {
     "title": "Projects",
