@@ -104,12 +104,14 @@ export default function HeroStats({ stats, label }: { stats: HeroStat[]; label: 
           key={stat.key}
           className="flex flex-col-reverse justify-end gap-1 bg-ctp-mantle/75 px-4 py-3.5 sm:px-5"
         >
-          <dt className="font-nf text-[0.6875rem] uppercase leading-snug tracking-wider text-ctp-subtext0">
+          <dt className="font-nf text-[0.6875rem] uppercase leading-snug tracking-wider text-ctp-subtext0 latte:text-ctp-subtext1">
             {stat.label}
           </dt>
           <dd className="font-nf text-2xl font-bold tabular-nums text-ctp-text sm:text-3xl">
             <StatValue value={stat.value} phase={phase} delay={index * 0.12} />
-            {stat.suffix && <span className="text-ctp-teal">{stat.suffix}</span>}
+            {stat.suffix && (
+              <span className="text-ctp-teal latte:text-ctp-teal-700">{stat.suffix}</span>
+            )}
           </dd>
         </div>
       ))}

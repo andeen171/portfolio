@@ -4,9 +4,9 @@ import { ChevronDownIcon } from '@heroicons/react/20/solid';
 import { useTranslations } from 'next-intl';
 import { useEffect, useId, useRef, useState } from 'react';
 import ProfileCard from '@/components/home/ProfileCard';
-import { SOCIALS } from '@/components/home/socials';
 import TypedText from '@/components/home/TypedText';
 import SectionHeading from '@/components/ui/SectionHeading';
+import { SOCIALS } from '@/lib/social';
 import { cn } from '@/lib/utils';
 
 const ROLE_KEYS = ['backend', 'fullstack', 'linux', 'entrepreneur', 'father', 'thinker'] as const;
@@ -86,7 +86,9 @@ const AboutSection: React.FC = () => {
         <div className="min-w-0 lg:col-start-1 lg:row-start-2">
           <p className="font-nf text-lg font-semibold sm:text-xl">
             <span className="sr-only">
-              {t('rolesLabel')}: {roles.join(', ')}
+              {/* Semicolons: a role may contain a comma of its own
+                  ("Full-stack, backend at heart"). */}
+              {t('rolesLabel')}: {roles.join('; ')}
             </span>
             <span aria-hidden="true" className="flex gap-3">
               <span className="text-ctp-teal">❯</span>
@@ -137,7 +139,7 @@ const AboutSection: React.FC = () => {
               aria-expanded={isExpanded}
               aria-controls={bodyId}
               onClick={() => setIsExpanded((v) => !v)}
-              className="mt-6 inline-flex items-center gap-2 rounded-full bg-ctp-mantle/60 px-4 py-2 font-nf text-sm text-ctp-lavender ring-1 ring-ctp-surface1 backdrop-blur-md transition-colors hover:text-ctp-mauve latte:text-ctp-blue hover:ring-ctp-lavender/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ctp-lavender"
+              className="mt-6 inline-flex items-center gap-2 rounded-full bg-ctp-mantle/60 px-4 py-2 font-nf text-sm text-ctp-lavender ring-1 ring-ctp-surface1 backdrop-blur-md transition-colors hover:text-ctp-mauve latte:text-ctp-blue-700 hover:ring-ctp-lavender/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ctp-lavender"
             >
               {isExpanded ? t('readLess') : t('readMore')}
               <ChevronDownIcon
