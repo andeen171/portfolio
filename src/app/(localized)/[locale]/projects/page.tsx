@@ -1,5 +1,6 @@
 import { getTranslations } from 'next-intl/server';
 import ProjectTimeline from '@/components/projects/ProjectTimeline';
+import SectionHeading from '@/components/ui/SectionHeading';
 import { client } from '@/sanity/lib/client';
 import { listProjectsQuery } from '@/sanity/queries';
 
@@ -12,11 +13,14 @@ export default async function ProjectsPage() {
   return (
     <div className="py-24 sm:py-32">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
-        <div className="animated-gradient-text mx-auto max-w-2xl text-center mb-10 font-nf">
-          <h2 className="text-base font-semibold leading-7">{t('title')}</h2>
-          <p className="py-2 text-3xl font-bold tracking-tight sm:text-4xl">{t('subtitle')}</p>
+        <SectionHeading as="h1" eyebrow={t('eyebrow')} title={t('subtitle')} />
+        <p className="mx-auto mt-4 max-w-2xl text-center text-pretty text-ctp-subtext1">
+          {t('lede')}
+        </p>
+
+        <div className="mt-14 sm:mt-20">
+          <ProjectTimeline projects={projects} yearAs="h2" />
         </div>
-        <ProjectTimeline projects={projects} />
       </div>
     </div>
   );

@@ -1,7 +1,8 @@
-import Link from 'next/link';
 import { useTranslations } from 'next-intl';
+import SectionHeading from '@/components/ui/SectionHeading';
 import type { PreviewProjectsQueryResult } from '@/sanity/types';
 import ProjectTimeline from './ProjectTimeline';
+import SeeMoreLink from './SeeMoreLink';
 
 interface ProjectsSectionProps {
   projects: PreviewProjectsQueryResult;
@@ -11,26 +12,24 @@ const ProjectsSection: React.FC<ProjectsSectionProps> = ({ projects }) => {
   const t = useTranslations('projects');
 
   return (
-    <div className="py-24 sm:py-32">
+    <section id="projects" className="scroll-mt-16 py-24 sm:py-32">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
-        <div className="animated-gradient-text mx-auto max-w-2xl text-center mb-10 font-nf">
-          <h2 className="text-base font-semibold leading-7">{t('title')}</h2>
-          <p className="py-2 text-3xl font-bold tracking-tight sm:text-4xl">{t('subtitle')}</p>
+        <SectionHeading index="02" eyebrow={t('eyebrow')} title={t('subtitle')} />
+        <p className="mx-auto mt-4 max-w-2xl text-center text-pretty text-ctp-subtext1">
+          {t('lede')}
+        </p>
+
+        <div className="mt-14 sm:mt-16">
+          <ProjectTimeline projects={projects} />
         </div>
-        <ProjectTimeline projects={projects} />
-        <div className="mt-12 text-center">
-          <Link
-            className="inline-flex items-center gap-1 text-lg font-semibold text-ctp-lavender hover:text-ctp-pink transition-colors duration-300"
-            href="/projects"
-          >
+
+        <div className="mt-4 text-center">
+          <SeeMoreLink href="/projects" path={t('eyebrow')}>
             {t('seeMore')}
-            <span className="transition-transform duration-300 group-hover:translate-x-1">
-              &rarr;
-            </span>
-          </Link>
+          </SeeMoreLink>
         </div>
       </div>
-    </div>
+    </section>
   );
 };
 
