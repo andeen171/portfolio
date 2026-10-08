@@ -1,201 +1,154 @@
-/** biome-ignore-all lint/suspicious/noArrayIndexKey: Because I don't know better */
 'use client';
 
-import Image from 'next/image';
+import { ChevronDownIcon } from '@heroicons/react/20/solid';
 import { useTranslations } from 'next-intl';
-import { useEffect, useRef, useState } from 'react';
-import Typed from 'typed.js';
-import ProfilePic from '@/img/icon.png';
+import { useEffect, useId, useRef, useState } from 'react';
+import ProfileCard from '@/components/home/ProfileCard';
+import { SOCIALS } from '@/components/home/socials';
+import TypedText from '@/components/home/TypedText';
+import SectionHeading from '@/components/ui/SectionHeading';
+import { cn } from '@/lib/utils';
+
+const ROLE_KEYS = ['backend', 'fullstack', 'linux', 'entrepreneur', 'father', 'thinker'] as const;
+
+/** Paragraphs left showing while collapsed, by breakpoint. */
+const KEEP_MOBILE = 1;
+const KEEP_DESKTOP = 2;
+
+type Heights = { collapsed: number; full: number };
 
 const AboutSection: React.FC = () => {
   const t = useTranslations('about');
-  const tExp = useTranslations('experiences');
-  const titleRef = useRef(null);
-  const descriptionRef = useRef<HTMLDivElement>(null);
-  const collapsedRef = useRef<HTMLDivElement>(null);
-  const expandedRef = useRef<HTMLDivElement>(null);
+  const bodyId = useId();
+  const innerRef = useRef<HTMLDivElement>(null);
   const [isExpanded, setIsExpanded] = useState(false);
-  const [showToggle, setShowToggle] = useState(false);
-  const [collapsedHeight, setCollapsedHeight] = useState(0);
-  const [expandedHeight, setExpandedHeight] = useState(0);
+  const [heights, setHeights] = useState<Heights | null>(null);
 
-  useEffect(() => {
-    const name = new Typed(titleRef.current, {
-      strings: [
-        t('typedStrings.fullstack'),
-        t('typedStrings.linux'),
-        t('typedStrings.backend'),
-        t('typedStrings.entrepreneur'),
-        t('typedStrings.father'),
-        t('typedStrings.thinker'),
-      ],
-      typeSpeed: 70,
-      backSpeed: 70,
-      loop: true,
-    });
-
-    return () => {
-      name.destroy();
-    };
-  }, [t]);
-
-  // Split description by newlines to format as paragraphs
-  const descriptionParagraphs = t('description')
+  const roles = ROLE_KEYS.map((key) => t(`typedStrings.${key}`));
+  const paragraphs = t('description')
     .split('\n\n')
-    .filter((p) => p.trim());
+    .map((p) => p.trim())
+    .filter(Boolean);
 
+  // Measure the live text rather than hidden copies: the inner wrapper is
+  // never clamped, so its height is the full text, and the last paragraph we
+  // keep marks the collapsed cut. A ResizeObserver re-measures whenever the
+  // text reflows (viewport width, web font arriving, locale switch) without
+  // touching the expanded state, so mobile toolbar resizes don't fold the
+  // text back up mid-read.
   useEffect(() => {
-    const measureHeights = () => {
-      const isMobile = window.innerWidth < 640;
+    const inner = innerRef.current;
+    if (!inner) return;
 
-      if (isMobile) {
-        // On mobile, use a fixed height limit
-        const mobileCollapsedHeight = 144; // ~6 lines
-        const fullHeight = expandedRef.current?.scrollHeight || 0;
-
-        setCollapsedHeight(mobileCollapsedHeight);
-        setExpandedHeight(fullHeight);
-        setShowToggle(fullHeight > mobileCollapsedHeight + 1);
-      } else {
-        // On desktop, measure the height of the first 2 paragraphs vs. all paragraphs
-        const twoParaHeight = collapsedRef.current?.scrollHeight || 0;
-        const fullHeight = expandedRef.current?.scrollHeight || 0;
-
-        setCollapsedHeight(twoParaHeight);
-        setExpandedHeight(fullHeight);
-        setShowToggle(descriptionParagraphs.length > 2);
-      }
-      setIsExpanded(false);
+    const measure = () => {
+      const blocks = inner.querySelectorAll<HTMLParagraphElement>(':scope > p');
+      const keep = window.matchMedia('(min-width: 640px)').matches ? KEEP_DESKTOP : KEEP_MOBILE;
+      const last = blocks[Math.min(keep, blocks.length) - 1];
+      const full = inner.offsetHeight;
+      const collapsed = last ? last.offsetTop + last.offsetHeight : full;
+      setHeights((prev) =>
+        prev?.collapsed === collapsed && prev.full === full ? prev : { collapsed, full }
+      );
     };
 
-    // Small delay to ensure DOM is ready
-    const timer = setTimeout(measureHeights, 100);
-    window.addEventListener('resize', measureHeights);
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(inner);
+    return () => observer.disconnect();
+  }, []);
 
-    return () => {
-      clearTimeout(timer);
-      window.removeEventListener('resize', measureHeights);
-    };
-  }, [descriptionParagraphs.length]);
+  // Until measured (and without JS) the whole text shows.
+  const canCollapse = heights !== null && heights.full > heights.collapsed + 1;
+  const clamped = canCollapse && !isExpanded;
 
   return (
-    <div className="relative isolate overflow-hidden px-4 py-8 sm:px-6 lg:overflow-visible lg:px-0">
-      <div className="mx-auto flex flex-col lg:grid max-w-2xl gap-x-6 gap-y-8 sm:gap-x-8 sm:gap-y-12 lg:mx-0 lg:max-w-none lg:grid-cols-2 lg:items-start lg:gap-y-10">
-        {/* Profile picture - shows first on mobile */}
-        <div className="order-1 lg:order-2 mx-auto p-4 sm:p-6 lg:sticky lg:top-4 lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:overflow-hidden">
-          <Image
-            className="w-full max-w-sm sm:max-w-md md:max-w-lg rounded-xl bg-ctp-mantle shadow-xl ring-2 sm:ring-4 ring-ctp-overlay0"
-            src={ProfilePic}
-            placeholder="blur"
-            alt="Me, Myself and I"
-          />
-        </div>
+    <div className="mx-auto max-w-7xl px-4 py-24 sm:px-6 sm:py-32 lg:px-8">
+      <div className="grid gap-x-16 gap-y-10 lg:grid-cols-[minmax(0,1fr)_22rem] xl:grid-cols-[minmax(0,1fr)_24rem]">
+        <SectionHeading
+          as="h2"
+          align="left"
+          index="01"
+          eyebrow={t('eyebrow')}
+          title={t('title')}
+          className="lg:col-start-1 lg:row-start-1"
+        />
 
-        {/* Text content - shows second on mobile */}
-        <div className="order-2 lg:order-1 lg:col-span-2 lg:col-start-1 lg:row-start-1 lg:mx-auto lg:grid lg:w-full lg:max-w-7xl lg:grid-cols-2 lg:gap-x-8 lg:px-8">
-          <div className="px-2 sm:px-4 lg:pr-4">
-            <div className="animated-gradient-text text-3xl sm:text-4xl lg:max-w-lg">
-              <p className="text-base sm:text-lg font-semibold leading-7 text-ctp-lavender">
-                {t('greeting')}
-              </p>
-              <span
-                ref={titleRef}
-                className="font-nf mt-2 min-h-12 text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight"
-              />
+        <ProfileCard
+          name={t('card.name')}
+          type={t('card.type')}
+          flavor={t('card.flavor')}
+          origin={t('card.origin')}
+          handle={SOCIALS.github.handle}
+          photoAlt={t('card.photoAlt')}
+          className="mx-auto w-full max-w-[19rem] sm:max-w-[21rem] lg:sticky lg:top-28 lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:max-w-none lg:self-start"
+        />
 
-              {/* Description with collapsible functionality */}
-              <div className="mt-4 sm:mt-8 relative">
-                {/* Hidden measurement divs.
-                    `invisible` (visibility: hidden), not just `opacity-0`: an
-                    ancestor carries `.animated-gradient-text`, whose
-                    `background-clip: text` clips its gradient to the glyphs of
-                    its whole subtree. That paints these copies from the
-                    ancestor, so the wrapper's own opacity never applies to them.
-                    `visibility: hidden` still reserves layout, so scrollHeight
-                    below stays measurable. */}
-                <div className="absolute invisible opacity-0 pointer-events-none -z-10">
-                  {/* Measure collapsed height (2 paragraphs on desktop, fixed on mobile) */}
-                  <div ref={collapsedRef}>
-                    {descriptionParagraphs.slice(0, 2).map((paragraph, index) => (
-                      <p
-                        key={`collapsed-${index}`}
-                        className="text-lg sm:text-xl leading-7 sm:leading-8 text-ctp-subtext0 mb-4 last:mb-0"
-                      >
-                        {paragraph}
-                      </p>
-                    ))}
-                  </div>
-                  {/* Measure expanded height (all paragraphs) */}
-                  <div ref={expandedRef}>
-                    {descriptionParagraphs.map((paragraph, index) => (
-                      <p
-                        key={`expanded-${index}`}
-                        className="text-lg sm:text-xl leading-7 sm:leading-8 text-ctp-subtext0 mb-4 last:mb-0"
-                      >
-                        {paragraph}
-                      </p>
-                    ))}
-                  </div>
-                </div>
+        <div className="min-w-0 lg:col-start-1 lg:row-start-2">
+          <p className="font-nf text-lg font-semibold sm:text-xl">
+            <span className="sr-only">
+              {t('rolesLabel')}: {roles.join(', ')}
+            </span>
+            <span aria-hidden="true" className="flex gap-3">
+              <span className="text-ctp-teal">❯</span>
+              <span className="min-w-0 flex-1">
+                <TypedText
+                  initial={roles[0]!}
+                  strings={roles.slice(1)}
+                  className="animated-gradient-text"
+                  typeSpeed={55}
+                  backSpeed={30}
+                  backDelay={1800}
+                />
+              </span>
+            </span>
+          </p>
 
-                {/* Visible content with smooth height transition */}
-                <div
-                  ref={descriptionRef}
-                  style={{
-                    maxHeight: isExpanded ? `${expandedHeight}px` : `${collapsedHeight}px`,
-                  }}
-                  className="overflow-hidden transition-all duration-500 ease-in-out"
+          <div
+            id={bodyId}
+            style={
+              canCollapse ? { maxHeight: isExpanded ? heights.full : heights.collapsed } : undefined
+            }
+            className={cn(
+              'mt-8 overflow-hidden transition-[max-height] duration-500 ease-in-out motion-reduce:transition-none',
+              // Fade the cut line into whatever is behind (the starfield),
+              // rather than painting a band of base colour over it.
+              clamped &&
+                '[mask-image:linear-gradient(to_bottom,#000_calc(100%-4.5rem),transparent)]'
+            )}
+          >
+            <div ref={innerRef} className="relative space-y-6">
+              {paragraphs.map((paragraph, index) => (
+                <p
+                  key={paragraph}
+                  className={cn(
+                    'text-lg leading-8 text-pretty sm:text-xl sm:leading-9',
+                    index === 0 ? 'text-ctp-text' : 'text-ctp-subtext1'
+                  )}
                 >
-                  {descriptionParagraphs.map((paragraph, index) => (
-                    <p
-                      key={`visible-${index}`}
-                      className="text-lg sm:text-xl leading-7 sm:leading-8 text-ctp-subtext0 mb-4 last:mb-0"
-                    >
-                      {paragraph}
-                    </p>
-                  ))}
-                </div>
-
-                {/* Fade overlay when collapsed */}
-                {!isExpanded && showToggle && (
-                  <div className="absolute bottom-0 left-0 right-0 h-12 bg-linear-to-t from-ctp-base via-ctp-base/80 to-transparent pointer-events-none" />
-                )}
-
-                {/* Expand/collapse button.
-                    `relative`: the fade overlay above is absolutely positioned
-                    and so paints after this in-flow button regardless of DOM
-                    order, veiling it with ~92% opaque ctp-base while collapsed.
-                    Making the button positioned too puts it in the same paint
-                    step, where tree order wins and it lands on top. */}
-                {showToggle && (
-                  <button
-                    type="button"
-                    onClick={() => setIsExpanded((v) => !v)}
-                    className="relative mt-4 flex items-center gap-2 text-sm text-ctp-lavender hover:text-ctp-mauve transition-colors duration-200"
-                  >
-                    <span>{isExpanded ? tExp('collapse') : tExp('expand')}</span>
-                    <svg
-                      className={`w-4 h-4 transition-transform duration-300 ${
-                        isExpanded ? 'rotate-180' : ''
-                      }`}
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                      aria-label={isExpanded ? tExp('collapse') : tExp('expand')}
-                    >
-                      <title>{isExpanded ? tExp('collapse') : tExp('expand')}</title>
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M19 9l-7 7-7-7"
-                      />
-                    </svg>
-                  </button>
-                )}
-              </div>
+                  {paragraph}
+                </p>
+              ))}
             </div>
           </div>
+
+          {canCollapse && (
+            <button
+              type="button"
+              aria-expanded={isExpanded}
+              aria-controls={bodyId}
+              onClick={() => setIsExpanded((v) => !v)}
+              className="mt-6 inline-flex items-center gap-2 rounded-full bg-ctp-mantle/60 px-4 py-2 font-nf text-sm text-ctp-lavender ring-1 ring-ctp-surface1 backdrop-blur-md transition-colors hover:text-ctp-mauve latte:text-ctp-blue hover:ring-ctp-lavender/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ctp-lavender"
+            >
+              {isExpanded ? t('readLess') : t('readMore')}
+              <ChevronDownIcon
+                aria-hidden="true"
+                className={cn(
+                  'size-4 transition-transform duration-300 motion-reduce:transition-none',
+                  isExpanded && 'rotate-180'
+                )}
+              />
+            </button>
+          )}
         </div>
       </div>
     </div>
