@@ -211,7 +211,8 @@ function useCardStyle(skill: Skill): React.CSSProperties {
  * - `--tint`   — the logo's own colour, when it has one: the face and the art
  *   window's backlight. Falls back to the accent.
  *
- * `compact` fits the grid; `detail` grows to its content for the dialog.
+ * `compact` fits the grid; `detail` is the larger copy in the dialog, which
+ * also prints the skill's flavor text under the rules.
  */
 const SkillCardFace = ({
   skill,
@@ -230,6 +231,9 @@ const SkillCardFace = ({
 
   const compact = variant === 'compact';
   const description = getLocalizedValue(skill.description, locale);
+  // Flavor text is a reward for opening the card, so only the detail face
+  // prints it. Optional in Sanity, and may be missing from either language.
+  const flavorText = compact ? '' : getLocalizedValue(skill.flavorText, locale)?.trim();
   const categoryName = skill.category ? getLocalizedValue(skill.category.name, locale) : undefined;
   const svgCode = skill.svgCode ?? skill.category?.fallbackSvgCode;
   const tags = skill.tags ?? [];
@@ -324,9 +328,14 @@ const SkillCardFace = ({
             </p>
           </div>
         ) : (
-          <p className="text-left text-[0.8125rem] leading-relaxed text-ctp-subtext1">
-            {description}
-          </p>
+          <>
+            {description && (
+              <p className="text-left text-[0.8125rem] leading-relaxed text-ctp-subtext1">
+                {description}
+              </p>
+            )}
+            {flavorText && <p className="skill-card__flavor">{flavorText}</p>}
+          </>
         )}
       </div>
 

@@ -210,6 +210,36 @@
   mask-image: linear-gradient(to bottom, #000 calc(100% - 1.25rem), transparent);
 }
 
+/* Flavor text (detail card only): the italic aside at the foot of the rules,
+   set off by a hairline in the accent that fades out at both ends. Subtext0
+   keeps it a step quieter than the rules without dropping below AA, on the
+   dark panels and on latte's lightened one alike. */
+.skill-card__flavor {
+  margin-top: 0.875rem;
+  padding-top: 0.75rem;
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      color-mix(in oklab, var(--accent) 60%, transparent) 20% 80%,
+      transparent
+    )
+    top / 100% 1px no-repeat;
+  font-size: 0.75rem;
+  font-style: italic;
+  line-height: 1.55;
+  text-align: left;
+  text-wrap: pretty;
+  color: var(--catppuccin-color-subtext0);
+}
+
+/* With no rules text above it, there's nothing to set it apart from. */
+.skill-card__flavor:first-child {
+  margin-top: 0;
+  padding-top: 0;
+  background: none;
+}
+
 /* ── Open affordance ─────────────────────────────────────────────────────── */
 
 /* The whole card is a button (SkillItem): a transparent layer over the face,

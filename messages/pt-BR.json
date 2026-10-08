@@ -72,8 +72,8 @@
   },
   "skills": {
     "title": "Habilidades",
-    "subtitle": "Minhas habilidades técnicas",
-    "seeMore": "Ver todas as habilidades",
+    "subtitle": "As cartas do meu deck",
+    "seeMore": "Ver o deck completo",
     "searchPlaceholder": "Buscar habilidades ou tags...",
     "allCategories": "Todas",
     "noResults": "Nenhuma habilidade corresponde à sua busca.",
@@ -99,7 +99,18 @@
     "backToFilters": "Busca e filtros",
     "showDetails": "Ver detalhes: {name}",
     "close": "Fechar",
-    "moreTags": "{count, plural, one {mais # tag} other {mais # tags}}"
+    "moreTags": "{count, plural, one {mais # tag} other {mais # tags}}",
+    "eyebrow": "habilidades",
+    "lede": "Linguagens, frameworks, bancos de dados, ferramentas e habilidades interpessoais, cada qual em sua carta. Quanto mais rara a carta, maior o domínio. Abra qualquer carta para lê-la por completo.",
+    "metaTitle": "Habilidades",
+    "metaDescription": "Linguagens, frameworks, bancos de dados e ferramentas de Anderson Ribeiro Lopes, desenvolvedor full-stack de Belo Horizonte com foco em backend, reunidos em um deck de cartas colecionáveis."
+  },
+  "og": {
+    "role": "Dev full-stack com foco em backend",
+    "tagline": "Pagamentos, microsserviços e integrações feitos para aguentar o tranco da produção.",
+    "location": "Belo Horizonte, Brasil",
+    "language": "Linguagem",
+    "database": "Banco de dados"
   },
   "projects": {
     "title": "Projetos",
