@@ -39,7 +39,6 @@ function useDuration(start: YearMonth | null, end: YearMonth) {
       yearsText && monthsText
         ? t('durationBoth', { years: yearsText, months: monthsText })
         : (yearsText ?? monthsText ?? ''),
-    iso: `P${years > 0 ? `${years}Y` : ''}${months > 0 || years === 0 ? `${months}M` : ''}`,
   };
 }
 
@@ -86,7 +85,7 @@ const ExperienceItem: React.FC<ExperienceProps> = ({ experience, now, titleAs: T
               {title}
             </Title>
             {isCurrent && (
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-ctp-green/10 px-2 py-0.5 font-nf text-[0.6875rem] font-medium text-ctp-green ring-1 ring-ctp-green/30 ring-inset latte:text-ctp-green-700">
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-ctp-green/10 px-2 py-0.5 font-nf text-[0.6875rem] font-medium text-ctp-green ring-1 ring-ctp-green/30 ring-inset latte:text-ctp-green-900">
                 <span aria-hidden className="relative flex size-1.5">
                   <span className="absolute inline-flex size-full animate-ping rounded-full bg-ctp-green opacity-75 motion-reduce:animate-none" />
                   <span className="relative inline-flex size-1.5 rounded-full bg-ctp-green" />
@@ -128,7 +127,9 @@ const ExperienceItem: React.FC<ExperienceProps> = ({ experience, now, titleAs: T
             <dt className="sr-only">{t('duration')}</dt>
             <dd className="flex items-center gap-1.5">
               <ClockIcon aria-hidden className="size-3.5 text-ctp-teal" />
-              <time dateTime={duration.iso}>{duration.text}</time>
+              {/* Not a <time>: HTML durations can't express years or months, and the
+                  period's <time> dates above already carry the machine-readable span. */}
+              <span>{duration.text}</span>
             </dd>
           </div>
         )}

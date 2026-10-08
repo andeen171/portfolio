@@ -21,7 +21,7 @@ export default function SeeMoreLink({
         aria-hidden
         className="hidden font-nf text-xs font-normal text-ctp-subtext0 latte:text-ctp-subtext1 sm:inline"
       >
-        <span className="text-ctp-teal">cd</span> ~/{path}
+        <span className="text-ctp-teal latte:text-ctp-teal-800">cd</span> ~/{path}
       </span>
       <span>{children}</span>
       <ArrowRightIcon
