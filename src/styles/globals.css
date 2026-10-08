@@ -62,32 +62,49 @@ body::-webkit-scrollbar {
 }
 
 /*
-  Veil behind the sticky search + category chips on /skills.
-
-  The bar itself has no background — a solid strip read as detached from the
-  navbar. But the controls are translucent, so cards scrolling underneath used
-  to slide right through the search field. An elliptical wash of the page
-  background solves both: opaque where the controls are, gone by the edges, so
-  it never reads as a bar with hard borders.
-
-  The last stop is `color-mix(... 0%, transparent)` rather than the bare
-  `transparent` keyword: that keyword is `rgb(0 0 0 / 0)`, so an engine
-  interpolating non-premultiplied would fade the ends through grey.
-
-  It reads `--catppuccin-color-base`, not Tailwind's `--color-ctp-base`. The
-  theme block is `@theme inline`, so `--color-ctp-base` is substituted where
-  it's declared — at `:root` — and hand-written CSS using it inherits the
-  root's flavor, not the one on the `.mocha`/`.latte` element in Layout. The
-  Catppuccin token is re-declared by each flavor class and inherits properly.
+  Carousel edge fades (ui/carousel.tsx). Each edge's fade width is a
+  registered property so it can transition: when the active card sits under
+  one edge, only that edge eases out instead of both snapping off at once.
 */
-.skills-bar-veil {
-  background: radial-gradient(
-    115% 118% at 50% 40%,
-    var(--catppuccin-color-base) 0%,
-    color-mix(in oklab, var(--catppuccin-color-base) 92%, transparent) 40%,
-    color-mix(in oklab, var(--catppuccin-color-base) 55%, transparent) 66%,
-    color-mix(in oklab, var(--catppuccin-color-base) 0%, transparent) 84%
+@property --fade-start {
+  syntax: "<length-percentage>";
+  inherits: false;
+  initial-value: 0%;
+}
+
+@property --fade-end {
+  syntax: "<length-percentage>";
+  inherits: false;
+  initial-value: 0%;
+}
+
+.carousel-viewport {
+  --fade-start: 0%;
+  --fade-end: 0%;
+  mask-image: linear-gradient(
+    to right,
+    transparent,
+    #000 var(--fade-start),
+    #000 calc(100% - var(--fade-end)),
+    transparent
   );
+  transition:
+    --fade-start 0.45s ease,
+    --fade-end 0.45s ease;
+}
+
+.carousel-viewport[data-fade-start] {
+  --fade-start: 7%;
+}
+
+.carousel-viewport[data-fade-end] {
+  --fade-end: 7%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .carousel-viewport {
+    transition: none;
+  }
 }
 
 .skill-svg-container svg,

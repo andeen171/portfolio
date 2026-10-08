@@ -1,16 +1,16 @@
 'use client';
 
-import Link from 'next/link';
 import { useTranslations } from 'next-intl';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import {
   Carousel,
-  type CarouselApi,
   CarouselContent,
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
+  CarouselProgress,
 } from '@/components/ui/carousel';
+import { Link } from '@/i18n/routing';
 import type { ListSkillCategoriesQueryResult, ListSkillsQueryResult } from '@/sanity/types';
 import CategoryChips from './CategoryChips';
 import SkillItem from './SkillItem';
@@ -30,17 +30,11 @@ const SkillsSection: React.FC<Props> = ({ skills, categories }) => {
   const [activeCategory, setActiveCategory] = useState<string | null>(
     () => categories[0]?._id ?? null
   );
-  const [api, setApi] = useState<CarouselApi>();
 
   const filtered = useMemo(() => {
     if (!activeCategory) return skills;
     return skills.filter((skill) => skill.category?._id === activeCategory);
   }, [skills, activeCategory]);
-
-  // Switching category resets the carousel to the start.
-  useEffect(() => {
-    api?.scrollTo(0);
-  }, [api]);
 
   return (
     <div className="py-24 sm:py-32">
@@ -65,7 +59,6 @@ const SkillsSection: React.FC<Props> = ({ skills, categories }) => {
             the vertical padding leaves room for an active card's lift. */}
         <Carousel
           key={activeCategory ?? 'all'}
-          setApi={setApi}
           opts={{
             // Mobile centres one card at a time; sm+ keeps a start-aligned row.
             align: 'center',
@@ -92,31 +85,30 @@ const SkillsSection: React.FC<Props> = ({ skills, categories }) => {
                 </div>
               </CarouselItem>
             ))}
-
-            <CarouselItem className={SLIDE}>
-              <div className="flex h-full justify-center">
-                <Link
-                  href="/skills"
-                  className="flex aspect-5/7 w-full max-w-48 flex-col items-center justify-center gap-3 self-center rounded-2xl border border-dashed border-ctp-surface1 text-ctp-subtext0 transition-colors hover:border-ctp-lavender hover:text-ctp-lavender"
-                >
-                  <span className="max-w-28 text-sm font-semibold">{t('seeMore')}</span>
-                  <span className="text-2xl" aria-hidden>
-                    &rarr;
-                  </span>
-                </Link>
-              </div>
-            </CarouselItem>
           </CarouselContent>
 
-          <CarouselPrevious label={t('previousSkills')} />
-          <CarouselNext label={t('nextSkills')} />
+          {/* Controls live under the row, not on top of it, so they never
+              cover a card (or collide with the floating social links). */}
+          <div className="grid grid-cols-[auto_1fr] items-center gap-x-5 gap-y-6 sm:grid-cols-[auto_1fr_auto]">
+            <div className="flex gap-2">
+              <CarouselPrevious label={t('previousSkills')} />
+              <CarouselNext label={t('nextSkills')} />
+            </div>
+            <CarouselProgress className="max-w-md" />
+            <Link
+              href="/skills"
+              className="group col-span-2 inline-flex items-center gap-1.5 justify-self-center font-semibold text-ctp-lavender transition-colors hover:text-ctp-pink sm:col-span-1 sm:justify-self-end"
+            >
+              {t('seeMore')}
+              <span
+                aria-hidden
+                className="transition-transform duration-300 group-hover:translate-x-1"
+              >
+                &rarr;
+              </span>
+            </Link>
+          </div>
         </Carousel>
-
-        <div className="mt-12 hidden text-center sm:block">
-          <Link className="text-lg font-semibold text-ctp-lavender" href="/skills">
-            {t('seeMore')} &rarr;
-          </Link>
-        </div>
       </div>
     </div>
   );

@@ -132,7 +132,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  filter: drop-shadow(0 6px 10px rgb(0 0 0 / 0.35));
+  /* The hairline light rim keeps near-black logos readable on the dark
+     window; on coloured logos it's invisible. */
+  filter: drop-shadow(0 0 0.75px rgb(255 255 255 / 0.4)) drop-shadow(0 6px 10px rgb(0 0 0 / 0.35));
   transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
@@ -433,6 +435,25 @@
   mix-blend-mode: soft-light;
 }
 
+/* ── Grid entrance ────────────────────────────────────────────────────────── */
+
+/* Cards deal in, staggered, when the /skills grid is (re)built: on load and
+   when the sort or category changes. The stagger caps out after a dozen
+   cards so a long grid doesn't take seconds to settle. */
+.skill-deal {
+  /* `backwards`, not `both`: a filled animation would leave every card in its
+     own stacking context and trap the active card's z-index. */
+  animation: skill-deal 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+  animation-delay: calc(min(var(--i, 0), 12) * 30ms);
+}
+
+@keyframes skill-deal {
+  from {
+    opacity: 0;
+    translate: 0 12px;
+  }
+}
+
 /* ── Reduced motion ───────────────────────────────────────────────────────── */
 
 /* No tilt, no lift, no frame shimmer. The foils still light up on hover, they
@@ -453,6 +474,10 @@
 
   .skill-card[data-rarity] .skill-card__face::after {
     transition: none;
+    animation: none;
+  }
+
+  .skill-deal {
     animation: none;
   }
 }

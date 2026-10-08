@@ -41,3 +41,15 @@ export function isProficiency(value?: string | null): value is Proficiency {
 export function rarityTier(proficiency?: string | null): RarityTier | undefined {
   return isProficiency(proficiency) ? TIER_BY_PROFICIENCY[proficiency] : undefined;
 }
+
+const PROFICIENCY_RANK: Record<Proficiency, number> = {
+  beginner: 1,
+  intermediate: 2,
+  advanced: 3,
+  expert: 4,
+};
+
+/** Proficiency as a number, for sorting. Unset sorts below beginner. */
+export function proficiencyRank(proficiency?: string | null): number {
+  return isProficiency(proficiency) ? PROFICIENCY_RANK[proficiency] : 0;
+}

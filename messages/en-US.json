@@ -52,7 +52,18 @@
       "advanced": "Advanced",
       "expert": "Expert"
     },
-    "years": "{count, plural, one {# year} other {# years}}"
+    "years": "{count, plural, one {# year} other {# years}}",
+    "searchLabel": "Search skills",
+    "clearSearch": "Clear search",
+    "clearFilters": "Clear filters",
+    "results": "{count, plural, =0 {No skills} one {# skill} other {# skills}}",
+    "sortLabel": "Sort by",
+    "sort": {
+      "category": "Category",
+      "experience": "Most experience",
+      "proficiency": "Highest proficiency"
+    },
+    "backToFilters": "Search & filters"
   },
   "projects": {
     "title": "Projects",

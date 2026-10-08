@@ -19,7 +19,7 @@ export default async function SkillsPage() {
           <h2 className="text-base font-semibold leading-7">{t('title')}</h2>
           <p className="py-2 text-3xl font-bold tracking-tight sm:text-4xl">{t('subtitle')}</p>
         </div>
-        <div className="mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-7xl">
+        <div className="mx-auto mt-12 max-w-2xl sm:mt-14 lg:max-w-7xl">
           <SkillsExplorer skills={skills} categories={categories} />
         </div>
       </div>
