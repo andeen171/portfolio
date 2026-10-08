@@ -1,139 +1,158 @@
-'use client';
-
+import { CalendarIcon, ClockIcon, MapPinIcon } from '@heroicons/react/20/solid';
 import { useLocale, useTranslations } from 'next-intl';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import ExpandableText from '@/components/projects/ExpandableText';
+import TechChips from '@/components/projects/TechChips';
+import { cn } from '@/lib/utils';
 import type { ListExperiencesQueryResult } from '@/sanity/types';
 import { useLocalization } from '@/utils/localization';
+import {
+  formatMonthYear,
+  isoYearMonth,
+  monthsBetween,
+  parseYearMonth,
+  toParagraphs,
+  type YearMonth,
+} from './format';
+
+type Locale = 'en-US' | 'pt-BR';
 
 interface ExperienceProps {
   experience: ListExperiencesQueryResult[number];
+  /** "Now", fixed by the server render so every duration on the page agrees. */
+  now: YearMonth;
+  /** h3 under a page's h2 year headings, h4 under a home section's h3 years. */
+  titleAs?: 'h3' | 'h4';
 }
 
-const ExperienceItem: React.FC<ExperienceProps> = ({ experience }) => {
-  const [isExpanded, setIsExpanded] = useState(false);
-  const [showToggle, setShowToggle] = useState(false);
-  const descriptionRef = useRef<HTMLDivElement>(null);
+function useDuration(start: YearMonth | null, end: YearMonth) {
+  const t = useTranslations('experiences');
+  if (!start) return null;
 
-  const locale = useLocale();
+  const total = monthsBetween(start, end);
+  const years = Math.floor(total / 12);
+  const months = total % 12;
+  const yearsText = years > 0 ? t('durationYears', { count: years }) : null;
+  const monthsText = months > 0 ? t('durationMonths', { count: months }) : null;
+
+  return {
+    text:
+      yearsText && monthsText
+        ? t('durationBoth', { years: yearsText, months: monthsText })
+        : (yearsText ?? monthsText ?? ''),
+    iso: `P${years > 0 ? `${years}Y` : ''}${months > 0 || years === 0 ? `${months}M` : ''}`,
+  };
+}
+
+/**
+ * One role on the experience timeline. A server component: only the
+ * description's read-more toggle ships to the client.
+ */
+const ExperienceItem: React.FC<ExperienceProps> = ({ experience, now, titleAs: Title = 'h3' }) => {
+  const locale = useLocale() as Locale;
+  const t = useTranslations('experiences');
   const { getLocalizedValue } = useLocalization();
 
-  const title = getLocalizedValue(experience.title, locale as 'en-US' | 'pt-BR');
-  const description = getLocalizedValue(experience.description, locale as 'en-US' | 'pt-BR') || '';
-  const normalizedDescription = description.replace(/\\n/g, '\n');
-  const descriptionParagraphs = normalizedDescription
-    .replace(/\r\n/g, '\n')
-    .split('\n\n')
-    .map((paragraph) => paragraph.trim())
-    .filter((paragraph) => paragraph.length > 0);
+  // Titles were typed into Sanity with stray (and doubled) spaces.
+  const title = (getLocalizedValue(experience.title, locale) ?? '').replace(/\s+/g, ' ').trim();
+  const paragraphs = toParagraphs(getLocalizedValue(experience.description, locale));
+  const company = experience.company?.trim();
+  const location = experience.location?.trim();
 
-  const t = useTranslations('experiences');
-
-  const formatDate = useMemo(() => {
-    const formatDateString = (dateString: string | undefined) => {
-      if (!dateString) return null;
-      const date = new Date(dateString);
-      return date.toLocaleDateString(locale, { month: 'short', year: 'numeric' });
-    };
-
-    const start = formatDateString(experience.startDate);
-    const end = experience.endDate ? formatDateString(experience.endDate) : t('current');
-
-    return { start, end, full: `${start} - ${end}` };
-  }, [experience.startDate, experience.endDate, locale, t]);
-
-  useEffect(() => {
-    const element = descriptionRef.current;
-    if (!element) return;
-    const collapsedMaxHeight = 72;
-    const isOverflowing = element.scrollHeight > collapsedMaxHeight + 1;
-    setShowToggle(isOverflowing);
-  }, []);
+  const start = parseYearMonth(experience.startDate);
+  const end = parseYearMonth(experience.endDate);
+  const isCurrent = !experience.endDate;
+  const duration = useDuration(start, end ?? now);
 
   return (
-    <button
-      type="button"
-      key={experience._id}
-      onClick={() => setIsExpanded((v) => !v)}
-      onKeyDown={(e) => e.key === 'Enter' && setIsExpanded((v) => !v)}
-      className="group w-full text-left relative flex flex-col min-h-45 overflow-hidden rounded-lg border border-ctp-surface1/40 bg-ctp-mantle/50 p-6 transition-all duration-300 hover:border-ctp-surface2 hover:bg-ctp-mantle/70 cursor-pointer backdrop-blur-sm"
+    <article
+      className={cn(
+        'relative rounded-2xl bg-ctp-mantle/60 p-5 shadow-xl shadow-ctp-crust/20 ring-1 backdrop-blur-md transition-[box-shadow] duration-300 sm:p-6',
+        isCurrent
+          ? 'ring-ctp-green/35 hover:ring-ctp-green/60'
+          : 'ring-ctp-surface1/60 hover:ring-ctp-lavender/40'
+      )}
     >
-      {/* Subtle gradient overlay on hover */}
-      <div className="absolute inset-0 bg-linear-to-br from-ctp-blue/5 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-
-      <div className="relative z-10 flex flex-col h-full">
-        {/* Header */}
-        <div className="flex flex-col gap-3 mb-3 sm:flex-row sm:items-start sm:justify-between">
-          <div className="flex-1">
-            <h3 className="animated-gradient-text text-lg font-semibold mb-1">{title}</h3>
-            <p className="text-ctp-subtext0 font-medium text-sm">{experience.company}</p>
-          </div>
-          <div className="flex flex-col items-start gap-1 text-xs text-ctp-subtext1 sm:items-end sm:text-right">
-            <span className="font-medium hidden md:block">{formatDate.end}</span>
-            <span className="opacity-70">{experience.location}</span>
-          </div>
+      <header className="flex items-start gap-4">
+        <div
+          aria-hidden
+          className="hidden size-11 shrink-0 place-items-center rounded-xl bg-linear-to-br from-ctp-teal/20 to-ctp-lavender/25 font-nf text-lg font-bold text-ctp-text ring-1 ring-ctp-surface1 min-[420px]:grid"
+        >
+          {company?.charAt(0).toUpperCase() ?? '·'}
         </div>
 
-        {/* Timeline indicator */}
-        <div className="flex items-center gap-2 mb-4 text-xs text-ctp-subtext1">
-          <span className="w-1.5 h-1.5 rounded-full bg-ctp-blue/60" />
-          <span>{formatDate.full}</span>
-        </div>
-
-        {/* Description with smooth expand/collapse */}
-        <div className="relative flex-1">
-          <div
-            ref={descriptionRef}
-            className={`overflow-hidden transition-all duration-500 ease-in-out ${
-              isExpanded ? 'max-h-500 opacity-100' : 'max-h-18 opacity-90'
-            }`}
-          >
-            {descriptionParagraphs.length > 0 ? (
-              descriptionParagraphs.map((paragraph, index) => (
-                <p
-                  key={`${experience._id}-desc-${index}`}
-                  className="text-sm leading-relaxed text-ctp-text/90 mb-3 last:mb-0"
-                >
-                  {paragraph}
-                </p>
-              ))
-            ) : (
-              <p className="text-sm leading-relaxed text-ctp-text/90">{normalizedDescription}</p>
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
+            <Title className="text-lg font-bold leading-snug text-balance text-ctp-text">
+              {title}
+            </Title>
+            {isCurrent && (
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-ctp-green/10 px-2 py-0.5 font-nf text-[0.6875rem] font-medium text-ctp-green ring-1 ring-ctp-green/30 ring-inset latte:text-ctp-green-700">
+                <span aria-hidden className="relative flex size-1.5">
+                  <span className="absolute inline-flex size-full animate-ping rounded-full bg-ctp-green opacity-75 motion-reduce:animate-none" />
+                  <span className="relative inline-flex size-1.5 rounded-full bg-ctp-green" />
+                </span>
+                {t('currentBadge')}
+              </span>
             )}
           </div>
-
-          {/* Fade overlay when collapsed */}
-          {!isExpanded && showToggle && (
-            <div className="absolute bottom-0 left-0 right-0 h-8 bg-linear-to-t from-ctp-mantle/50 to-transparent pointer-events-none" />
+          {company && (
+            <p className="mt-0.5 font-nf text-sm text-ctp-subtext1">
+              <span aria-hidden className="text-ctp-teal">
+                @
+              </span>
+              {company}
+            </p>
           )}
         </div>
+      </header>
 
-        {/* Expand/collapse indicator */}
-        {showToggle && (
-          <div className="flex items-center justify-center mt-4">
-            <div className="flex items-center gap-2 text-xs text-ctp-subtext1/70 group-hover:text-ctp-subtext1 transition-colors">
-              <span>{isExpanded ? t('collapse') : t('expand')}</span>
-              <svg
-                className={`w-4 h-4 transition-transform duration-300 ${
-                  isExpanded ? 'rotate-180' : ''
-                }`}
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                aria-label={isExpanded ? t('collapse') : t('expand')}
-              >
-                <title>{isExpanded ? t('collapse') : t('expand')}</title>
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M19 9l-7 7-7-7"
-                />
-              </svg>
-            </div>
+      <dl className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1.5 font-nf text-xs text-ctp-subtext0 latte:text-ctp-subtext1">
+        {start && (
+          <div>
+            <dt className="sr-only">{t('period')}</dt>
+            <dd className="flex items-center gap-1.5">
+              <CalendarIcon aria-hidden className="size-3.5 text-ctp-teal" />
+              <time dateTime={isoYearMonth(start)}>{formatMonthYear(locale, start)}</time>
+              <span aria-hidden> — </span>
+              <span className="sr-only"> {t('to')} </span>
+              {end ? (
+                <time dateTime={isoYearMonth(end)}>{formatMonthYear(locale, end)}</time>
+              ) : (
+                t('present')
+              )}
+            </dd>
           </div>
         )}
-      </div>
-    </button>
+        {duration && (
+          <div>
+            <dt className="sr-only">{t('duration')}</dt>
+            <dd className="flex items-center gap-1.5">
+              <ClockIcon aria-hidden className="size-3.5 text-ctp-teal" />
+              <time dateTime={duration.iso}>{duration.text}</time>
+            </dd>
+          </div>
+        )}
+        {location && (
+          <div className="min-w-0">
+            <dt className="sr-only">{t('location')}</dt>
+            <dd className="flex items-center gap-1.5">
+              <MapPinIcon aria-hidden className="size-3.5 shrink-0 text-ctp-teal" />
+              {location}
+            </dd>
+          </div>
+        )}
+      </dl>
+
+      <ExpandableText
+        paragraphs={paragraphs}
+        lines={4}
+        moreLabel={t('readMore')}
+        lessLabel={t('showLess')}
+        className="mt-4 max-w-3xl"
+      />
+
+      <TechChips skills={experience.skills} label={t('stack')} className="mt-5" />
+    </article>
   );
 };
 
