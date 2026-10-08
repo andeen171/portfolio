@@ -8,32 +8,54 @@
   },
   "home": {
     "hero": {
-      "greeting": "Olá, eu sou",
-      "subtitle": "Desenvolvedor, Empreendedor e Pai",
-      "description": "Eu construo coisas para web e mobile"
+      "now": "agora",
+      "tagline": "Construo sistemas backend que <hl>movimentam dinheiro</hl>.",
+      "lead": "Hoje, pagamentos no PicPay; antes, transações distribuídas para compra de passagens aéreas na Onfly. Nas horas vagas: side quests em Rust no Arch Linux.",
+      "exploreProjects": "Explorar projetos",
+      "github": "Anderson no GitHub",
+      "linkedin": "Anderson no LinkedIn",
+      "stats": {
+        "label": "Em números",
+        "years": "{count, plural, one {ano} other {anos}} de estrada",
+        "projects": "{count, plural, one {projeto} other {projetos}}",
+        "skills": "{count, plural, one {habilidade no deck} other {habilidades no deck}}",
+        "companies": "{count, plural, one {empresa} other {empresas}}"
+      },
+      "scroll": "rolar",
+      "scrollLabel": "Ir para a seção Sobre"
     }
   },
+  "contact": {
+    "eyebrow": "contato",
+    "title": "Bora trocar uma ideia?",
+    "invite": "Pagamentos, transações distribuídas, um monólito querendo virar microsserviços ou uma side quest em Rust: se é um problema difícil de backend, eu quero ouvir.",
+    "channels": "Onde me encontrar",
+    "linkedin": "O melhor para falar de trabalho",
+    "github": "Onde o código mora",
+    "x": "Para um oi rápido",
+    "newTab": "(abre em uma nova aba)"
+  },
   "about": {
-    "title": "Sobre",
-    "subtitle": "Conheça-me melhor",
-    "greeting": "Olá, eu sou um",
-    "description": "Sou desenvolvedor de software com experiência em produtos reais e sistemas em escala, atuando principalmente no backend. Já trabalhei com microserviços, APIs e integrações complexas em ambientes de produção críticos, sempre com foco em estabilidade, desempenho e impacto direto no negócio.\n\nGosto de entender o problema a fundo antes de pensar na solução. Para mim, escrever código vai além de “fazer funcionar”: envolve clareza, boa arquitetura, responsabilidade técnica e manutenção no longo prazo. Valorizo código limpo, testável e bem estruturado, e tenho um olhar crítico para refatoração e melhoria contínua.\n\nSou autodidata, curioso e inquieto por natureza. Aprendo construindo, quebrando e melhorando sistemas, e me sinto confortável navegando por diferentes camadas da aplicação — do backend à infraestrutura, e eventualmente ao frontend quando necessário. Tenho facilidade em trabalhar de forma independente, mas também em colaborar com times multidisciplinares, especialmente em contextos remotos e ambientes ágeis.",
+    "eyebrow": "sobre",
+    "title": "A pessoa por trás dos commits",
+    "description": "Sou o Anderson, desenvolvedor autodidata de Belo Horizonte. Vivo principalmente no backend, onde um bug não é um botão torto: é um número errado no saldo de alguém. Desde 2024 trabalho com pagamentos no PicPay pela Onebrain: primeiro no Débito Automático, hoje no time do Assistente de Pagamentos (DDA), onde cuido de vários microsserviços em PHP, Hyperf e Go.\n\nAntes, na Onfly, migrei um monólito PHP para microsserviços em Hyperf e construí um gerenciador de transações distribuídas próprio, para que compra de passagens aéreas, pagamentos e saldo interno fossem confirmados ou desfeitos juntos. Antes disso, cofundei duas startups, a Mediallize (marketplace de influenciadores, finalista da aceleradora do COTEMIG) e a Borealis (marketplace de conserto de aparelhos), e construí na Edutec uma plataforma educacional em Laravel e React onde professores criam os próprios jogos.\n\nFora do expediente, uso Arch Linux e escrevo Rust por diversão: uma CLI que fala o protocolo USB do teclado e das ventoinhas do meu Dell G15 (descoberto por engenharia reversa e publicado no AUR) e uma simulação que dá a cada pessoa sua própria thread. Também sou pai, o melhor motivo que conheço para escrever código que não acorda ninguém às 3 da manhã.",
+    "readMore": "Continuar lendo",
+    "readLess": "Mostrar menos",
+    "rolesLabel": "Alguns dos chapéus que uso",
     "typedStrings": {
-      "fullstack": "Desenvolvedor Fullstack",
-      "backend": "Desenvolvedor Backend",
-      "linux": "Entusiasta Linux",
-      "entrepreneur": "Empreendedor",
-      "father": "Pai Amoroso",
-      "thinker": "Pensador crítico"
+      "backend": "Desenvolvedor backend",
+      "fullstack": "Full-stack de alma backend",
+      "linux": "Entusiasta de Arch Linux",
+      "entrepreneur": "Cofundador de duas startups",
+      "father": "Pai coruja",
+      "thinker": "Livre-pensador"
     },
-    "connect": "Conecte-se comigo",
-    "linkedin": {
-      "title": "Linkedin",
-      "description": "Conecte-se comigo para saber mais sobre meu trabalho e experiência. Às vezes posto sobre meus projetos e outras coisas."
-    },
-    "github": {
-      "title": "Github",
-      "description": "Confira meus projetos e contribuições. Estou sempre trabalhando em algo ou aprendendo algo novo."
+    "card": {
+      "name": "Anderson Lopes",
+      "type": "Humano — Desenvolvedor Backend",
+      "origin": "Belo Horizonte, BR",
+      "flavor": "Autodidata. Usa Arch, btw.",
+      "photoAlt": "Retrato ilustrado de Anderson Lopes"
     }
   },
   "skills": {
