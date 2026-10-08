@@ -1,18 +1,22 @@
 'use client';
 
 import { type CatppuccinColors, flavors } from '@catppuccin/palette';
+import { useReducedMotion } from 'motion/react';
 import type React from 'react';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { cn } from '@/lib/utils';
 import { useCtpStore } from '@/store';
 
-interface StarProps {
+interface Star {
+  /** Position as a fraction of the canvas, so a resize stretches the sky instead of reshuffling it. */
   x: number;
   y: number;
-  initialY: number;
   radius: number;
   opacity: number;
+  /** Seconds per twinkle, or null for a steady star. */
   twinkleSpeed: number | null;
+  /** Offsets the twinkle so stars don't pulse in unison. */
+  phase: number;
   parallaxSpeed: number;
   colorIndex: number;
 }
@@ -26,6 +30,22 @@ interface StarBackgroundProps {
   className?: string;
 }
 
+/** `r, g, b` triplets and an alpha multiplier per star color. */
+function starPalette(colors: CatppuccinColors) {
+  const swatch = (name: keyof CatppuccinColors, alpha: number) => {
+    const { r, g, b } = colors[name].rgb;
+    return { rgb: `${r}, ${g}, ${b}`, alpha };
+  };
+  return [
+    swatch('lavender', 0.9),
+    swatch('teal', 0.8),
+    swatch('pink', 0.7),
+    swatch('sky', 0.8),
+    swatch('sapphire', 0.9),
+    swatch('blue', 0.8),
+  ];
+}
+
 export const StarsBackground: React.FC<StarBackgroundProps> = ({
   starDensity = 0.00015,
   allStarsTwinkle = true,
@@ -35,151 +55,137 @@ export const StarsBackground: React.FC<StarBackgroundProps> = ({
   className,
 }) => {
   const flavor = useCtpStore((state) => state.flavor);
-  const [stars, setStars] = useState<StarProps[]>([]);
-  const [scrollY, setScrollY] = useState(0);
-  const [colors, setColors] = useState<CatppuccinColors>(flavors[flavor].colors);
+  const reduceMotion = useReducedMotion();
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const paletteRef = useRef(starPalette(flavors[flavor].colors));
+  // Repaints one frame; the sky's effect points it at its current closure.
+  const repaintRef = useRef<() => void>(() => {});
 
-  // Update colors when flavor changes
   useEffect(() => {
-    setColors(flavors[flavor].colors);
+    paletteRef.current = starPalette(flavors[flavor].colors);
+    repaintRef.current();
   }, [flavor]);
 
-  const getStarColor = (colorIndex: number, opacity: number): string => {
-    const starColors = [
-      `rgba(${colors.lavender.rgb.r}, ${colors.lavender.rgb.g}, ${colors.lavender.rgb.b}, ${
-        opacity * 0.9
-      })`,
-      `rgba(${colors.teal.rgb.r}, ${colors.teal.rgb.g}, ${colors.teal.rgb.b}, ${opacity * 0.8})`,
-      `rgba(${colors.pink.rgb.r}, ${colors.pink.rgb.g}, ${colors.pink.rgb.b}, ${opacity * 0.7})`,
-      `rgba(${colors.sky.rgb.r}, ${colors.sky.rgb.g}, ${colors.sky.rgb.b}, ${opacity * 0.8})`,
-      `rgba(${colors.sapphire.rgb.r}, ${colors.sapphire.rgb.g}, ${colors.sapphire.rgb.b}, ${
-        opacity * 0.9
-      })`,
-      `rgba(${colors.blue.rgb.r}, ${colors.blue.rgb.g}, ${colors.blue.rgb.b}, ${opacity * 0.8})`,
-    ];
-    return starColors[colorIndex % starColors.length]!;
-  };
-
-  const generateStars = useCallback(
-    (width: number, height: number): StarProps[] => {
-      const area = width * height;
-      const numStars = Math.floor(area * starDensity);
-      return Array.from({ length: numStars }, (_) => {
-        const shouldTwinkle = allStarsTwinkle || Math.random() < twinkleProbability;
-        return {
-          x: Math.random() * width,
-          y: Math.random() * height,
-          initialY: Math.random() * height,
-          radius: Math.random() * 1.2 + 0.4,
-          opacity: Math.random() * 0.4 + 0.3,
-          twinkleSpeed: shouldTwinkle
-            ? minTwinkleSpeed + Math.random() * (maxTwinkleSpeed - minTwinkleSpeed)
-            : null,
-          parallaxSpeed: Math.random() * 0.5 + 0.1,
-          colorIndex: Math.floor(Math.random() * 6),
-        };
-      });
-    },
-    [starDensity, allStarsTwinkle, twinkleProbability, minTwinkleSpeed, maxTwinkleSpeed]
-  );
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrollY(window.scrollY);
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  useEffect(() => {
-    const updateStars = () => {
-      if (canvasRef.current) {
-        const canvas = canvasRef.current;
-        const ctx = canvas.getContext('2d');
-        if (!ctx) return;
-
-        const { width, height } = canvas.getBoundingClientRect();
-        if (canvas.width !== width || canvas.height !== height) {
-          canvas.width = width;
-          canvas.height = height;
-          setStars(generateStars(width, height));
-        }
-      }
-    };
-
-    updateStars();
-
-    const resizeObserver = new ResizeObserver(updateStars);
-    if (canvasRef.current) {
-      resizeObserver.observe(canvasRef.current);
-    }
-
-    return () => {
-      if (canvasRef.current) {
-        resizeObserver.unobserve(canvasRef.current);
-      }
-    };
-  }, [generateStars]);
-
-  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    const ctx = canvas?.getContext('2d');
+    if (!canvas || !ctx) return;
 
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+    // Reduced motion: a still sky, painted on demand, no twinkle or parallax.
+    const animate = !reduceMotion;
+    let stars: Star[] = [];
+    let width = 0;
+    let height = 0;
+    let frame = 0;
+    let running = false;
 
-    let animationFrameId: number;
-
-    const render = (time: number) => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      // biome-ignore lint/complexity/noForEach: <explanation>
-      stars.forEach((star) => {
-        // Apply parallax effect with wrapping
-        // The stars move based on scroll, and we wrap them around the canvas height
-        let parallaxY = (star.initialY - scrollY * star.parallaxSpeed) % canvas.height;
-        if (parallaxY < 0) parallaxY += canvas.height;
-
-        // Update twinkle
-        let currentOpacity = star.opacity;
-        if (star.twinkleSpeed !== null) {
-          currentOpacity = 0.2 + Math.abs(Math.sin((time * 0.001) / star.twinkleSpeed) * 0.4);
-        }
-
-        ctx.beginPath();
-        ctx.arc(star.x, parallaxY, star.radius, 0, Math.PI * 2);
-
-        const color = getStarColor(star.colorIndex, currentOpacity);
-        ctx.fillStyle = color;
-
-        // Add subtle glow for larger stars
-        if (star.radius > 0.8) {
-          ctx.shadowColor = color;
-          ctx.shadowBlur = star.radius * 2;
-          ctx.fill();
-          ctx.shadowBlur = 0;
-        } else {
-          ctx.fill();
-        }
-      });
-
-      animationFrameId = requestAnimationFrame(render);
+    const createStar = (): Star => {
+      const shouldTwinkle = allStarsTwinkle || Math.random() < twinkleProbability;
+      return {
+        x: Math.random(),
+        y: Math.random(),
+        radius: Math.random() * 1.2 + 0.4,
+        opacity: Math.random() * 0.4 + 0.3,
+        twinkleSpeed: shouldTwinkle
+          ? minTwinkleSpeed + Math.random() * (maxTwinkleSpeed - minTwinkleSpeed)
+          : null,
+        phase: Math.random() * Math.PI * 2,
+        parallaxSpeed: Math.random() * 0.5 + 0.1,
+        colorIndex: Math.floor(Math.random() * 6),
+      };
     };
 
-    animationFrameId = requestAnimationFrame(render);
+    const paint = (time: number) => {
+      ctx.clearRect(0, 0, width, height);
+      const palette = paletteRef.current;
+      const scrollY = animate ? window.scrollY : 0;
+
+      for (const star of stars) {
+        // Parallax with wrap-around: deeper stars drift slower as you scroll.
+        let y = (star.y * height - scrollY * star.parallaxSpeed) % height;
+        if (y < 0) y += height;
+        const x = star.x * width;
+
+        const opacity =
+          animate && star.twinkleSpeed !== null
+            ? 0.2 + Math.abs(Math.sin((time * 0.001) / star.twinkleSpeed + star.phase) * 0.4)
+            : star.opacity;
+        const { rgb, alpha } = palette[star.colorIndex % palette.length]!;
+
+        // A faint halo instead of shadowBlur, which is costly per frame.
+        if (star.radius > 0.8) {
+          ctx.beginPath();
+          ctx.arc(x, y, star.radius * 2.6, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(${rgb}, ${opacity * alpha * 0.18})`;
+          ctx.fill();
+        }
+        ctx.beginPath();
+        ctx.arc(x, y, star.radius, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(${rgb}, ${opacity * alpha})`;
+        ctx.fill();
+      }
+    };
+
+    const resize = () => {
+      const rect = canvas.getBoundingClientRect();
+      if (rect.width === width && rect.height === height) return;
+      width = rect.width;
+      height = rect.height;
+      // Crisp on high-density screens; capped, since stars don't need 3x.
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      canvas.width = Math.round(width * dpr);
+      canvas.height = Math.round(height * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+      // Keep the existing sky; only top up or trim to the new area's count.
+      const count = Math.floor(width * height * starDensity);
+      if (stars.length > count) stars = stars.slice(0, count);
+      while (stars.length < count) stars.push(createStar());
+      paint(performance.now());
+    };
+
+    const loop = (time: number) => {
+      paint(time);
+      frame = requestAnimationFrame(loop);
+    };
+    const start = () => {
+      if (!animate || running || document.hidden) return;
+      running = true;
+      frame = requestAnimationFrame(loop);
+    };
+    const stop = () => {
+      running = false;
+      cancelAnimationFrame(frame);
+    };
+    // Nobody watches the sky in a background tab.
+    const onVisibilityChange = () => (document.hidden ? stop() : start());
+
+    repaintRef.current = () => paint(performance.now());
+    resize();
+    const observer = new ResizeObserver(resize);
+    observer.observe(canvas);
+    document.addEventListener('visibilitychange', onVisibilityChange);
+    start();
 
     return () => {
-      cancelAnimationFrame(animationFrameId);
+      stop();
+      observer.disconnect();
+      document.removeEventListener('visibilitychange', onVisibilityChange);
+      repaintRef.current = () => {};
     };
-  }, [stars, scrollY, colors]);
+  }, [
+    reduceMotion,
+    starDensity,
+    allStarsTwinkle,
+    twinkleProbability,
+    minTwinkleSpeed,
+    maxTwinkleSpeed,
+  ]);
 
   return (
     <canvas
       ref={canvasRef}
-      className={cn('h-full w-full absolute inset-0 pointer-events-none', className)}
+      className={cn('pointer-events-none absolute inset-0 h-full w-full', className)}
     />
   );
 };

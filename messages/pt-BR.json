@@ -4,7 +4,19 @@
     "about": "Sobre",
     "skills": "Habilidades",
     "projects": "Projetos",
-    "experiences": "Experiências"
+    "experiences": "Experiências",
+    "contact": "Contato",
+    "primary": "Principal",
+    "homeLink": "Anderson Lopes, início",
+    "skipToContent": "Pular para o conteúdo",
+    "menu": "Menu",
+    "openMenu": "Abrir menu",
+    "theme": "Tema",
+    "language": "Idioma",
+    "light": "claro",
+    "dark": "escuro",
+    "search": "Buscar…",
+    "openPalette": "Abrir paleta de comandos"
   },
   "home": {
     "hero": {
@@ -83,6 +95,81 @@
     "collapse": "Clique para recolher"
   },
   "footer": {
-    "quote": "Ambição sem esforço é apenas ganância"
+    "quote": "Ambição sem esforço é apenas ganância",
+    "tagline": "Desenvolvedor full-stack com pé no backend, de Belo Horizonte. Autodidata, entusiasta de Arch Linux e pai.",
+    "sitemap": "mapa-do-site",
+    "social": "redes",
+    "navLabel": "Rodapé",
+    "newTab": "(abre em nova aba)",
+    "paletteCta": "Abrir a paleta de comandos",
+    "paletteTip": "Tudo aqui está a um comando de distância.",
+    "copyright": "© {year} Anderson Ribeiro Lopes",
+    "builtWith": "Feito com <next>Next.js</next>, <sanity>Sanity</sanity> e <ctp>Catppuccin</ctp>",
+    "backToTop": "Voltar ao topo"
+  },
+  "palette": {
+    "title": "Paleta de comandos",
+    "description": "Digite para filtrar os comandos, use as setas para escolher um e Enter para executá-lo.",
+    "placeholder": "Digite um comando ou pesquise…",
+    "inputLabel": "Comando",
+    "groups": {
+      "navigate": "Navegar",
+      "theme": "Tema",
+      "language": "Idioma",
+      "social": "Redes",
+      "actions": "Ações"
+    },
+    "commands": {
+      "home": "Início",
+      "about": "Sobre mim",
+      "skills": "Habilidades",
+      "projects": "Projetos",
+      "experiences": "Experiências",
+      "contact": "Contato",
+      "theme": "Tema {name}",
+      "social": "Abrir {name}",
+      "copyLink": "Copiar link desta página"
+    },
+    "current": "atual",
+    "newTab": "abre em nova aba",
+    "notFound": "comando não encontrado: {query}",
+    "notFoundHint": "Tente “tema”, “habilidades” ou “github”.",
+    "results": "{count, plural, =0 {Nenhum comando} one {# comando} other {# comandos}}",
+    "keys": {
+      "navigate": "navegar",
+      "run": "executar",
+      "close": "fechar"
+    },
+    "copied": "Link copiado para a área de transferência",
+    "copyFailed": "Não foi possível copiar o link"
+  },
+  "notFound": {
+    "eyebrow": "erro 404",
+    "title": "Página não encontrada",
+    "error": "arquivo ou diretório inexistente",
+    "description": "Esta página se perdeu no céu noturno, ou talvez nunca tenha existido. Vamos te colocar de volta no caminho.",
+    "home": "Voltar ao início",
+    "palette": "Abrir paleta de comandos"
+  },
+  "meta": {
+    "siteName": "Anderson Lopes",
+    "title": "Anderson Lopes · Desenvolvedor full-stack",
+    "titleTemplate": "%s · Anderson Lopes",
+    "description": "Desenvolvedor full-stack com foco em backend, de Belo Horizonte, construindo microsserviços de pagamentos com PHP, Hyperf e Go. Autodidata, entusiasta de Linux e cofundador de duas startups.",
+    "jobTitle": "Desenvolvedor full-stack",
+    "pages": {
+      "skills": {
+        "title": "Habilidades",
+        "description": "As linguagens, frameworks e ferramentas com que Anderson Lopes trabalha, reunidas em um baralho de cartas holográficas."
+      },
+      "projects": {
+        "title": "Projetos",
+        "description": "Projetos pessoais de Anderson Lopes: uma CLI em Rust que fez engenharia reversa do protocolo de teclado e ventoinhas de um Dell G15, uma simulação com uma thread por pessoa, um monorepo de Hábitos Atômicos e mais."
+      },
+      "experiences": {
+        "title": "Experiência",
+        "description": "De cofundar duas startups a microsserviços de pagamentos no PicPay: os times, sistemas e produtos em que Anderson Lopes já trabalhou."
+      }
+    }
   }
 }

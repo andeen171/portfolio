@@ -4,7 +4,19 @@
     "about": "About",
     "skills": "Skills",
     "projects": "Projects",
-    "experiences": "Experiences"
+    "experiences": "Experiences",
+    "contact": "Contact",
+    "primary": "Main",
+    "homeLink": "Anderson Lopes, home",
+    "skipToContent": "Skip to content",
+    "menu": "Menu",
+    "openMenu": "Open menu",
+    "theme": "Theme",
+    "language": "Language",
+    "light": "light",
+    "dark": "dark",
+    "search": "Search…",
+    "openPalette": "Open command palette"
   },
   "home": {
     "hero": {
@@ -83,6 +95,81 @@
     "collapse": "Click to collapse"
   },
   "footer": {
-    "quote": "Ambition without effort is just greed"
+    "quote": "Ambition without effort is just greed",
+    "tagline": "Backend-leaning full-stack developer from Belo Horizonte, Brazil. Self-taught, Arch Linux enthusiast and father.",
+    "sitemap": "sitemap",
+    "social": "social",
+    "navLabel": "Footer",
+    "newTab": "(opens in a new tab)",
+    "paletteCta": "Open the command palette",
+    "paletteTip": "Everything here is one command away.",
+    "copyright": "© {year} Anderson Ribeiro Lopes",
+    "builtWith": "Built with <next>Next.js</next>, <sanity>Sanity</sanity> & <ctp>Catppuccin</ctp>",
+    "backToTop": "Back to top"
+  },
+  "palette": {
+    "title": "Command palette",
+    "description": "Type to filter commands, use the arrow keys to pick one and Enter to run it.",
+    "placeholder": "Type a command or search…",
+    "inputLabel": "Command",
+    "groups": {
+      "navigate": "Navigate",
+      "theme": "Theme",
+      "language": "Language",
+      "social": "Social",
+      "actions": "Actions"
+    },
+    "commands": {
+      "home": "Home",
+      "about": "About me",
+      "skills": "Skills",
+      "projects": "Projects",
+      "experiences": "Experiences",
+      "contact": "Contact",
+      "theme": "{name} theme",
+      "social": "Open {name}",
+      "copyLink": "Copy link to this page"
+    },
+    "current": "current",
+    "newTab": "opens in a new tab",
+    "notFound": "command not found: {query}",
+    "notFoundHint": "Try “theme”, “skills” or “github”.",
+    "results": "{count, plural, =0 {No commands} one {# command} other {# commands}}",
+    "keys": {
+      "navigate": "navigate",
+      "run": "run",
+      "close": "close"
+    },
+    "copied": "Link copied to the clipboard",
+    "copyFailed": "Couldn’t copy the link"
+  },
+  "notFound": {
+    "eyebrow": "error 404",
+    "title": "Page not found",
+    "error": "no such file or directory",
+    "description": "This page drifted off into the night sky, or maybe it never existed. Let’s get you back on course.",
+    "home": "Back to home",
+    "palette": "Open command palette"
+  },
+  "meta": {
+    "siteName": "Anderson Lopes",
+    "title": "Anderson Lopes · Full-stack developer",
+    "titleTemplate": "%s · Anderson Lopes",
+    "description": "Backend-leaning full-stack developer from Belo Horizonte, Brazil, building payment microservices with PHP, Hyperf and Go. Self-taught, Linux enthusiast and two-time startup co-founder.",
+    "jobTitle": "Full-stack developer",
+    "pages": {
+      "skills": {
+        "title": "Skills",
+        "description": "The languages, frameworks and tools Anderson Lopes works with, collected as a deck of holographic trading cards."
+      },
+      "projects": {
+        "title": "Projects",
+        "description": "Side projects by Anderson Lopes: a Rust CLI that reverse-engineered a Dell G15’s keyboard and fan protocol, a thread-per-person simulation, an Atomic Habits monorepo and more."
+      },
+      "experiences": {
+        "title": "Experience",
+        "description": "From co-founding two startups to payment microservices at PicPay: the teams, systems and products Anderson Lopes has worked on."
+      }
+    }
   }
 }
