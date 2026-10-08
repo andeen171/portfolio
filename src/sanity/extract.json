@@ -155,6 +155,21 @@
         },
         "optional": true
       },
+      "yearsOfExperience": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "union",
+          "of": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "optional": true
+      },
       "svgCode": {
         "type": "objectAttribute",
         "value": {

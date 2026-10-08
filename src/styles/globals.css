@@ -4,6 +4,7 @@
 @import "@catppuccin/tailwindcss/macchiato.css";
 
 @import "tailwindcss";
+@import "./skill-card.css";
 
 @theme {
   --font-nf: "FiraCode NF", monospace;
@@ -58,6 +59,52 @@ body::-webkit-scrollbar {
 
 .nf {
   font-family: "FiraCode NF", monospace;
+}
+
+/*
+  Carousel edge fades (ui/carousel.tsx). Each edge's fade width is a
+  registered property so it can transition: when the active card sits under
+  one edge, only that edge eases out instead of both snapping off at once.
+*/
+@property --fade-start {
+  syntax: "<length-percentage>";
+  inherits: false;
+  initial-value: 0%;
+}
+
+@property --fade-end {
+  syntax: "<length-percentage>";
+  inherits: false;
+  initial-value: 0%;
+}
+
+.carousel-viewport {
+  --fade-start: 0%;
+  --fade-end: 0%;
+  mask-image: linear-gradient(
+    to right,
+    transparent,
+    #000 var(--fade-start),
+    #000 calc(100% - var(--fade-end)),
+    transparent
+  );
+  transition:
+    --fade-start 0.45s ease,
+    --fade-end 0.45s ease;
+}
+
+.carousel-viewport[data-fade-start] {
+  --fade-start: 7%;
+}
+
+.carousel-viewport[data-fade-end] {
+  --fade-end: 7%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .carousel-viewport {
+    transition: none;
+  }
 }
 
 .skill-svg-container svg,

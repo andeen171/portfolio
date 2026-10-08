@@ -9,6 +9,7 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useRef,
   useState,
 } from 'react';
 import { cn } from '@/lib/utils';
@@ -140,34 +141,65 @@ const Carousel = ({
   );
 };
 
-const CarouselContent = ({ className, ...props }: HTMLAttributes<HTMLDivElement>) => {
-  const { carouselRef, orientation, canScrollPrev, canScrollNext } = useCarousel();
+/** Width of each edge fade, as a fraction of the viewport. Matches the 7% in
+ *  `.carousel-viewport` (globals.css). */
+const EDGE_FADE = 0.07;
 
-  // Only fade an edge when there's actually content scrolled away on that side,
-  // so the first card is never dimmed at the start. When a card is hovered
-  // (`:has(.group:hover)`) the mask is dropped entirely so a card sitting under
-  // a fade becomes fully legible. The four combinations are enumerated as
-  // static class strings so Tailwind's compiler can see them.
-  const MASKS = {
-    'false-false': '[mask-image:none]',
-    'true-false':
-      '[mask-image:linear-gradient(to_right,transparent,black_7%,black_100%)] [&:has(.group:hover)]:[mask-image:none]',
-    'false-true':
-      '[mask-image:linear-gradient(to_right,black_0%,black_93%,transparent)] [&:has(.group:hover)]:[mask-image:none]',
-    'true-true':
-      '[mask-image:linear-gradient(to_right,transparent,black_7%,black_93%,transparent)] [&:has(.group:hover)]:[mask-image:none]',
-  } as const;
-  const maskClass =
-    orientation === 'horizontal'
-      ? MASKS[`${canScrollPrev}-${canScrollNext}` as keyof typeof MASKS]
-      : '';
+const CarouselContent = ({ className, ...props }: HTMLAttributes<HTMLDivElement>) => {
+  const { carouselRef, api, orientation, canScrollPrev, canScrollNext } = useCarousel();
+  const viewportRef = useRef<HTMLDivElement | null>(null);
+  // Which edge fades are held back because the active card sits under them.
+  const [reveal, setReveal] = useState({ start: false, end: false });
+
+  const setViewport = useCallback(
+    (node: HTMLDivElement | null) => {
+      viewportRef.current = node;
+      carouselRef(node);
+    },
+    [carouselRef]
+  );
+
+  // An edge fades only when there's content scrolled away on that side, so
+  // the first card is never dimmed at the start. When a card under a fade
+  // becomes active (hovered), that one fade eases out so the card is
+  // fully legible; the opposite edge keeps its fade.
+  useEffect(() => {
+    const viewport = viewportRef.current;
+    if (!viewport || orientation !== 'horizontal') return;
+
+    const update = () => {
+      const active = viewport.querySelector('[data-active]');
+      let start = false;
+      let end = false;
+      if (active) {
+        const view = viewport.getBoundingClientRect();
+        const card = active.getBoundingClientRect();
+        const fade = view.width * EDGE_FADE;
+        start = card.left < view.left + fade;
+        end = card.right > view.right - fade;
+      }
+      setReveal((prev) => (prev.start === start && prev.end === end ? prev : { start, end }));
+    };
+
+    const observer = new MutationObserver(update);
+    observer.observe(viewport, { subtree: true, attributeFilter: ['data-active'] });
+    api?.on('scroll', update);
+    return () => {
+      observer.disconnect();
+      api?.off('scroll', update);
+    };
+  }, [api, orientation]);
+
+  const horizontal = orientation === 'horizontal';
 
   return (
-    <div ref={carouselRef} className={cn('overflow-hidden', maskClass)}>
-      <div
-        className={cn('flex', orientation === 'horizontal' ? '-ml-6' : '-mt-6 flex-col', className)}
-        {...props}
-      />
+    <div
+      ref={setViewport}
+      data-fade-start={(horizontal && canScrollPrev && !reveal.start) || undefined}
+      data-fade-end={(horizontal && canScrollNext && !reveal.end) || undefined}
+      className={cn('overflow-hidden', horizontal && 'carousel-viewport')}
+    >
+      <div className={cn('flex', horizontal ? '-ml-6' : '-mt-6 flex-col', className)} {...props} />
     </div>
   );
 };
@@ -187,6 +219,9 @@ const CarouselItem = ({ className, ...props }: HTMLAttributes<HTMLDivElement>) =
   );
 };
 
+const NAV_BUTTON =
+  'inline-flex size-10 items-center justify-center rounded-full border border-ctp-surface1 bg-ctp-mantle/70 text-ctp-subtext1 backdrop-blur-sm transition-colors hover:border-ctp-lavender hover:text-ctp-lavender focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ctp-lavender/50 disabled:pointer-events-none disabled:opacity-35';
+
 // Callers pass a localized `label`; it drives both aria-label and the
 // sr-only text so the two never disagree across locales.
 const CarouselPrevious = ({
@@ -202,13 +237,10 @@ const CarouselPrevious = ({
       aria-label={label}
       disabled={!canScrollPrev}
       onClick={scrollPrev}
-      className={cn(
-        'absolute left-0 top-1/2 z-30 -translate-y-1/2 text-ctp-subtext0/60 transition-colors hover:text-ctp-text disabled:pointer-events-none disabled:opacity-0',
-        className
-      )}
+      className={cn(NAV_BUTTON, className)}
       {...props}
     >
-      <ChevronLeftIcon className="h-8 w-8 sm:h-10 sm:w-10" strokeWidth={1.5} />
+      <ChevronLeftIcon className="size-5" strokeWidth={2} />
       <span className="sr-only">{label}</span>
     </button>
   );
@@ -227,15 +259,55 @@ const CarouselNext = ({
       aria-label={label}
       disabled={!canScrollNext}
       onClick={scrollNext}
-      className={cn(
-        'absolute right-0 top-1/2 z-30 -translate-y-1/2 text-ctp-subtext0/60 transition-colors hover:text-ctp-text disabled:pointer-events-none disabled:opacity-0',
-        className
-      )}
+      className={cn(NAV_BUTTON, className)}
       {...props}
     >
-      <ChevronRightIcon className="h-8 w-8 sm:h-10 sm:w-10" strokeWidth={1.5} />
+      <ChevronRightIcon className="size-5" strokeWidth={2} />
       <span className="sr-only">{label}</span>
     </button>
+  );
+};
+
+/**
+ * A scrollbar-like track: the thumb's width is the share of the row in view,
+ * its position how far the row is scrolled. Hidden when everything fits.
+ */
+const CarouselProgress = ({ className }: { className?: string }) => {
+  const { api, canScrollPrev, canScrollNext } = useCarousel();
+  const [progress, setProgress] = useState(0);
+  const [thumb, setThumb] = useState(1);
+
+  useEffect(() => {
+    if (!api) return;
+    const measure = () => {
+      const content = api.containerNode().scrollWidth;
+      setThumb(content ? Math.min(1, api.rootNode().clientWidth / content) : 1);
+    };
+    const update = () => setProgress(Math.min(1, Math.max(0, api.scrollProgress())));
+    measure();
+    update();
+    api.on('scroll', update);
+    api.on('reInit', measure);
+    api.on('reInit', update);
+    return () => {
+      api.off('scroll', update);
+      api.off('reInit', measure);
+      api.off('reInit', update);
+    };
+  }, [api]);
+
+  if (!canScrollPrev && !canScrollNext) return <div className={className} />;
+
+  return (
+    <div aria-hidden className={cn('h-1 overflow-hidden rounded-full bg-ctp-surface0', className)}>
+      <div
+        className="h-full rounded-full bg-linear-to-r from-ctp-teal to-ctp-lavender transition-[width] duration-300"
+        style={{
+          width: `${thumb * 100}%`,
+          translate: `${(progress * (1 - thumb) * 100) / thumb}% 0`,
+        }}
+      />
+    </div>
   );
 };
 
@@ -246,4 +318,5 @@ export {
   CarouselItem,
   CarouselPrevious,
   CarouselNext,
+  CarouselProgress,
 };

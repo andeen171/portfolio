@@ -41,6 +41,17 @@ const PLURAL_LABELS: Record<string, Record<'en-US' | 'pt-BR', string>> = {
   'skillCategory-soft-skill': { 'en-US': 'Soft Skills', 'pt-BR': 'Interpessoais' },
 };
 
+type Category = ListSkillCategoriesQueryResult[number];
+
+/** Localized category name — plural for selectors and headings, singular on cards. */
+export function useCategoryLabel() {
+  const locale = useLocale() as 'en-US' | 'pt-BR';
+  const { getLocalizedValue } = useLocalization();
+  return (category: Pick<Category, '_id' | 'name'>, plural = false) =>
+    (plural ? PLURAL_LABELS[category._id]?.[locale] : undefined) ??
+    getLocalizedValue(category.name, locale);
+}
+
 const CategoryChips: React.FC<Props> = ({
   categories,
   activeCategory,
@@ -50,8 +61,7 @@ const CategoryChips: React.FC<Props> = ({
   className,
 }) => {
   const t = useTranslations('skills');
-  const locale = useLocale() as 'en-US' | 'pt-BR';
-  const { getLocalizedValue } = useLocalization();
+  const categoryLabel = useCategoryLabel();
 
   return (
     <div className={cn('flex flex-wrap justify-center gap-2', className)}>
@@ -59,6 +69,7 @@ const CategoryChips: React.FC<Props> = ({
         <button
           type="button"
           data-active={activeCategory === null}
+          aria-pressed={activeCategory === null}
           onClick={() => onSelect(null)}
           className={cn(
             CHIP_BASE,
@@ -69,19 +80,17 @@ const CategoryChips: React.FC<Props> = ({
         </button>
       )}
       {categories.map((category) => {
-        const singular = getLocalizedValue(category.name, locale);
-        const pluralLabel = plural ? PLURAL_LABELS[category._id]?.[locale] : undefined;
-        const name = pluralLabel ?? singular;
         const accentClass = category.accentColor ? ACCENT_CHIP[category.accentColor] : '';
         return (
           <button
             key={category._id}
             type="button"
             data-active={activeCategory === category._id}
+            aria-pressed={activeCategory === category._id}
             onClick={() => onSelect(category._id)}
             className={cn(CHIP_BASE, accentClass)}
           >
-            {name}
+            {categoryLabel(category, plural)}
           </button>
         );
       })}

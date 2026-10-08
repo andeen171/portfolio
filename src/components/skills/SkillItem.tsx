@@ -1,167 +1,351 @@
 'use client';
 
-import { useLocale } from 'next-intl';
-import FoilLayer from '@/components/FoilLayer';
-import CatppuccinGlareCard, { type GlareCardAccent } from '@/components/GlareCard';
+import { ArrowsPointingOutIcon, XMarkIcon } from '@heroicons/react/24/outline';
+import { useLocale, useTranslations } from 'next-intl';
+import { useId, useMemo, useRef, useState } from 'react';
+import { flushSync } from 'react-dom';
+import TiltCard from '@/components/TiltCard';
+import { dominantLogoHsl, logoTint } from '@/lib/logoColor';
+import { isProficiency, RARITY_SYMBOL, type RarityTier, rarityTier } from '@/lib/rarity';
 import { cn } from '@/lib/utils';
 import type { ListSkillsQueryResult } from '@/sanity/types';
 import { useLocalization } from '@/utils/localization';
 
-interface SkillItemProps {
-  skill: ListSkillsQueryResult[number];
+type Skill = ListSkillsQueryResult[number];
+type Accent = 'teal' | 'lavender' | 'pink' | 'peach' | 'green' | 'sky';
+type Variant = 'compact' | 'detail';
+
+/** At most this many tags on the compact card; the rest collapse into "+N". */
+const COMPACT_TAGS = 3;
+/** Tag-row width on the narrowest compact card (a 14rem grid track), in px. */
+const TAG_ROW = 200;
+/** What the "+N" chip and its gap take out of the row. */
+const MORE_CHIP = 32;
+
+/** Rough rendered width of a compact tag chip — 9px bold uppercase with wide
+ *  tracking, plus padding and border. Errs wide; CSS truncation catches the
+ *  rest. */
+const chipWidth = (tag: string) => tag.length * 6.4 + 18;
+
+/**
+ * The tags the compact card has room for, in the author's order: as many as
+ * fit on one line (always at least one), so a long tag isn't squeezed down
+ * to "O…" just to make room for the next one.
+ */
+function fitTags(tags: string[]): string[] {
+  const candidates = tags.slice(0, COMPACT_TAGS);
+  const width = (list: string[]) =>
+    list.reduce((sum, tag, i) => sum + chipWidth(tag) + (i ? 4 : 0), 0);
+
+  if (tags.length === candidates.length && width(candidates) <= TAG_ROW) return candidates;
+
+  const fitted: string[] = [];
+  for (const tag of candidates) {
+    if (fitted.length && width([...fitted, tag]) > TAG_ROW - MORE_CHIP) break;
+    fitted.push(tag);
+  }
+  return fitted;
 }
-
-// Accent-driven text tints for the name bar / badge (static so Tailwind sees them).
-const ACCENT_TEXT: Record<GlareCardAccent, string> = {
-  teal: 'text-ctp-teal',
-  lavender: 'text-ctp-lavender',
-  pink: 'text-ctp-pink',
-  peach: 'text-ctp-peach',
-  green: 'text-ctp-green',
-  sky: 'text-ctp-sky',
-};
-
-const ACCENT_RULE: Record<GlareCardAccent, string> = {
-  teal: 'border-ctp-teal/40',
-  lavender: 'border-ctp-lavender/40',
-  pink: 'border-ctp-pink/40',
-  peach: 'border-ctp-peach/40',
-  green: 'border-ctp-green/40',
-  sky: 'border-ctp-sky/40',
-};
+/** Shared by the grid card and the open detail card, so the browser morphs
+ *  one into the other. Only one card ever carries it at a time. */
+const TRANSITION_NAME = 'skill-card';
 
 // Filled tag-pill styles, cycled by tag index. Static strings so Tailwind's
-// compiler can see them. The /20 fill + full-strength text + bold reads on
-// both latte and the dark flavors.
+// compiler can see them.
 const TAG_STYLES = [
-  'bg-ctp-teal/20 text-ctp-teal border-ctp-teal/40',
-  'bg-ctp-lavender/20 text-ctp-lavender border-ctp-lavender/40',
-  'bg-ctp-pink/20 text-ctp-pink border-ctp-pink/40',
-  'bg-ctp-peach/20 text-ctp-peach border-ctp-peach/40',
-  'bg-ctp-green/20 text-ctp-green border-ctp-green/40',
-  'bg-ctp-sky/20 text-ctp-sky border-ctp-sky/40',
+  'bg-ctp-teal/15 text-ctp-teal border-ctp-teal/35',
+  'bg-ctp-lavender/15 text-ctp-lavender border-ctp-lavender/35',
+  'bg-ctp-pink/15 text-ctp-pink border-ctp-pink/35',
+  'bg-ctp-peach/15 text-ctp-peach border-ctp-peach/35',
+  'bg-ctp-green/15 text-ctp-green border-ctp-green/35',
+  'bg-ctp-sky/15 text-ctp-sky border-ctp-sky/35',
 ] as const;
 
-interface SkillItemInnerProps extends SkillItemProps {
-  /** When true, apply the full hover visuals even without a pointer hover
-   *  (used for tap-to-activate on touch devices). */
-  active?: boolean;
-}
+const TAG_BASE =
+  'rounded-full border px-2 py-0.5 text-[0.5625rem] font-bold uppercase tracking-wider';
 
-const SkillItem: React.FC<SkillItemInnerProps> = ({ skill, active }) => {
-  const locale = useLocale();
-  const { getLocalizedValue } = useLocalization();
-  const description = getLocalizedValue(skill.description, locale as 'en-US' | 'pt-BR');
-  const categoryName = skill.category
-    ? getLocalizedValue(skill.category.name, locale as 'en-US' | 'pt-BR')
-    : undefined;
-  // Prefer the skill's own accent, fall back to its category accent.
-  const accent = (skill.accentColor ?? skill.category?.accentColor) as GlareCardAccent | undefined;
-  const svgCode = skill.svgCode ?? skill.category?.fallbackSvgCode;
+/**
+ * A skill as a trading card. Proficiency sets the card's rarity, and the
+ * rarity decides which foil it gets — see `src/styles/skill-card.css`, which
+ * holds every visual of the card that isn't plain layout.
+ *
+ * The card is sized for a grid, so long Sanity content is fitted rather than
+ * allowed to push the layout around: tags stay on one line (ellipsized, with
+ * "+N" for the rest) and the description fades out where the card ends.
+ * Clicking or tapping the card brings it closer — it morphs into a larger
+ * copy in a dialog with the full description and every tag.
+ */
+const SkillItem: React.FC<{ skill: Skill }> = ({ skill }) => {
+  const t = useTranslations('skills');
+  const style = useCardStyle(skill);
+  const tier = rarityTier(skill.proficiency);
 
-  const accentText = accent ? ACCENT_TEXT[accent] : 'text-ctp-lavender';
-  const accentRule = accent ? ACCENT_RULE[accent] : 'border-ctp-surface1';
-  // Tags are metadata — keep them neutral so they don't compete with the accent.
-  const tags = (skill.tags ?? []).slice(0, 3);
+  const cardRef = useRef<HTMLDivElement>(null);
+  const dialogRef = useRef<HTMLDialogElement>(null);
+  const [open, setOpen] = useState(false);
+  const titleId = useId();
+
+  const openDetail = () =>
+    morph(cardRef.current, 'open', () => {
+      flushSync(() => setOpen(true));
+      dialogRef.current?.showModal();
+    });
+
+  const closeDetail = () =>
+    morph(cardRef.current, 'close', () => {
+      dialogRef.current?.close();
+      flushSync(() => setOpen(false));
+    });
 
   return (
-    <div className="group relative flex justify-center" data-card data-active={active || undefined}>
-      {/* Lift the whole card toward the viewer on hover; transform-only so layout doesn't shift.
-          `data-active` mirrors :hover for touch tap-to-activate. */}
-      <div
-        className={cn(
-          'relative z-0 transform-gpu transition-transform duration-300 ease-out will-change-transform hover:z-30 hover:scale-[1.12]',
-          active && 'z-30 scale-[1.12]'
-        )}
-      >
-        <CatppuccinGlareCard accent={accent} active={active}>
-          <div className="flex h-full flex-col">
-            {/* Header / name bar — title with a tiny category line under it. The
-                accent colour already signals the category, so keep it small. */}
-            <div className={cn('border-b bg-ctp-crust/50 px-3 py-2', accentRule)}>
-              <span
-                className={cn(
-                  'block w-full truncate text-center text-sm font-bold leading-tight',
-                  accentText
-                )}
-                title={skill.name}
-              >
-                {skill.name}
-              </span>
-              {categoryName && (
-                <span className="mt-0.5 block truncate text-center text-[9px] uppercase tracking-wider text-ctp-subtext0">
-                  {categoryName}
-                </span>
-              )}
-            </div>
+    <>
+      <TiltCard ref={cardRef} data-card data-rarity={tier} className="skill-card" style={style}>
+        <SkillCardFace skill={skill} tier={tier} variant="compact" />
+        {/* The whole card is the button: a transparent layer over the face,
+            under the glare. Keeps the face's own semantics (heading, list). */}
+        <button
+          type="button"
+          aria-haspopup="dialog"
+          onClick={openDetail}
+          className="skill-card__open"
+        >
+          <span className="sr-only">{t('showDetails', { name: skill.name ?? '' })}</span>
+        </button>
+        <div aria-hidden className="skill-card__glare" />
+      </TiltCard>
 
-            {/* Art window — the foil shimmer sits behind the icon so light icons
-                pop against it. */}
-            <div
+      {open && (
+        // biome-ignore lint/a11y/useKeyWithClickEvents: the click handles the backdrop; Esc (onCancel) is the keyboard path
+        <dialog
+          ref={dialogRef}
+          aria-labelledby={titleId}
+          className="skill-dialog"
+          onCancel={(event) => {
+            // Esc: close through the same animated path as the button.
+            event.preventDefault();
+            closeDetail();
+          }}
+          onClick={(event) => {
+            // The dialog fills the viewport; a click on it (not on its
+            // content) is a click on the backdrop.
+            if (event.target === event.currentTarget) closeDetail();
+          }}
+        >
+          <div className="flex flex-col items-end gap-3">
+            <button
+              type="button"
+              onClick={closeDetail}
+              className="inline-flex size-10 items-center justify-center rounded-full border border-ctp-surface1 bg-ctp-mantle/80 text-ctp-subtext1 backdrop-blur-sm transition-colors hover:border-ctp-lavender hover:text-ctp-lavender focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ctp-lavender/50"
+            >
+              <XMarkIcon className="size-5" />
+              <span className="sr-only">{t('close')}</span>
+            </button>
+            <TiltCard
+              active
+              idle
+              touch="drag"
+              data-rarity={tier}
+              data-variant="detail"
+              className="skill-card"
+              style={{ ...style, viewTransitionName: TRANSITION_NAME }}
+            >
+              <SkillCardFace skill={skill} tier={tier} variant="detail" titleId={titleId} />
+              <div aria-hidden className="skill-card__glare" />
+            </TiltCard>
+          </div>
+        </dialog>
+      )}
+    </>
+  );
+};
+
+/**
+ * Runs a DOM update inside a view transition, so the grid card and the
+ * dialog card morph into each other. The source card carries the shared
+ * transition name on whichever side of the change it's visible.
+ *
+ * Falls back to an instant update without the API or with reduced motion.
+ */
+function morph(source: HTMLElement | null, direction: 'open' | 'close', update: () => void) {
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (!source || reduced || !document.startViewTransition) {
+    update();
+    return;
+  }
+
+  if (direction === 'open') {
+    source.style.viewTransitionName = TRANSITION_NAME;
+    document.startViewTransition(() => {
+      source.style.viewTransitionName = '';
+      update();
+    });
+  } else {
+    const transition = document.startViewTransition(() => {
+      update();
+      source.style.viewTransitionName = TRANSITION_NAME;
+    });
+    transition.finished.finally(() => {
+      source.style.viewTransitionName = '';
+    });
+  }
+}
+
+/** The card's two colours as custom properties — see the face doc below. */
+function useCardStyle(skill: Skill): React.CSSProperties {
+  const accent = (skill.accentColor ?? skill.category?.accentColor ?? 'lavender') as Accent;
+  const svgCode = skill.svgCode ?? skill.category?.fallbackSvgCode;
+  // Scanning the SVG source is cheap but not free, and it never changes for a
+  // given skill.
+  const tint = useMemo(() => logoTint(dominantLogoHsl(svgCode)), [svgCode]);
+
+  return {
+    '--accent': `var(--catppuccin-color-${accent})`,
+    ...(tint && { '--tint': tint }),
+  } as React.CSSProperties;
+}
+
+/**
+ * The printed side of the card. Two colours drive it, set on the card by
+ * {@link useCardStyle}:
+ * - `--accent` — the category (or per-skill) accent: frame, name, rules.
+ * - `--tint`   — the logo's own colour, when it has one: the face and the art
+ *   window's backlight. Falls back to the accent.
+ *
+ * `compact` fits the grid; `detail` grows to its content for the dialog.
+ */
+const SkillCardFace = ({
+  skill,
+  tier,
+  variant,
+  titleId,
+}: {
+  skill: Skill;
+  tier?: RarityTier;
+  variant: Variant;
+  titleId?: string;
+}) => {
+  const locale = useLocale() as 'en-US' | 'pt-BR';
+  const t = useTranslations('skills');
+  const { getLocalizedValue } = useLocalization();
+
+  const compact = variant === 'compact';
+  const description = getLocalizedValue(skill.description, locale);
+  const categoryName = skill.category ? getLocalizedValue(skill.category.name, locale) : undefined;
+  const svgCode = skill.svgCode ?? skill.category?.fallbackSvgCode;
+  const tags = skill.tags ?? [];
+  const shownTags = compact ? fitTags(tags) : tags;
+  const hiddenTags = tags.length - shownTags.length;
+  const proficiency = isProficiency(skill.proficiency) ? skill.proficiency : undefined;
+  // "0 years" reads as a typo rather than a fact, so only positive figures show.
+  const years =
+    skill.yearsOfExperience && skill.yearsOfExperience > 0 ? skill.yearsOfExperience : null;
+
+  return (
+    <article className="skill-card__face">
+      {tier === 'secret' && <div aria-hidden className="foil foil--card" />}
+
+      <header className="skill-card__header">
+        <h3
+          id={titleId}
+          className={cn(
+            'font-bold leading-tight',
+            compact ? 'truncate text-[0.9375rem]' : 'text-balance text-xl'
+          )}
+          title={compact ? (skill.name ?? undefined) : undefined}
+        >
+          {skill.name}
+        </h3>
+        {categoryName && (
+          <p className="mt-0.5 truncate text-[0.625rem] uppercase tracking-[0.14em] text-ctp-subtext0">
+            {categoryName}
+          </p>
+        )}
+        {compact && <ArrowsPointingOutIcon aria-hidden className="skill-card__hint" />}
+      </header>
+
+      <div className="skill-card__art">
+        <div aria-hidden className="foil foil--art" />
+        {svgCode && (
+          <div
+            className={cn(
+              'skill-svg-container relative',
+              compact ? 'size-14 sm:size-16' : 'size-20'
+            )}
+            // biome-ignore lint/security/noDangerouslySetInnerHtml: Sanity content
+            dangerouslySetInnerHTML={{ __html: svgCode }}
+          />
+        )}
+      </div>
+
+      {tags.length > 0 && (
+        <ul
+          className={cn(
+            'flex justify-center gap-1 px-3',
+            // One line on the compact card, whatever the tags: long ones
+            // shrink and ellipsize instead of wrapping into the text box.
+            compact ? 'flex-nowrap overflow-hidden' : 'flex-wrap'
+          )}
+        >
+          {shownTags.map((tag, i) => (
+            <li
+              // Sanity doesn't enforce tag uniqueness — index the key so
+              // duplicate tags can't collide.
+              key={`${i}-${tag}`}
+              title={compact ? tag : undefined}
               className={cn(
-                'relative mx-3 mt-3 flex items-center justify-center overflow-hidden rounded-md border py-4',
-                accentRule
+                TAG_BASE,
+                compact && 'min-w-0 truncate',
+                TAG_STYLES[i % TAG_STYLES.length]
               )}
             >
-              <FoilLayer className="rounded-md" seed={skill._id} />
+              {tag}
+            </li>
+          ))}
+          {hiddenTags > 0 && (
+            <li
+              className={cn(TAG_BASE, 'shrink-0 border-ctp-surface2 text-ctp-subtext0')}
+              title={tags.slice(shownTags.length).join(', ')}
+            >
+              <span aria-hidden>+{hiddenTags}</span>
+              <span className="sr-only">{t('moreTags', { count: hiddenTags })}</span>
+            </li>
+          )}
+        </ul>
+      )}
 
-              <svg width="0" height="0" style={{ position: 'absolute' }}>
-                <title>Gradient</title>
-                <defs>
-                  <linearGradient id="skillGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="rgb(var(--ctp-teal))" />
-                    <stop offset="50%" stopColor="rgb(var(--ctp-lavender))" />
-                    <stop offset="100%" stopColor="rgb(var(--ctp-pink))" />
-                  </linearGradient>
-                </defs>
-              </svg>
-
-              {svgCode && (
-                <div
-                  className={cn(
-                    'relative z-10 flex h-16 w-16 items-center justify-center',
-                    accentText
-                  )}
-                >
-                  <div
-                    className="skill-svg-container flex h-full w-full items-center justify-center"
-                    // biome-ignore lint/security/noDangerouslySetInnerHtml: Sanity content
-                    dangerouslySetInnerHTML={{ __html: svgCode }}
-                  />
-                </div>
-              )}
-            </div>
-
-            {/* Tags — neutral metadata pills between the art window and the
-                rules-text box. Wrap to at most two lines. */}
-            {tags.length > 0 && (
-              <div className="mt-2.5 flex max-h-11 flex-wrap justify-center gap-1 overflow-hidden px-3">
-                {tags.map((tag, i) => (
-                  <span
-                    // Sanity doesn't enforce tag uniqueness — index the key so
-                    // duplicate tags can't collide.
-                    key={`${i}-${tag}`}
-                    className={cn(
-                      'rounded-full border px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider',
-                      TAG_STYLES[i % TAG_STYLES.length]
-                    )}
-                  >
-                    {tag}
-                  </span>
-                ))}
-              </div>
-            )}
-
-            {/* Rules-text box with the description */}
-            <div className="mx-3 mb-3 mt-2.5 flex flex-1 items-start rounded-md border border-ctp-surface0 bg-ctp-crust/60 px-2.5 py-2">
-              <p className="line-clamp-4 text-left text-[10px] leading-snug text-ctp-subtext1">
-                {description}
-              </p>
-            </div>
+      {/* On the open card this box scrolls by touch, so it doesn't steer. */}
+      <div className="skill-card__rules" data-no-tilt={compact ? undefined : true}>
+        {compact ? (
+          // Fades out where the card ends rather than cutting a line in half;
+          // the full text is one click away.
+          <div className="skill-card__rules-fit">
+            <p className="text-left text-[0.6875rem] leading-snug text-ctp-subtext1">
+              {description}
+            </p>
           </div>
-        </CatppuccinGlareCard>
+        ) : (
+          <p className="text-left text-[0.8125rem] leading-relaxed text-ctp-subtext1">
+            {description}
+          </p>
+        )}
       </div>
-    </div>
+
+      {(proficiency || years) && (
+        <footer className="skill-card__footer">
+          {proficiency && tier ? (
+            <span className="skill-card__rarity">
+              <span aria-hidden className="skill-card__symbol">
+                {RARITY_SYMBOL[tier]}
+              </span>
+              {t(`proficiency.${proficiency}`)}
+            </span>
+          ) : (
+            <span />
+          )}
+          {years && <span>{t('years', { count: years })}</span>}
+        </footer>
+      )}
+    </article>
   );
 };
 

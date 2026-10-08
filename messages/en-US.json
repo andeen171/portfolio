@@ -44,7 +44,28 @@
     "allCategories": "All",
     "noResults": "No skills match your search.",
     "previousSkills": "Previous skills",
-    "nextSkills": "Next skills"
+    "nextSkills": "Next skills",
+    "proficiency": {
+      "beginner": "Beginner",
+      "intermediate": "Intermediate",
+      "advanced": "Advanced",
+      "expert": "Expert"
+    },
+    "years": "{count, plural, one {# year} other {# years}}",
+    "searchLabel": "Search skills",
+    "clearSearch": "Clear search",
+    "clearFilters": "Clear filters",
+    "results": "{count, plural, =0 {No skills} one {# skill} other {# skills}}",
+    "sortLabel": "Sort by",
+    "sort": {
+      "category": "Category",
+      "experience": "Most experience",
+      "proficiency": "Highest proficiency"
+    },
+    "backToFilters": "Search & filters",
+    "showDetails": "Show details: {name}",
+    "close": "Close",
+    "moreTags": "{count, plural, one {# more tag} other {# more tags}}"
   },
   "projects": {
     "title": "Projects",

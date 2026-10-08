@@ -1,19 +1,23 @@
 'use client';
 
-import Link from 'next/link';
 import { useTranslations } from 'next-intl';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import {
   Carousel,
-  type CarouselApi,
   CarouselContent,
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
+  CarouselProgress,
 } from '@/components/ui/carousel';
+import { Link } from '@/i18n/routing';
 import type { ListSkillCategoriesQueryResult, ListSkillsQueryResult } from '@/sanity/types';
 import CategoryChips from './CategoryChips';
 import SkillItem from './SkillItem';
+
+// One card per ~80% of a phone screen (so the next one peeks in), then 2/3/4
+// across. The card itself is fluid up to its max width, so it always fits.
+const SLIDE = 'basis-[80%] min-[480px]:basis-[60%] sm:basis-1/2 md:basis-1/3 xl:basis-1/4';
 
 type Props = {
   skills: ListSkillsQueryResult;
@@ -26,31 +30,11 @@ const SkillsSection: React.FC<Props> = ({ skills, categories }) => {
   const [activeCategory, setActiveCategory] = useState<string | null>(
     () => categories[0]?._id ?? null
   );
-  const [api, setApi] = useState<CarouselApi>();
-  // On touch devices a tap activates a card's hover visuals; it stays active
-  // until another card is tapped or the user taps outside any card.
-  const [pressedCardId, setPressedCardId] = useState<string | null>(null);
 
   const filtered = useMemo(() => {
     if (!activeCategory) return skills;
     return skills.filter((skill) => skill.category?._id === activeCategory);
   }, [skills, activeCategory]);
-
-  // Switching category resets the carousel to the start.
-  useEffect(() => {
-    api?.scrollTo(0);
-  }, [api]);
-
-  // Dismiss the tapped-active card when the user presses outside any card.
-  useEffect(() => {
-    if (!pressedCardId) return;
-    const onPointerDown = (e: PointerEvent) => {
-      const target = e.target as HTMLElement | null;
-      if (!target?.closest('[data-card]')) setPressedCardId(null);
-    };
-    document.addEventListener('pointerdown', onPointerDown);
-    return () => document.removeEventListener('pointerdown', onPointerDown);
-  }, [pressedCardId]);
 
   return (
     <div className="py-24 sm:py-32">
@@ -70,73 +54,61 @@ const SkillsSection: React.FC<Props> = ({ skills, categories }) => {
         />
 
         {/* Embla carousel. Re-keyed on category so it re-inits at slide 0.
-            Viewport bleeds into the page padding via negative margins so cards
-            can extend past the container edge under the fade mask. */}
+            The viewport bleeds into the page padding via negative margins so
+            cards can extend past the container edge under the fade mask, and
+            the vertical padding leaves room for an active card's lift. */}
         <Carousel
           key={activeCategory ?? 'all'}
-          setApi={setApi}
           opts={{
-            // Mobile centres one card at a time (no fade under the first card);
-            // sm+ keeps the multi-card start-aligned row.
+            // Mobile centres one card at a time; sm+ keeps a start-aligned row.
             align: 'center',
             containScroll: 'trimSnaps',
             slidesToScroll: 1,
             breakpoints: {
               '(min-width: 640px)': { align: 'start' },
             },
-            // Let drags that begin on a card fall through to native vertical
-            // page scroll; only gaps/arrows drive the carousel. On desktop this
-            // is a no-op (pointer drags on cards just tilt them).
+            // A mouse drag on a card tilts it rather than scrolling the row;
+            // touch swipes always drive the carousel.
             watchDrag: (_emblaApi, event) => {
+              if ('touches' in event) return true;
               const target = event.target as HTMLElement | null;
               return !target?.closest('[data-card]');
             },
           }}
           className="-mx-6 mt-12 px-6 sm:mt-14 lg:mt-16"
         >
-          <CarouselContent className="py-14">
+          <CarouselContent className="py-10">
             {filtered.map((skill) => (
-              <CarouselItem
-                key={skill._id}
-                className="basis-[70%] sm:basis-1/2 md:basis-1/3 xl:basis-1/4"
-              >
-                <div
-                  className="flex justify-center"
-                  onPointerUp={(e) => {
-                    // Tap-to-activate on coarse (touch) pointers only.
-                    if (e.pointerType !== 'touch') return;
-                    setPressedCardId((prev) => (prev === skill._id ? null : skill._id));
-                  }}
-                >
-                  <SkillItem skill={skill} active={pressedCardId === skill._id} />
+              <CarouselItem key={skill._id} className={SLIDE}>
+                <div className="flex justify-center">
+                  <SkillItem skill={skill} />
                 </div>
               </CarouselItem>
             ))}
-
-            <CarouselItem className="basis-[70%] sm:basis-1/2 md:basis-1/3 xl:basis-1/4">
-              <div className="flex justify-center">
-                <Link
-                  href="/skills"
-                  className="flex h-80 w-40 flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-ctp-surface1 text-ctp-subtext0 transition-colors hover:border-ctp-lavender hover:text-ctp-lavender"
-                >
-                  <span className="max-w-28 text-sm font-semibold">{t('seeMore')}</span>
-                  <span className="text-2xl" aria-hidden>
-                    &rarr;
-                  </span>
-                </Link>
-              </div>
-            </CarouselItem>
           </CarouselContent>
 
-          <CarouselPrevious label={t('previousSkills')} />
-          <CarouselNext label={t('nextSkills')} />
+          {/* Controls live under the row, not on top of it, so they never
+              cover a card (or collide with the floating social links). */}
+          <div className="grid grid-cols-[auto_1fr] items-center gap-x-5 gap-y-6 sm:grid-cols-[auto_1fr_auto]">
+            <div className="flex gap-2">
+              <CarouselPrevious label={t('previousSkills')} />
+              <CarouselNext label={t('nextSkills')} />
+            </div>
+            <CarouselProgress className="max-w-md" />
+            <Link
+              href="/skills"
+              className="group col-span-2 inline-flex items-center gap-1.5 justify-self-center font-semibold text-ctp-lavender transition-colors hover:text-ctp-pink sm:col-span-1 sm:justify-self-end"
+            >
+              {t('seeMore')}
+              <span
+                aria-hidden
+                className="transition-transform duration-300 group-hover:translate-x-1"
+              >
+                &rarr;
+              </span>
+            </Link>
+          </div>
         </Carousel>
-
-        <div className="mt-12 hidden text-center sm:block">
-          <Link className="text-lg font-semibold text-ctp-lavender" href="/skills">
-            {t('seeMore')} &rarr;
-          </Link>
-        </div>
       </div>
     </div>
   );
