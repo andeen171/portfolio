@@ -1,5 +1,13 @@
 import { defineField, defineType } from 'sanity';
 
+/**
+ * Soft limits for what fits on the compact skill card. Longer content still
+ * renders (the card fades the description and ellipsizes tags, and the full
+ * text shows when the card is opened); these only warn in the Studio.
+ */
+const CARD_DESCRIPTION_CHARS = 180;
+const CARD_TAG_CHARS = 16;
+
 export const skill = defineType({
   name: 'skill',
   title: 'Skill',
@@ -15,7 +23,20 @@ export const skill = defineType({
       name: 'description',
       title: 'Description',
       type: 'internationalizedArrayString',
-      validation: (Rule) => Rule.required(),
+      description: `Shown on the card; around ${CARD_DESCRIPTION_CHARS} characters fit before it fades out (the full text shows when the card is opened).`,
+      validation: (Rule) => [
+        Rule.required(),
+        Rule.custom((value?: { _key: string; value?: string }[]) => {
+          const long = (value ?? []).filter(
+            (item) => (item.value?.length ?? 0) > CARD_DESCRIPTION_CHARS
+          );
+          return long.length
+            ? `Longer than ${CARD_DESCRIPTION_CHARS} characters (${long
+                .map((item) => `${item._key}: ${item.value?.length}`)
+                .join(', ')}) — the card will fade it out.`
+            : true;
+        }).warning(),
+      ],
     }),
     defineField({
       name: 'category',
@@ -45,8 +66,15 @@ export const skill = defineType({
       title: 'Tags',
       type: 'array',
       of: [{ type: 'string' }],
-      description: 'Free-form keywords for search/filtering (e.g. "backend", "web3")',
+      description: `Free-form keywords for search/filtering (e.g. "backend", "web3"). The card shows up to 3 that fit; keep them under ${CARD_TAG_CHARS} characters so they don't get cut.`,
       options: { layout: 'tags' },
+      validation: (Rule) =>
+        Rule.custom((value?: string[]) => {
+          const long = (value ?? []).filter((tag) => tag.length > CARD_TAG_CHARS);
+          return long.length
+            ? `Will be cut on the card (over ${CARD_TAG_CHARS} characters): ${long.join(', ')}`
+            : true;
+        }).warning(),
     }),
     defineField({
       name: 'proficiency',

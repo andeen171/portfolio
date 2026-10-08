@@ -7,7 +7,8 @@
   - `--accent` / `--tint`  set inline by SkillItem (category accent, logo colour)
   - `--pointer-x` / `-y`, `--rotate-x` / `-y`
                            written by TiltCard as the pointer moves
-  - `data-active`          on the card while hovered (mouse) or tapped (touch)
+  - `data-active`          on the card while hovered, and always on the open
+                           detail card
   - `data-rarity`          uncommon | holo | radiant | secret, from proficiency
 
   Theme: colours come from the Catppuccin flavor tokens and are mixed into the
@@ -22,6 +23,33 @@
   - radiant   + crosshatched sparkle foil and an iridescent frame
   - secret    + the whole card is foil, and the frame shimmers at rest
 */
+
+/* Registered so the detail card's idle sway can animate them; TiltCard writes
+   the same names inline while a mouse steers. Inherited, like any custom
+   property, because the foil layers read them. */
+@property --pointer-x {
+  syntax: "<percentage>";
+  inherits: true;
+  initial-value: 50%;
+}
+
+@property --pointer-y {
+  syntax: "<percentage>";
+  inherits: true;
+  initial-value: 50%;
+}
+
+@property --rotate-x {
+  syntax: "<angle>";
+  inherits: true;
+  initial-value: 0deg;
+}
+
+@property --rotate-y {
+  syntax: "<angle>";
+  inherits: true;
+  initial-value: 0deg;
+}
 
 .skill-card {
   --tint: var(--accent);
@@ -159,6 +187,56 @@
 
 .skill-card__rules:last-child {
   margin-bottom: 0.75rem;
+}
+
+/* Compact card: the text fills the box and fades out over its last line, so
+   a long description ends softly instead of being cut mid-line. Short text
+   never reaches the fade. */
+.skill-card__rules-fit {
+  height: 100%;
+  overflow: hidden;
+  mask-image: linear-gradient(to bottom, #000 calc(100% - 1.25rem), transparent);
+}
+
+/* ── Open affordance ─────────────────────────────────────────────────────── */
+
+/* The whole card is a button (SkillItem): a transparent layer over the face,
+   under the glare. */
+.skill-card__open {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  border-radius: inherit;
+  cursor: pointer;
+}
+
+.skill-card__open:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+/* A small "expand" mark in the header corner, shown when the card is lit or
+   focused, and always (dimmer) on touch screens, which have no hover. */
+.skill-card__hint {
+  position: absolute;
+  top: 0.625rem;
+  right: 0.625rem;
+  width: 0.875rem;
+  height: 0.875rem;
+  color: var(--catppuccin-color-subtext0);
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.skill-card[data-active] .skill-card__hint,
+.skill-card:has(.skill-card__open:focus-visible) .skill-card__hint {
+  opacity: 0.85;
+}
+
+@media (hover: none) {
+  .skill-card__hint {
+    opacity: 0.5;
+  }
 }
 
 .skill-card__footer {
@@ -434,6 +512,93 @@
   mix-blend-mode: soft-light;
 }
 
+/* ── Detail card ──────────────────────────────────────────────────────────── */
+
+/* The card opened in the dialog: wider, and sized by its content instead of
+   the 5:7 frame, so the full description and every tag fit. A very long
+   description scrolls inside its own box. */
+.skill-card[data-variant="detail"] {
+  --scale: 1;
+  max-width: 24rem;
+  aspect-ratio: auto;
+}
+
+.skill-card[data-variant="detail"] .skill-card__face {
+  height: auto;
+  max-height: calc(100dvh - 6rem);
+}
+
+.skill-card[data-variant="detail"] .skill-card__header {
+  padding: 0.875rem 1rem 0.75rem;
+}
+
+.skill-card[data-variant="detail"] .skill-card__rules {
+  flex: 1 1 auto;
+  min-height: 3rem;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 0.75rem 0.875rem;
+}
+
+/* With no mouse steering it, the detail card sways on its own so the foil
+   keeps moving — the only way to see it shimmer on a touch screen. */
+.skill-card[data-idle]:not([data-tracking]) {
+  animation: skill-card-idle 7s ease-in-out infinite;
+}
+
+@keyframes skill-card-idle {
+  0%,
+  100% {
+    --pointer-x: 28%;
+    --pointer-y: 22%;
+    --rotate-x: 4deg;
+    --rotate-y: -6deg;
+  }
+
+  50% {
+    --pointer-x: 72%;
+    --pointer-y: 78%;
+    --rotate-x: -4deg;
+    --rotate-y: 6deg;
+  }
+}
+
+.skill-dialog {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  max-width: none;
+  height: 100dvh;
+  max-height: none;
+  margin: 0;
+  padding: 1rem;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  overflow: hidden;
+}
+
+.skill-dialog[open] {
+  display: grid;
+  place-items: center;
+}
+
+.skill-dialog::backdrop {
+  background: color-mix(in oklab, var(--catppuccin-color-crust) 70%, transparent);
+  backdrop-filter: blur(6px);
+}
+
+/* The page behind an open card doesn't scroll. */
+html:has(.skill-dialog[open]) {
+  overflow: hidden;
+}
+
+/* The card ↔ dialog morph (SkillItem's view transition). */
+::view-transition-group(skill-card) {
+  animation-duration: 0.4s;
+  animation-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
 /* ── Grid entrance ────────────────────────────────────────────────────────── */
 
 /* Cards deal in, staggered, when the /skills grid is (re)built: on load and
@@ -476,7 +641,8 @@
     animation: none;
   }
 
-  .skill-deal {
+  .skill-deal,
+  .skill-card[data-idle]:not([data-tracking]) {
     animation: none;
   }
 }

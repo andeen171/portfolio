@@ -63,7 +63,10 @@
       "experience": "Most experience",
       "proficiency": "Highest proficiency"
     },
-    "backToFilters": "Search & filters"
+    "backToFilters": "Search & filters",
+    "showDetails": "Show details: {name}",
+    "close": "Close",
+    "moreTags": "{count, plural, one {# more tag} other {# more tags}}"
   },
   "projects": {
     "title": "Projects",

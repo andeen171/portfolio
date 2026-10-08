@@ -63,7 +63,10 @@
       "experience": "Mais experiência",
       "proficiency": "Maior proficiência"
     },
-    "backToFilters": "Busca e filtros"
+    "backToFilters": "Busca e filtros",
+    "showDetails": "Ver detalhes: {name}",
+    "close": "Fechar",
+    "moreTags": "{count, plural, one {mais # tag} other {mais # tags}}"
   },
   "projects": {
     "title": "Projetos",

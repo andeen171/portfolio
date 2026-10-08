@@ -161,7 +161,7 @@ const CarouselContent = ({ className, ...props }: HTMLAttributes<HTMLDivElement>
 
   // An edge fades only when there's content scrolled away on that side, so
   // the first card is never dimmed at the start. When a card under a fade
-  // becomes active (hovered or tapped), that one fade eases out so the card is
+  // becomes active (hovered), that one fade eases out so the card is
   // fully legible; the opposite edge keeps its fade.
   useEffect(() => {
     const viewport = viewportRef.current;
