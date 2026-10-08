@@ -139,7 +139,7 @@ const AboutSection: React.FC = () => {
               aria-expanded={isExpanded}
               aria-controls={bodyId}
               onClick={() => setIsExpanded((v) => !v)}
-              className="mt-6 inline-flex items-center gap-2 rounded-full bg-ctp-mantle/60 px-4 py-2 font-nf text-sm text-ctp-lavender ring-1 ring-ctp-surface1 backdrop-blur-md transition-colors hover:text-ctp-mauve latte:text-ctp-blue hover:ring-ctp-lavender/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ctp-lavender"
+              className="mt-6 inline-flex items-center gap-2 rounded-full bg-ctp-mantle/60 px-4 py-2 font-nf text-sm text-ctp-lavender ring-1 ring-ctp-surface1 backdrop-blur-md transition-colors hover:text-ctp-mauve latte:text-ctp-blue-700 hover:ring-ctp-lavender/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ctp-lavender"
             >
               {isExpanded ? t('readLess') : t('readMore')}
               <ChevronDownIcon
