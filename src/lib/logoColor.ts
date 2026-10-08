@@ -1,17 +1,17 @@
 /**
- * Derives a skill card's colour from its logo.
+ * Derives a skill card's tint from its logo.
  *
- * Card backgrounds used to be seeded by hashing the document id, which made
- * them arbitrary — a Python card was as likely to be pink as blue. Instead we
- * read the dominant colour straight out of the icon's SVG source, so the card
- * agrees with the logo sitting on it.
+ * We read the dominant colour straight out of the icon's SVG source, so the
+ * card agrees with the logo sitting on it — a Python card leans blue, a Redis
+ * card leans red.
  *
  * Roughly 40% of the icons in the dataset are `currentColor`-only (soft skills
- * and monochrome wordmarks); those have no colour to read. For them
- * {@link logoGradient} returns `undefined` and the card falls back to its flat
- * mantle background (see GlareCard's `faceBackground`).
+ * and monochrome wordmarks); those have no colour to read, and the card falls
+ * back to its category accent instead.
  *
- * Everything here is pure and deterministic so SSR and client renders agree.
+ * Everything here is pure and deterministic so SSR and client renders agree,
+ * and the output is theme-agnostic: the stylesheet mixes the tint into the
+ * active Catppuccin flavor, so nothing here needs to know which one is on.
  */
 
 export type Hsl = { h: number; s: number; l: number };
@@ -76,27 +76,6 @@ export function rgbToHsl(r: number, g: number, b: number): Hsl {
   return { h, s, l };
 }
 
-/** Inverse of {@link rgbToHsl}; channels come back in the 0–1 range GL wants. */
-export function hslToRgbUnit({ h, s, l }: Hsl): [number, number, number] {
-  const c = (1 - Math.abs(2 * l - 1)) * s;
-  const hp = h / 60;
-  const x = c * (1 - Math.abs((hp % 2) - 1));
-  const [r1, g1, b1] =
-    hp < 1
-      ? [c, x, 0]
-      : hp < 2
-        ? [x, c, 0]
-        : hp < 3
-          ? [0, c, x]
-          : hp < 4
-            ? [0, x, c]
-            : hp < 5
-              ? [x, 0, c]
-              : [c, 0, x];
-  const m = l - c / 2;
-  return [r1 + m, g1 + m, b1 + m];
-}
-
 /**
  * A colour is "carrying" if it's saturated enough and neither near-black nor
  * near-white. Logos are full of `#fff` counter-shapes and `#000` outlines that
@@ -155,20 +134,14 @@ export function dominantLogoHsl(svgCode?: string | null): Hsl | null {
 }
 
 /**
- * Builds the card's background gradient from a logo hue.
- *
- * The hue comes from the logo; saturation and lightness are pinned to values
- * that sit inside the Catppuccin surface range, so a neon-yellow logo can't
- * produce a card that glares. The second stop is nudged around the wheel to
- * keep the gradient from reading flat.
+ * Normalises a logo colour into a card tint. The hue is the logo's; saturation
+ * and lightness are pinned to a band that sits comfortably next to the
+ * Catppuccin accents, so a neon-yellow or near-navy logo can't produce a card
+ * that glares or disappears.
  */
-export function logoGradient(hsl: Hsl | null, isLightTheme: boolean): string | undefined {
+export function logoTint(hsl: Hsl | null): string | undefined {
   if (!hsl) return undefined;
-
-  const h1 = Math.round(hsl.h);
-  const h2 = Math.round((hsl.h + 28) % 360);
-
-  return isLightTheme
-    ? `linear-gradient(145deg, hsl(${h1} 42% 90%) 0%, hsl(${h2} 38% 84%) 100%)`
-    : `linear-gradient(145deg, hsl(${h1} 26% 20%) 0%, hsl(${h2} 30% 13%) 100%)`;
+  const h = Math.round(hsl.h);
+  const s = Math.round(Math.min(0.8, Math.max(0.45, hsl.s)) * 100);
+  return `hsl(${h} ${s}% 62%)`;
 }

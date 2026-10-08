@@ -45,7 +45,14 @@
     "allCategories": "Todas",
     "noResults": "Nenhuma habilidade corresponde à sua busca.",
     "previousSkills": "Habilidades anteriores",
-    "nextSkills": "Próximas habilidades"
+    "nextSkills": "Próximas habilidades",
+    "proficiency": {
+      "beginner": "Iniciante",
+      "intermediate": "Intermediário",
+      "advanced": "Avançado",
+      "expert": "Especialista"
+    },
+    "years": "{count, plural, one {# ano} other {# anos}}"
   },
   "projects": {
     "title": "Projetos",

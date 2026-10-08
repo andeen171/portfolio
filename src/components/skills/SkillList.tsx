@@ -7,11 +7,15 @@ type Props = {
 
 const SkillList: React.FC<Props> = ({ skills }) => {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-8 justify-items-center">
+    // auto-fill tracks never go narrower than a card can lay out in, so the
+    // grid adds or drops a column instead of squeezing cards into each other.
+    <ul className="grid grid-cols-[repeat(auto-fill,minmax(min(100%,14rem),1fr))] justify-items-center gap-x-6 gap-y-8">
       {skills.map((skill) => (
-        <SkillItem key={skill._id} skill={skill} />
+        <li key={skill._id} className="flex w-full justify-center">
+          <SkillItem skill={skill} />
+        </li>
       ))}
-    </div>
+    </ul>
   );
 };
 

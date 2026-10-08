@@ -144,18 +144,18 @@ const CarouselContent = ({ className, ...props }: HTMLAttributes<HTMLDivElement>
   const { carouselRef, orientation, canScrollPrev, canScrollNext } = useCarousel();
 
   // Only fade an edge when there's actually content scrolled away on that side,
-  // so the first card is never dimmed at the start. When a card is hovered
-  // (`:has(.group:hover)`) the mask is dropped entirely so a card sitting under
-  // a fade becomes fully legible. The four combinations are enumerated as
+  // so the first card is never dimmed at the start. When a card is active
+  // (hovered or tapped — `:has([data-active])`) the mask is dropped entirely so
+  // a card sitting under a fade becomes fully legible. The four combinations are enumerated as
   // static class strings so Tailwind's compiler can see them.
   const MASKS = {
     'false-false': '[mask-image:none]',
     'true-false':
-      '[mask-image:linear-gradient(to_right,transparent,black_7%,black_100%)] [&:has(.group:hover)]:[mask-image:none]',
+      '[mask-image:linear-gradient(to_right,transparent,black_7%,black_100%)] [&:has([data-active])]:[mask-image:none]',
     'false-true':
-      '[mask-image:linear-gradient(to_right,black_0%,black_93%,transparent)] [&:has(.group:hover)]:[mask-image:none]',
+      '[mask-image:linear-gradient(to_right,black_0%,black_93%,transparent)] [&:has([data-active])]:[mask-image:none]',
     'true-true':
-      '[mask-image:linear-gradient(to_right,transparent,black_7%,black_93%,transparent)] [&:has(.group:hover)]:[mask-image:none]',
+      '[mask-image:linear-gradient(to_right,transparent,black_7%,black_93%,transparent)] [&:has([data-active])]:[mask-image:none]',
   } as const;
   const maskClass =
     orientation === 'horizontal'

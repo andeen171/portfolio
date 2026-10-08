@@ -1,0 +1,458 @@
+/*
+  ── Skill cards ──────────────────────────────────────────────────────────────
+  A skill rendered as a trading card (SkillItem.tsx). The markup is plain
+  layout; everything that shines lives here.
+
+  Inputs, all custom properties:
+  - `--accent` / `--tint`  set inline by SkillItem (category accent, logo colour)
+  - `--pointer-x` / `-y`, `--rotate-x` / `-y`
+                           written by TiltCard as the pointer moves
+  - `data-active`          on the card while hovered (mouse) or tapped (touch)
+  - `data-rarity`          uncommon | holo | radiant | secret, from proficiency
+
+  Theme: colours come from the Catppuccin flavor tokens and are mixed into the
+  flavor's own surfaces with `color-mix`, so the same rules hold on every
+  flavor. Latte (the only light one) swaps the foil blend mode, since `screen`
+  over a pale surface washes out to white — see the overrides at the bottom.
+
+  Rarity ladder, each tier adding to the one below:
+  - (none)    pointer glare over the card
+  - uncommon  + a silver sheen sweeping the art window
+  - holo      + a rainbow holofoil in the art window (faint at rest)
+  - radiant   + crosshatched sparkle foil and an iridescent frame
+  - secret    + the whole card is foil, and the frame shimmers at rest
+*/
+
+.skill-card {
+  --tint: var(--accent);
+  --pointer-x: 50%;
+  --pointer-y: 50%;
+  --rotate-x: 0deg;
+  --rotate-y: 0deg;
+  --scale: 1;
+
+  --rainbow:
+    var(--catppuccin-color-red), var(--catppuccin-color-peach), var(--catppuccin-color-yellow),
+    var(--catppuccin-color-green), var(--catppuccin-color-sky), var(--catppuccin-color-lavender),
+    var(--catppuccin-color-mauve), var(--catppuccin-color-pink), var(--catppuccin-color-red);
+
+  /* Theme knobs, overridden for latte below. */
+  --face-mix: 16%;
+  --panel: color-mix(in oklab, var(--catppuccin-color-crust) 55%, transparent);
+  --foil-blend: screen;
+  --shadow: 0 12px 28px -14px rgb(0 0 0 / 0.65);
+
+  position: relative;
+  width: 100%;
+  max-width: 17rem;
+  aspect-ratio: 5 / 7;
+  border-radius: 1rem;
+  transform: perspective(900px) rotateX(var(--rotate-x)) rotateY(var(--rotate-y))
+    scale(var(--scale));
+  transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.skill-card[data-active] {
+  --scale: 1.04;
+  z-index: 10;
+}
+
+/* While a mouse is steering, follow it closely instead of easing behind it. */
+.skill-card[data-tracking] {
+  transition-duration: 0.12s;
+}
+
+/* ── Face ─────────────────────────────────────────────────────────────────── */
+
+.skill-card__face {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  border-radius: inherit;
+  border: 1px solid color-mix(in oklab, var(--accent) 45%, transparent);
+  background: linear-gradient(
+    160deg,
+    color-mix(in oklab, var(--tint) var(--face-mix), var(--catppuccin-color-mantle)) 0%,
+    var(--catppuccin-color-mantle) 50%,
+    var(--catppuccin-color-crust) 100%
+  );
+  box-shadow: var(--shadow);
+  transition:
+    box-shadow 0.35s ease,
+    border-color 0.35s ease;
+}
+
+.skill-card[data-active] .skill-card__face {
+  border-color: color-mix(in oklab, var(--accent) 80%, transparent);
+  box-shadow:
+    var(--shadow),
+    0 18px 44px -18px color-mix(in oklab, var(--tint) 70%, transparent);
+}
+
+/* Content sits above the card-wide foil, which is absolutely positioned. */
+.skill-card__face > :not(.foil) {
+  position: relative;
+}
+
+.skill-card__header {
+  padding: 0.625rem 0.875rem 0.5rem;
+  text-align: center;
+  color: var(--accent);
+  background: var(--panel);
+  border-bottom: 1px solid color-mix(in oklab, var(--accent) 30%, transparent);
+}
+
+.skill-card__art {
+  isolation: isolate;
+  display: grid;
+  place-items: center;
+  flex: none;
+  aspect-ratio: 2 / 1;
+  margin: 0.75rem 0.75rem 0;
+  overflow: hidden;
+  border-radius: 0.625rem;
+  border: 1px solid color-mix(in oklab, var(--accent) 30%, transparent);
+  /* Backlight in the logo's own colour, so the window belongs to the icon. */
+  background:
+    radial-gradient(
+      60% 85% at 50% 50%,
+      color-mix(in oklab, var(--tint) 30%, transparent),
+      transparent 75%
+    ),
+    var(--catppuccin-color-crust);
+  /* `currentColor` icons pick up the accent. */
+  color: var(--accent);
+}
+
+.skill-card__art .skill-svg-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  filter: drop-shadow(0 6px 10px rgb(0 0 0 / 0.35));
+  transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.skill-card[data-active] .skill-svg-container {
+  transform: scale(1.08);
+}
+
+.skill-card__art + ul {
+  margin-top: 0.625rem;
+}
+
+.skill-card__rules {
+  flex: 1;
+  min-height: 0;
+  margin: 0.625rem 0.75rem 0;
+  padding: 0.5rem 0.625rem;
+  overflow: hidden;
+  border-radius: 0.5rem;
+  border: 1px solid color-mix(in oklab, var(--catppuccin-color-surface0) 80%, transparent);
+  background: var(--panel);
+}
+
+.skill-card__rules:last-child {
+  margin-bottom: 0.75rem;
+}
+
+.skill-card__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.4375rem 0.875rem 0.5625rem;
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--catppuccin-color-subtext0);
+}
+
+.skill-card__rarity {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.skill-card__symbol {
+  letter-spacing: 0;
+  color: var(--catppuccin-color-overlay2);
+}
+
+.skill-card[data-rarity="holo"] .skill-card__symbol {
+  color: var(--accent);
+}
+
+.skill-card[data-rarity="radiant"] .skill-card__symbol,
+.skill-card[data-rarity="secret"] .skill-card__symbol {
+  background: linear-gradient(90deg, var(--rainbow));
+  background-clip: text;
+  color: transparent;
+}
+
+/* ── Card-wide glare (every card) ─────────────────────────────────────────── */
+
+.skill-card__glare {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(
+    farthest-corner circle at var(--pointer-x) var(--pointer-y),
+    rgb(255 255 255 / 0.28) 0%,
+    rgb(255 255 255 / 0.08) 28%,
+    transparent 60%
+  );
+  mix-blend-mode: overlay;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+
+.skill-card[data-active] .skill-card__glare {
+  opacity: 1;
+}
+
+/* ── Foils ────────────────────────────────────────────────────────────────── */
+
+/* Every foil fades between a resting and a lit opacity; tiers only set the
+   two numbers and the image. */
+.foil {
+  --foil-rest: 0;
+  --foil-lit: 0;
+
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: var(--foil-rest);
+  transition: opacity 0.35s ease;
+}
+
+.skill-card[data-active] .foil {
+  opacity: var(--foil-lit);
+}
+
+/* Art window, base: a silver sheen that sweeps across as the pointer moves.
+   Untiered cards get a faint version; uncommon gets it at full strength. */
+.foil--art {
+  --foil-lit: 0.45;
+
+  background: linear-gradient(
+    115deg,
+    transparent 30%,
+    rgb(255 255 255 / 0.4) 46%,
+    rgb(255 255 255 / 0.12) 52%,
+    transparent 64%
+  );
+  background-size: 250% 250%;
+  background-position: var(--pointer-x) var(--pointer-y);
+  mix-blend-mode: overlay;
+}
+
+.skill-card[data-rarity="uncommon"] .foil--art {
+  --foil-lit: 1;
+}
+
+/* Holo: a rainbow that drifts against the pointer, under a hotspot, broken
+   into soft vertical lines by its mask so it reads as foil, not paint. */
+.skill-card[data-rarity="holo"] .foil--art {
+  --foil-rest: 0.16;
+  --foil-lit: 0.7;
+
+  background-image:
+    radial-gradient(
+      farthest-corner circle at var(--pointer-x) var(--pointer-y),
+      rgb(255 255 255 / 0.45),
+      transparent 55%
+    ),
+    linear-gradient(110deg, var(--rainbow));
+  background-size:
+    100% 100%,
+    300% 300%;
+  background-position:
+    center,
+    calc(100% - var(--pointer-x)) calc(100% - var(--pointer-y));
+  mask-image: repeating-linear-gradient(90deg, #000 0 2px, rgb(0 0 0 / 0.72) 2px 4px);
+  mix-blend-mode: var(--foil-blend);
+}
+
+/* Radiant (and the secret card's window): the rainbow under a crosshatch of
+   bright lines that slides with the pointer, concentrated where the light
+   falls. */
+.skill-card[data-rarity="radiant"] .foil--art,
+.skill-card[data-rarity="secret"] .foil--art {
+  --foil-rest: 0.22;
+  --foil-lit: 0.85;
+
+  background-image:
+    repeating-linear-gradient(45deg, rgb(255 255 255 / 0.5) 0 1px, transparent 1px 6px),
+    repeating-linear-gradient(-45deg, rgb(255 255 255 / 0.5) 0 1px, transparent 1px 6px),
+    linear-gradient(135deg, var(--rainbow));
+  background-size:
+    200% 200%,
+    200% 200%,
+    300% 300%;
+  background-position:
+    var(--pointer-x) var(--pointer-y),
+    calc(100% - var(--pointer-x)) var(--pointer-y),
+    var(--pointer-x) var(--pointer-y);
+  mask-image: radial-gradient(
+    farthest-corner circle at var(--pointer-x) var(--pointer-y),
+    #000 15%,
+    rgb(0 0 0 / 0.4) 100%
+  );
+  mix-blend-mode: var(--foil-blend);
+}
+
+/* Secret: the whole face is foil — a diagonal rainbow laid along a fine
+   parallel hatch, with glitter that catches near the light. It sits under the
+   header and rules panels, which are translucent, so the foil shows through
+   the frame without ever running under text at full strength. */
+.foil--card {
+  --foil-rest: 0.14;
+  --foil-lit: 0.5;
+
+  z-index: 0;
+  background-image:
+    radial-gradient(circle, rgb(255 255 255 / 0.9) 0 0.6px, transparent 1.2px),
+    radial-gradient(circle, rgb(255 255 255 / 0.6) 0 0.5px, transparent 1px),
+    repeating-linear-gradient(45deg, rgb(255 255 255 / 0.2) 0 1px, transparent 1px 5px),
+    linear-gradient(45deg, var(--rainbow));
+  background-size:
+    9px 9px,
+    13px 13px,
+    100% 100%,
+    300% 300%;
+  background-position:
+    0 0,
+    5px 7px,
+    center,
+    var(--pointer-x) var(--pointer-y);
+  mask-image: radial-gradient(
+    farthest-corner circle at var(--pointer-x) var(--pointer-y),
+    #000 10%,
+    rgb(0 0 0 / 0.5) 100%
+  );
+  mix-blend-mode: var(--foil-blend);
+}
+
+/* ── Iridescent frame (radiant, secret) ───────────────────────────────────── */
+
+.skill-card[data-rarity="radiant"] .skill-card__face::after,
+.skill-card[data-rarity="secret"] .skill-card__face::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  padding: 1.5px;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(135deg, var(--rainbow));
+  background-size: 300% 300%;
+  background-position: var(--pointer-x) var(--pointer-y);
+  /* Punch out the content box so only the 1.5px ring paints. */
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+
+.skill-card[data-rarity="radiant"][data-active] .skill-card__face::after {
+  opacity: 0.9;
+}
+
+.skill-card[data-rarity="secret"] .skill-card__face::after {
+  opacity: 0.75;
+  animation: skill-card-frame 8s linear infinite;
+}
+
+.skill-card[data-rarity="secret"][data-active] .skill-card__face::after {
+  opacity: 1;
+  animation: none;
+}
+
+@keyframes skill-card-frame {
+  from {
+    background-position: 0% 50%;
+  }
+  to {
+    background-position: 300% 50%;
+  }
+}
+
+/* ── Latte ────────────────────────────────────────────────────────────────── */
+
+/* `screen` over a pale surface goes white, so foils multiply instead, at lower
+   strength; the panels are lightened so body text keeps its contrast where the
+   secret foil runs behind it. */
+.latte .skill-card {
+  --face-mix: 24%;
+  --panel: color-mix(in oklab, var(--catppuccin-color-base) 70%, transparent);
+  --foil-blend: multiply;
+  --shadow: 0 12px 28px -16px rgb(76 79 105 / 0.45);
+}
+
+.latte .skill-card__art {
+  background:
+    radial-gradient(
+      60% 85% at 50% 50%,
+      color-mix(in oklab, var(--tint) 28%, transparent),
+      transparent 75%
+    ),
+    var(--catppuccin-color-base);
+}
+
+.latte .skill-card__art .skill-svg-container {
+  filter: drop-shadow(0 4px 8px rgb(76 79 105 / 0.25));
+}
+
+.latte .skill-card[data-rarity="holo"] .foil--art {
+  --foil-rest: 0.12;
+  --foil-lit: 0.45;
+}
+
+.latte .skill-card[data-rarity="radiant"] .foil--art,
+.latte .skill-card[data-rarity="secret"] .foil--art {
+  --foil-rest: 0.14;
+  --foil-lit: 0.5;
+}
+
+.latte .foil--card {
+  --foil-rest: 0.08;
+  --foil-lit: 0.28;
+}
+
+.latte .skill-card__glare {
+  mix-blend-mode: soft-light;
+}
+
+/* ── Reduced motion ───────────────────────────────────────────────────────── */
+
+/* No tilt, no lift, no frame shimmer. The foils still light up on hover, they
+   just hold still. */
+@media (prefers-reduced-motion: reduce) {
+  .skill-card,
+  .skill-card__face,
+  .skill-card__glare,
+  .skill-card__art .skill-svg-container,
+  .foil {
+    transition: none;
+  }
+
+  .skill-card,
+  .skill-card[data-active] .skill-svg-container {
+    transform: none;
+  }
+
+  .skill-card[data-rarity] .skill-card__face::after {
+    transition: none;
+    animation: none;
+  }
+}

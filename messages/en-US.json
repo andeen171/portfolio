@@ -45,7 +45,14 @@
     "allCategories": "All",
     "noResults": "No skills match your search.",
     "previousSkills": "Previous skills",
-    "nextSkills": "Next skills"
+    "nextSkills": "Next skills",
+    "proficiency": {
+      "beginner": "Beginner",
+      "intermediate": "Intermediate",
+      "advanced": "Advanced",
+      "expert": "Expert"
+    },
+    "years": "{count, plural, one {# year} other {# years}}"
   },
   "projects": {
     "title": "Projects",

@@ -1,12 +1,9 @@
 /**
  * Skill rarity — maps the Sanity `proficiency` field onto trading-card rarity
- * tiers, borrowing the visual language of pokemon-cards-css and the OCG Secret
- * Rare effect.
+ * tiers. The visual treatments live in `src/styles/skill-card.css`, keyed off
+ * the card's `data-rarity` attribute.
  *
- * Skills with no `proficiency` set get no tier at all: the card renders in its
- * plain form. The published dataset has been fully patched with `proficiency`,
- * so this is a defensive default for future/draft documents rather than the
- * common case — keep "no tier" visually calm either way.
+ * Skills with no `proficiency` get no tier and render as a plain card.
  */
 
 export type Proficiency = 'beginner' | 'intermediate' | 'advanced' | 'expert';
@@ -14,10 +11,10 @@ export type Proficiency = 'beginner' | 'intermediate' | 'advanced' | 'expert';
 /**
  * Visual tiers, ordered from least to most eye-catching.
  *
- * - `uncommon` — a flare/glare that only shows on hover.
- * - `holo`     — rainbow + scanline holo, the classic Ultra Rare look.
- * - `radiant`  — the diagonal holographic banding of a Pokémon V card.
- * - `secret`   — OCG Secret Rare, applied to the whole card.
+ * - `uncommon` — a specular sheen on the art window, on interaction only.
+ * - `holo`     — a rainbow holofoil in the art window.
+ * - `radiant`  — a crosshatched, sparkling foil plus an iridescent frame.
+ * - `secret`   — the whole card is foil, and the frame shimmers at rest too.
  */
 export type RarityTier = 'uncommon' | 'holo' | 'radiant' | 'secret';
 
@@ -28,17 +25,19 @@ const TIER_BY_PROFICIENCY: Record<Proficiency, RarityTier> = {
   expert: 'secret',
 };
 
-/** Resolves a skill's rarity tier, or `undefined` when proficiency is unset. */
-export function rarityTier(proficiency?: string | null): RarityTier | undefined {
-  if (!proficiency) return undefined;
-  return TIER_BY_PROFICIENCY[proficiency as Proficiency];
+/** Set-symbol style marks, one per tier, shown next to the proficiency label. */
+export const RARITY_SYMBOL: Record<RarityTier, string> = {
+  uncommon: '◆',
+  holo: '★',
+  radiant: '★★',
+  secret: '★★★',
+};
+
+export function isProficiency(value?: string | null): value is Proficiency {
+  return !!value && value in TIER_BY_PROFICIENCY;
 }
 
-/**
- * Whether a tier's treatment covers the entire card rather than just the icon
- * window. Only Secret Rare goes card-wide — that's what makes it read as the
- * top of the ladder.
- */
-export function isCardWideTier(tier?: RarityTier): boolean {
-  return tier === 'secret';
+/** Resolves a skill's rarity tier, or `undefined` when proficiency is unset. */
+export function rarityTier(proficiency?: string | null): RarityTier | undefined {
+  return isProficiency(proficiency) ? TIER_BY_PROFICIENCY[proficiency] : undefined;
 }

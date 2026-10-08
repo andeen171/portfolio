@@ -67,7 +67,7 @@ export const skill = defineType({
       title: 'Years of Experience',
       type: 'number',
       description:
-        'Optional. Stored explicitly as null for skills where it does not apply (e.g. soft skills), so consumers must handle null. Reserved for future card metadata; nothing renders it yet.',
+        'Optional. Shown in the skill card footer. Stored explicitly as null where it does not apply (e.g. soft skills).',
       validation: (Rule) => Rule.integer().min(0).max(50),
     }),
     defineField({
