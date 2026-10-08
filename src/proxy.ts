@@ -4,6 +4,9 @@ export default createMiddleware({
   locales: ['en-US', 'pt-BR'],
   defaultLocale: 'en-US',
   localePrefix: 'as-needed', // Only adds prefix for non-default locale
+  // Pages declare their hreflang set in metadata (lib/metadata). The header
+  // version would repeat it, and also hand one to every 404.
+  alternateLinks: false,
 });
 
 export const config = {

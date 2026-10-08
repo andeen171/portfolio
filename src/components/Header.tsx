@@ -6,7 +6,7 @@ import { motion, useReducedMotion } from 'motion/react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useEffect, useId, useState } from 'react';
 import { PaletteShortcut } from '@/components/CommandPalette';
-import LanguageSelector, { LANGUAGES } from '@/components/LanguageSelector';
+import LanguageSelector, { LANGUAGES, useSwitchLocale } from '@/components/LanguageSelector';
 import ThemeSelector, { FlavorSwatch } from '@/components/ThemeSelector';
 import { Link, usePathname } from '@/i18n/routing';
 import { isActivePath, NAV_ITEMS } from '@/lib/navigation';
@@ -105,6 +105,7 @@ function MobileMenu({ pathname }: { pathname: string }) {
   const locale = useLocale();
   const flavor = useCtpStore((state) => state.flavor);
   const swapFlavor = useCtpStore((state) => state.swapFlavor);
+  const switchLocale = useSwitchLocale();
   const themeLabelId = useId();
   const languageLabelId = useId();
 
@@ -127,11 +128,14 @@ function MobileMenu({ pathname }: { pathname: string }) {
           </PopoverButton>
 
           {/* Anchored (portaled) so its backdrop blur samples the page, not
-              just the header's own blurred layer. */}
+              just the header's own blurred layer. On phones it spans the
+              page gutter edge to edge: the button pins its right edge 1rem
+              in, so 100vw-2rem leaves the same 1rem on the left and no
+              sliver of page text beside it. */}
           <PopoverPanel
             anchor="bottom end"
             transition
-            className="z-60 w-[min(22rem,calc(100vw-1.5rem))] origin-top-right rounded-2xl bg-ctp-mantle/90 p-2 shadow-2xl shadow-ctp-crust/40 ring-1 ring-ctp-surface1 backdrop-blur-xl transition duration-200 ease-out [--anchor-gap:0.75rem] data-closed:scale-95 data-closed:opacity-0 motion-reduce:transition-none motion-reduce:data-closed:scale-100 latte:shadow-ctp-overlay0/25"
+            className="z-60 w-[calc(100vw-2rem)] origin-top-right sm:w-88 rounded-2xl bg-ctp-mantle/90 p-2 shadow-2xl shadow-ctp-crust/40 ring-1 ring-ctp-surface1 backdrop-blur-xl transition duration-200 ease-out [--anchor-gap:0.75rem] data-closed:scale-95 data-closed:opacity-0 motion-reduce:transition-none motion-reduce:data-closed:scale-100 latte:shadow-ctp-overlay0/25"
           >
             {({ close }) => (
               <>
@@ -239,7 +243,15 @@ function MobileMenu({ pathname }: { pathname: string }) {
                             lang={language.code}
                             hrefLang={language.code}
                             replace
-                            onClick={() => close()}
+                            onClick={(event) => {
+                              close();
+                              // A real link for new tabs and no-JS; a plain
+                              // click switches in place, keeping the #section.
+                              if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey)
+                                return;
+                              event.preventDefault();
+                              switchLocale(language.code);
+                            }}
                             aria-current={current ? 'true' : undefined}
                             className={cn(
                               'flex items-center justify-between gap-2 rounded-xl px-3 py-2 text-sm transition-colors',

@@ -33,13 +33,15 @@ export default function SectionHeading({
         className
       )}
     >
-      <p className="text-sm font-semibold tracking-wide text-ctp-subtext0">
+      {/* Latte's muted tones and teal sit under 4.5:1 on its base, so each
+          step of the eyebrow moves one shade darker there. */}
+      <p className="text-sm font-semibold tracking-wide text-ctp-subtext0 latte:text-ctp-text">
         {index && (
-          <span aria-hidden className="mr-2 text-ctp-overlay1">
+          <span aria-hidden className="mr-2 text-ctp-overlay2 latte:text-ctp-subtext1">
             {index}
           </span>
         )}
-        <span aria-hidden className="text-ctp-teal">
+        <span aria-hidden className="text-ctp-teal latte:text-ctp-teal-800">
           ~/
         </span>
         {eyebrow}

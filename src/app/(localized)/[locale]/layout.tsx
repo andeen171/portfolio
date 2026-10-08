@@ -19,6 +19,12 @@ export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
 }
 
+// Any other first segment is not a locale. The proxy skips dotted paths, so
+// /apple-touch-icon.png would otherwise reach this layout as a "locale", whose
+// notFound() has no boundary above a root layout and turns into a bare 500;
+// unmatched, it gets app/global-not-found.tsx and a 404 instead.
+export const dynamicParams = false;
+
 export async function generateMetadata({ params }: Omit<Props, 'children'>): Promise<Metadata> {
   const { locale } = await params;
   if (!hasLocale(routing.locales, locale)) return {};

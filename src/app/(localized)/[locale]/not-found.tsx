@@ -17,18 +17,20 @@ function Line({ children }: { children: React.ReactNode }) {
   return <p className="wrap-anywhere">{children}</p>;
 }
 
+/** The hero's prompt, so the whole site is one shell session. */
 function Prompt() {
   return (
     <>
-      <span className="text-ctp-green">andeen@portfolio</span>
-      <span className="text-ctp-subtext0">:</span>
-      <span className="text-ctp-blue">~</span>
-      <span className="text-ctp-mauve">$</span>{' '}
+      <span className="text-ctp-green">anderson</span>
+      <span className="text-ctp-overlay1">@</span>
+      <span className="text-ctp-blue">arch</span> <span className="text-ctp-mauve">~</span>{' '}
+      <span className="text-ctp-teal">❯</span>{' '}
     </>
   );
 }
 
-// A client component so it can echo the path that was asked for.
+// Unmatched URLs get this view through app/global-not-found.tsx. A client
+// component so it can echo the path that was asked for.
 export default function NotFound() {
   const t = useTranslations('notFound');
   const pathname = usePathname();
@@ -49,8 +51,8 @@ export default function NotFound() {
           <span className="size-3 rounded-full bg-ctp-red/80" />
           <span className="size-3 rounded-full bg-ctp-yellow/80" />
           <span className="size-3 rounded-full bg-ctp-green/80" />
-          <span className="absolute inset-x-20 truncate text-center font-nf text-xs text-ctp-subtext0">
-            andeen@portfolio: ~
+          <span className="absolute inset-x-20 truncate text-center font-nf text-xs text-ctp-subtext0 latte:text-ctp-subtext1">
+            anderson@arch: ~
           </span>
         </div>
         <div className="space-y-1.5 p-5 font-nf text-sm leading-relaxed text-ctp-text sm:p-6">
@@ -73,13 +75,15 @@ export default function NotFound() {
         <Link
           href="/"
           className={cn(
-            'inline-flex items-center justify-center gap-2 rounded-full bg-ctp-lavender px-5 py-2.5 text-sm font-semibold text-ctp-base shadow-lg shadow-ctp-lavender/20 transition-colors hover:bg-ctp-teal',
+            // Latte's lavender and teal are too light under white text; their
+            // darker shades keep the hue at AA.
+            'inline-flex items-center justify-center gap-2 rounded-full bg-ctp-lavender px-5 py-2.5 text-sm font-semibold text-ctp-base shadow-lg shadow-ctp-lavender/20 transition-colors hover:bg-ctp-teal latte:bg-ctp-lavender-900 latte:hover:bg-ctp-blue-800',
             focusRing
           )}
         >
           <ArrowLeftIcon aria-hidden="true" className="size-4" />
           {t('home')}
-          <span aria-hidden="true" className="font-nf text-xs font-normal opacity-70">
+          <span aria-hidden="true" className="font-nf text-xs font-normal opacity-90">
             cd ~
           </span>
         </Link>
