@@ -131,7 +131,7 @@ const SkillItem: React.FC<{ skill: Skill }> = ({ skill }) => {
             if (event.target === event.currentTarget) closeDetail();
           }}
         >
-          <div className="flex w-full max-w-[24rem] flex-col items-end gap-3">
+          <div className="flex flex-col items-end gap-3">
             <button
               type="button"
               onClick={closeDetail}
@@ -143,6 +143,7 @@ const SkillItem: React.FC<{ skill: Skill }> = ({ skill }) => {
             <TiltCard
               active
               idle
+              touch="drag"
               data-rarity={tier}
               data-variant="detail"
               className="skill-card"
@@ -312,7 +313,8 @@ const SkillCardFace = ({
         </ul>
       )}
 
-      <div className="skill-card__rules">
+      {/* On the open card this box scrolls by touch, so it doesn't steer. */}
+      <div className="skill-card__rules" data-no-tilt={compact ? undefined : true}>
         {compact ? (
           // Fades out where the card ends rather than cutting a line in half;
           // the full text is one click away.

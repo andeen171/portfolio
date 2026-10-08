@@ -74,11 +74,23 @@
   width: 100%;
   max-width: 17rem;
   aspect-ratio: 5 / 7;
+  /* Hold the 5:7 frame: with the default `min-height: auto`, content taller
+     than the frame stretches the card instead of overflowing into the
+     (scrollable or faded) text box. */
+  min-height: 0;
   border-radius: 1rem;
   transform: perspective(900px) rotateX(var(--rotate-x)) rotateY(var(--rotate-y))
     scale(var(--scale));
   transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
   -webkit-tap-highlight-color: transparent;
+}
+
+/* On grid cards touch steering is press-and-hold then drag (TiltCard): keep
+   the long press from selecting text or opening the callout. The open detail
+   card stays selectable. */
+.skill-card:not([data-variant="detail"]) {
+  -webkit-touch-callout: none;
+  user-select: none;
 }
 
 .skill-card[data-active] {
@@ -514,30 +526,33 @@
 
 /* ── Detail card ──────────────────────────────────────────────────────────── */
 
-/* The card opened in the dialog: wider, and sized by its content instead of
-   the 5:7 frame, so the full description and every tag fit. A very long
-   description scrolls inside its own box. */
+/* The card opened in the dialog: the same 5:7 trading-card frame, just
+   larger — as large as fits the viewport (with room for the close button),
+   up to 24rem wide. The art window is a little shorter than on the compact
+   card to give the text more room, and a description longer than its box
+   scrolls inside it. */
 .skill-card[data-variant="detail"] {
   --scale: 1;
-  max-width: 24rem;
-  aspect-ratio: auto;
-}
-
-.skill-card[data-variant="detail"] .skill-card__face {
-  height: auto;
-  max-height: calc(100dvh - 6rem);
+  width: min(24rem, calc(100vw - 2rem), calc((100dvh - 7rem) * 5 / 7));
+  max-width: none;
+  /* Touch drags tilt the card (TiltCard `touch="drag"`)… */
+  touch-action: none;
 }
 
 .skill-card[data-variant="detail"] .skill-card__header {
   padding: 0.875rem 1rem 0.75rem;
 }
 
+.skill-card[data-variant="detail"] .skill-card__art {
+  aspect-ratio: 2.4 / 1;
+}
+
 .skill-card[data-variant="detail"] .skill-card__rules {
-  flex: 1 1 auto;
-  min-height: 3rem;
   overflow-y: auto;
   overscroll-behavior: contain;
   padding: 0.75rem 0.875rem;
+  /* …except in the text box, which keeps vertical scrolling. */
+  touch-action: pan-y;
 }
 
 /* With no mouse steering it, the detail card sways on its own so the foil
