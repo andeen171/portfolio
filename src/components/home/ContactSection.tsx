@@ -1,8 +1,8 @@
 import { ArrowUpRightIcon } from '@heroicons/react/20/solid';
 import { useTranslations } from 'next-intl';
 import SectionHeading from '@/components/ui/SectionHeading';
+import { SOCIALS } from '@/lib/social';
 import { cn } from '@/lib/utils';
-import { SOCIALS } from './socials';
 
 /** A shell prompt line; decorative, so the commands aren't read aloud. */
 function Prompt({
@@ -65,7 +65,7 @@ export default function ContactSection() {
           <span className="size-3 rounded-full bg-ctp-red/80" />
           <span className="size-3 rounded-full bg-ctp-yellow/80" />
           <span className="size-3 rounded-full bg-ctp-green/80" />
-          <span className="absolute inset-x-20 truncate text-center font-nf text-xs text-ctp-overlay1 latte:text-ctp-subtext0">
+          <span className="absolute inset-x-20 truncate text-center font-nf text-xs text-ctp-overlay1 latte:text-ctp-subtext1">
             anderson@arch: {cwd}
           </span>
         </div>
@@ -98,7 +98,7 @@ export default function ContactSection() {
                   {/* A row on phones, a small card from `sm` up. */}
                   <span className="min-w-0">
                     <span className="block font-semibold text-ctp-text">{name}</span>
-                    <span className="block truncate font-nf text-xs text-ctp-subtext0">
+                    <span className="block truncate font-nf text-xs text-ctp-subtext0 latte:text-ctp-subtext1">
                       {handle}
                     </span>
                     <span className="mt-1 block text-sm text-ctp-subtext1 sm:mt-4">

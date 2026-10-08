@@ -43,7 +43,7 @@ export default function TypedText({
     // typed.js treats the element's current text as the first string and
     // starts by backspacing it, so the server-rendered value hands over
     // seamlessly.
-    const typed = new Typed(element, {
+    const typed: Typed = new Typed(element, {
       strings: key.split('\u0000'),
       typeSpeed,
       backSpeed,
@@ -52,6 +52,15 @@ export default function TypedText({
       loop: true,
       smartBackspace: true,
       contentType: 'null',
+      // typed.js keeps that starting backspace position for good, so each
+      // time the loop wraps it "erases" `initial` from one character short of
+      // its end: the text jumps straight to it minus a letter instead of being
+      // typed. Rewinding makes `initial` type out (and hold) every cycle. The
+      // callback is invoked without the instance its typings promise, hence
+      // the closure.
+      onLastStringBackspaced: () => {
+        typed.strPos = 0;
+      },
     });
     return () => {
       typed.destroy();

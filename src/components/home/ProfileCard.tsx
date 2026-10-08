@@ -76,7 +76,7 @@ export default function ProfileCard({
           <p className="text-sm text-ctp-subtext1 italic">“{flavor}”</p>
         </div>
 
-        <div className="flex items-center justify-between gap-3 px-1 font-nf text-[0.625rem] tracking-wider text-ctp-overlay1 uppercase latte:text-ctp-subtext0">
+        <div className="flex items-center justify-between gap-3 px-1 font-nf text-[0.625rem] tracking-wider text-ctp-overlay1 uppercase latte:text-ctp-subtext1">
           <span className="truncate">{origin}</span>
           <span className="shrink-0 normal-case">{handle}</span>
         </div>
