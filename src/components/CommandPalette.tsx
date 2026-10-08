@@ -78,7 +78,7 @@ export function PaletteShortcut({ className }: { className?: string }) {
 
 /* ── Matching ──────────────────────────────────────────────────────────── */
 
-/** Lowercase without accents, so "experiencias" finds "Experiências". */
+/** Lowercase without accents, so "experiencia" finds "Experiência". */
 function normalize(text: string) {
   return text.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
 }
