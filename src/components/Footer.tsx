@@ -23,8 +23,8 @@ const SOCIAL_ACCENTS = {
 
 function ColumnTitle({ id, children }: { id: string; children: ReactNode }) {
   return (
-    <h2 id={id} className="font-nf text-xs font-semibold text-ctp-subtext0">
-      <span aria-hidden="true" className="text-ctp-teal">
+    <h2 id={id} className="font-nf text-xs font-semibold text-ctp-subtext0 latte:text-ctp-subtext1">
+      <span aria-hidden="true" className="text-ctp-teal latte:text-ctp-teal-800">
         ~/
       </span>
       {children}
@@ -47,6 +47,9 @@ const Footer: React.FC = () => {
   return (
     // No backdrop blur: over the full-width sky it leaves light seams down
     // both edges on latte; a denser fill does the same job.
+    //
+    // Latte's subtext0 and peach miss 4.5:1 on this fill; the small print
+    // steps up to subtext1 and the deepest peach there.
     <footer className="relative mt-16 border-t border-ctp-surface0/80 bg-ctp-mantle/80 sm:mt-24">
       {/* A teal → lavender horizon along the top edge. */}
       <div
@@ -61,7 +64,10 @@ const Footer: React.FC = () => {
       <div className="relative mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         {/* The motto, served the way a terminal serves wisdom. */}
         <figure className="mx-auto max-w-3xl py-16 text-center sm:py-20">
-          <p aria-hidden="true" className="font-nf text-xs text-ctp-subtext0">
+          <p
+            aria-hidden="true"
+            className="font-nf text-xs text-ctp-subtext0 latte:text-ctp-subtext1"
+          >
             <span className="text-ctp-mauve">~</span> <span className="text-ctp-teal">❯</span>{' '}
             fortune
           </p>
@@ -76,7 +82,7 @@ const Footer: React.FC = () => {
               </span>
             </p>
           </blockquote>
-          <figcaption className="mt-4 font-nf text-sm text-ctp-subtext0">
+          <figcaption className="mt-4 font-nf text-sm text-ctp-subtext0 latte:text-ctp-subtext1">
             — Anderson Lopes, 2022
           </figcaption>
         </figure>
@@ -96,7 +102,9 @@ const Footer: React.FC = () => {
             </p>
 
             <div className="mt-6">
-              <p className="font-nf text-xs text-ctp-subtext0">{t('paletteTip')}</p>
+              <p className="font-nf text-xs text-ctp-subtext0 latte:text-ctp-subtext1">
+                {t('paletteTip')}
+              </p>
               <button
                 type="button"
                 onClick={() => setOpen(true)}
@@ -166,7 +174,7 @@ const Footer: React.FC = () => {
                       <span className="text-ctp-subtext1 transition-colors group-hover:text-ctp-text">
                         {name}
                       </span>
-                      <span className="min-w-0 truncate font-nf text-xs text-ctp-subtext0">
+                      <span className="min-w-0 truncate font-nf text-xs text-ctp-subtext0 latte:text-ctp-subtext1">
                         {handle}
                       </span>
                       <ArrowUpRightIcon
@@ -182,7 +190,7 @@ const Footer: React.FC = () => {
           </section>
         </div>
 
-        <div className="flex flex-col gap-4 border-t border-ctp-surface0/80 py-6 font-nf text-xs text-ctp-subtext0 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-4 border-t border-ctp-surface0/80 py-6 font-nf text-xs text-ctp-subtext0 sm:flex-row sm:items-center sm:justify-between latte:text-ctp-subtext1">
           <p>
             {/* The year is rendered at build time; a client in a new year may differ. */}
             <span suppressHydrationWarning>
@@ -193,7 +201,9 @@ const Footer: React.FC = () => {
             <p>
               {t.rich('builtWith', {
                 next: (chunks) => <span className="text-ctp-text">{chunks}</span>,
-                sanity: (chunks) => <span className="text-ctp-peach">{chunks}</span>,
+                sanity: (chunks) => (
+                  <span className="text-ctp-peach latte:text-ctp-peach-900">{chunks}</span>
+                ),
                 ctp: (chunks) => <span className="text-ctp-mauve">{chunks}</span>,
               })}
             </p>
@@ -201,7 +211,7 @@ const Footer: React.FC = () => {
               type="button"
               onClick={scrollToTop}
               className={cn(
-                'inline-flex shrink-0 items-center gap-1 rounded-md px-1.5 py-1 text-ctp-subtext0 transition-colors hover:text-ctp-text',
+                'inline-flex shrink-0 items-center gap-1 rounded-md px-1.5 py-1 text-ctp-subtext0 transition-colors hover:text-ctp-text latte:text-ctp-subtext1',
                 focusRing
               )}
             >

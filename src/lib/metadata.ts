@@ -22,7 +22,11 @@ export function alternatesFor(locale: AppLocale, href: string): Metadata['altern
   };
 }
 
-/** Open Graph fields every route shares; images come from opengraph-image.tsx. */
+/**
+ * Open Graph fields every route shares. Images come from the opengraph-image.tsx
+ * file convention, which only fills a segment's own openGraph/twitter: each
+ * sub-page folder re-exports the locale's card for that reason.
+ */
 export async function baseOpenGraph(locale: AppLocale) {
   const t = await getTranslations({ locale, namespace: 'meta' });
   return {
@@ -41,7 +45,9 @@ type Page = 'skills' | 'projects' | 'experiences';
  * Metadata for a sub-page: a localized title (the layout's template adds
  * " · Anderson Lopes"), description, its own canonical/hreflang links and
  * Open Graph. Pages must set these themselves, since a page that doesn't
- * inherits the home page's canonical from the layout.
+ * inherits the home page's canonical from the layout. Setting openGraph and
+ * twitter here drops the layout's share image, so the page's folder needs its
+ * own opengraph-image.tsx (a re-export of [locale]/opengraph-image).
  *
  *   export async function generateMetadata({ params }) {
  *     const { locale } = await params;

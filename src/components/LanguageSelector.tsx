@@ -3,9 +3,10 @@
 import { Listbox, ListboxButton, ListboxOption, ListboxOptions } from '@headlessui/react';
 import { CheckIcon } from '@heroicons/react/20/solid';
 import { LanguageIcon } from '@heroicons/react/24/outline';
+import { useRouter } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
-import { useTransition } from 'react';
-import { usePathname, useRouter } from '@/i18n/routing';
+import { useCallback, useTransition } from 'react';
+import { getPathname, usePathname } from '@/i18n/routing';
 
 /** Each language named in itself, as a visitor looking for theirs expects. */
 export const LANGUAGES = [
@@ -13,18 +14,36 @@ export const LANGUAGES = [
   { code: 'pt-BR', label: 'Português', short: 'PT' },
 ] as const;
 
+/**
+ * Switches language in place, keeping the ?query and #section the visitor is
+ * on: next-intl's router serializes only the path, so a reader at #contact
+ * would land back at the top. Like that router, it updates the locale cookie
+ * itself, since the router cache may skip the request that would.
+ */
+export function useSwitchLocale() {
+  const router = useRouter();
+  const pathname = usePathname();
+
+  return useCallback(
+    (locale: string) => {
+      // biome-ignore lint/suspicious/noDocumentCookie: the same write next-intl's router makes; the Cookie Store API isn't in every browser yet
+      document.cookie = `NEXT_LOCALE=${locale}; path=/; samesite=lax`;
+      const { search, hash } = window.location;
+      router.replace(`${getPathname({ locale, href: pathname })}${search}${hash}`);
+    },
+    [router, pathname]
+  );
+}
+
 const LanguageSelector: React.FC = () => {
   const t = useTranslations('navigation');
-  const router = useRouter();
+  const switchLocale = useSwitchLocale();
   const [, startTransition] = useTransition();
-  const pathname = usePathname();
   const locale = useLocale();
   const current = LANGUAGES.find((language) => language.code === locale) ?? LANGUAGES[0];
 
   const switchLanguage = (newLocale: string) => {
-    startTransition(() => {
-      router.replace({ pathname }, { locale: newLocale });
-    });
+    startTransition(() => switchLocale(newLocale));
   };
 
   return (

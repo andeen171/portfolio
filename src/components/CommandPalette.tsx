@@ -30,7 +30,7 @@ import {
   useState,
   useSyncExternalStore,
 } from 'react';
-import { LANGUAGES } from '@/components/LanguageSelector';
+import { LANGUAGES, useSwitchLocale } from '@/components/LanguageSelector';
 import { FlavorSwatch } from '@/components/ThemeSelector';
 import { getPathname, usePathname, useRouter } from '@/i18n/routing';
 import { NAV_ITEMS, type NavKey } from '@/lib/navigation';
@@ -56,7 +56,7 @@ export function Kbd({ children, className }: { children: ReactNode; className?: 
   return (
     <kbd
       className={cn(
-        'inline-flex h-5 min-w-5 items-center justify-center rounded-md bg-ctp-surface0/80 px-1.5 font-nf text-[0.7rem] leading-none font-medium text-ctp-subtext1 shadow-[inset_0_-1px_0] shadow-ctp-surface2/60 ring-1 ring-ctp-surface1',
+        'inline-flex h-5 min-w-5 items-center justify-center rounded-md bg-ctp-surface0/80 px-1.5 font-nf text-[0.7rem] leading-none font-medium text-ctp-subtext1 shadow-[inset_0_-1px_0] shadow-ctp-surface2/60 ring-1 ring-ctp-surface1 latte:text-ctp-text',
         className
       )}
     >
@@ -158,7 +158,10 @@ function Highlighted({ text, indices }: { text: string; indices: number[] }) {
     <>
       {runs.map((run) =>
         run.hit ? (
-          <mark key={run.start} className="bg-transparent font-semibold text-ctp-lavender">
+          <mark
+            key={run.start}
+            className="bg-transparent font-semibold text-ctp-lavender latte:text-ctp-lavender-900"
+          >
             {run.text}
           </mark>
         ) : (
@@ -189,8 +192,8 @@ interface Command {
   /**
    * `now` runs inside the keypress/click: snappy, and pop-ups and the
    * clipboard need that user gesture. `afterClose` waits until the dialog has
-   * closed and handed focus back, so the focus a section jump moves isn't
-   * pulled back to the trigger.
+   * unmounted and handed focus back to its trigger, so the focus a section
+   * jump moves isn't pulled back there.
    */
   timing: 'now' | 'afterClose';
   perform: () => void;
@@ -224,6 +227,18 @@ function IconTile({ children }: { children: ReactNode }) {
   );
 }
 
+/**
+ * Calls `run` when it unmounts. Rendered inside the dialog, it unmounts in the
+ * same commit as Headless UI's focus trap, whose focus restore is a microtask
+ * queued from that unmount; a timeout queued alongside it always runs after.
+ */
+function OnUnmount({ run }: { run: () => void }) {
+  const latest = useRef(run);
+  latest.current = run;
+  useEffect(() => () => latest.current(), []);
+  return null;
+}
+
 function iconTile(Icon: ComponentType<{ className?: string }>) {
   return (
     <IconTile>
@@ -241,6 +256,7 @@ const CommandPalette: React.FC = () => {
   const pathname = usePathname();
   const router = useRouter();
   const nextRouter = useNextRouter();
+  const switchLocale = useSwitchLocale();
   const flavor = useCtpStore((state) => state.flavor);
   const swapFlavor = useCtpStore((state) => state.swapFlavor);
   const open = useCommandPalette((state) => state.open);
@@ -262,6 +278,9 @@ const CommandPalette: React.FC = () => {
       if (event.key.toLowerCase() !== 'k' || event.altKey || event.shiftKey) return;
       if (!(event.metaKey || event.ctrlKey) || event.isComposing) return;
       event.preventDefault();
+      // A native modal (a skill card's <dialog>) holds the top layer and makes
+      // the page inert: the palette would open beneath it, unreachable.
+      if (document.querySelector('dialog:modal')) return;
       toggle();
     };
     window.addEventListener('keydown', onKeyDown);
@@ -372,7 +391,7 @@ const CommandPalette: React.FC = () => {
       hint: language.code,
       current: locale === language.code,
       timing: 'now',
-      perform: () => router.replace(pathname, { locale: language.code }),
+      perform: () => switchLocale(language.code),
     }));
 
     const socials: Command[] = SOCIAL_IDS.map((id) => {
@@ -404,7 +423,18 @@ const CommandPalette: React.FC = () => {
     ];
 
     return [...pages, ...sections, ...themes, ...languages, ...socials, ...actions];
-  }, [t, tNav, pathname, router, scrollToSection, flavor, swapFlavor, locale, copyLink]);
+  }, [
+    t,
+    tNav,
+    pathname,
+    router,
+    scrollToSection,
+    flavor,
+    swapFlavor,
+    locale,
+    switchLocale,
+    copyLink,
+  ]);
 
   // Filtered, grouped in a fixed order, best match first within a group.
   // `index` is the row's place in the flat list the arrow keys walk.
@@ -455,12 +485,15 @@ const CommandPalette: React.FC = () => {
   };
 
   const afterLeave = () => {
-    const perform = pending.current;
-    pending.current = null;
     setQuery('');
     setActiveIndex(0);
-    // A frame later, once the dialog has handed focus back to its trigger.
-    if (perform) requestAnimationFrame(perform);
+  };
+
+  // An `afterClose` command, once the dialog is gone and focus is restored.
+  const runPending = () => {
+    const perform = pending.current;
+    pending.current = null;
+    if (perform) window.setTimeout(perform, 0);
   };
 
   return (
@@ -479,6 +512,7 @@ const CommandPalette: React.FC = () => {
               <DialogPanel className="mx-auto w-full max-w-xl overflow-hidden rounded-2xl bg-ctp-base/90 shadow-2xl shadow-ctp-crust/60 ring-1 ring-ctp-surface1 backdrop-blur-xl transition duration-200 ease-out data-leave:duration-150 data-leave:ease-in data-closed:translate-y-2 data-closed:scale-[0.98] data-closed:opacity-0 motion-reduce:transition-none motion-reduce:data-closed:translate-y-0 motion-reduce:data-closed:scale-100 latte:shadow-ctp-overlay0/25">
                 <DialogTitle className="sr-only">{t('title')}</DialogTitle>
                 <Description className="sr-only">{t('description')}</Description>
+                <OnUnmount run={runPending} />
 
                 {/* Window chrome */}
                 <div className="relative flex items-center gap-2 border-b border-ctp-surface0 bg-ctp-mantle/80 px-4 py-2.5">
@@ -487,14 +521,14 @@ const CommandPalette: React.FC = () => {
                   <span aria-hidden="true" className="size-3 rounded-full bg-ctp-green/80" />
                   <span
                     aria-hidden="true"
-                    className="pointer-events-none absolute inset-x-24 truncate text-center font-nf text-xs text-ctp-subtext0"
+                    className="pointer-events-none absolute inset-x-24 truncate text-center font-nf text-xs text-ctp-subtext0 latte:text-ctp-subtext1"
                   >
-                    andeen@portfolio: ~
+                    anderson@arch: ~
                   </span>
                   <button
                     type="button"
                     onClick={() => setOpen(false)}
-                    className="ml-auto inline-flex items-center rounded-md px-1.5 py-1 font-nf text-[0.7rem] text-ctp-subtext0 transition-colors hover:bg-ctp-surface0 hover:text-ctp-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ctp-lavender"
+                    className="ml-auto inline-flex items-center rounded-md px-1.5 py-1 font-nf text-[0.7rem] text-ctp-subtext0 transition-colors hover:bg-ctp-surface0 hover:text-ctp-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ctp-lavender latte:text-ctp-subtext1"
                   >
                     <span aria-hidden="true" className="hidden sm:inline">
                       esc
@@ -506,11 +540,15 @@ const CommandPalette: React.FC = () => {
 
                 {/* Prompt */}
                 <div className="flex items-center gap-2.5 border-b border-ctp-surface0 px-4 py-3.5 font-nf text-sm sm:text-base">
+                  {/* The hero's prompt; user@host gives way to the query on phones. */}
                   <span aria-hidden="true" className="shrink-0 select-none">
-                    <span className="hidden text-ctp-green sm:inline">andeen@portfolio</span>
-                    <span className="hidden text-ctp-subtext0 sm:inline">:</span>
-                    <span className="text-ctp-blue">~</span>
-                    <span className="text-ctp-mauve">$</span>
+                    <span className="hidden sm:inline">
+                      <span className="text-ctp-green">anderson</span>
+                      <span className="text-ctp-overlay1">@</span>
+                      <span className="text-ctp-blue">arch</span>{' '}
+                    </span>
+                    <span className="text-ctp-mauve">~</span>{' '}
+                    <span className="text-ctp-teal">❯</span>
                   </span>
                   <input
                     ref={inputRef}
@@ -518,7 +556,7 @@ const CommandPalette: React.FC = () => {
                     type="text"
                     role="combobox"
                     aria-label={t('inputLabel')}
-                    aria-expanded="true"
+                    aria-expanded={flat.length > 0}
                     aria-controls={listId}
                     aria-autocomplete="list"
                     aria-activedescendant={activeId}
@@ -538,102 +576,104 @@ const CommandPalette: React.FC = () => {
                   />
                 </div>
 
-                {/* Results */}
+                {/* Results. Kept mounted (the input's aria-controls points here)
+                    but hidden when nothing matches: a listbox may only hold
+                    options, so the empty state is its sibling. */}
                 <div
                   id={listId}
                   role="listbox"
                   aria-label={t('title')}
+                  hidden={flat.length === 0}
                   className="max-h-[min(26rem,56vh)] scroll-py-2 overflow-y-auto overscroll-contain p-2"
                 >
-                  {flat.length === 0 ? (
-                    <div className="px-3 py-8 font-nf text-sm">
-                      <p className="wrap-anywhere text-ctp-text">
-                        <span className="text-ctp-red">zsh: </span>
-                        {t('notFound', { query: query.trim() })}
-                      </p>
-                      <p className="mt-2 text-ctp-subtext0">{t('notFoundHint')}</p>
-                    </div>
-                  ) : (
-                    groups.map(({ group, items }) => (
-                      // biome-ignore lint/a11y/useSemanticElements: the ARIA listbox pattern groups options with role="group"; a fieldset isn't allowed there
+                  {groups.map(({ group, items }) => (
+                    // biome-ignore lint/a11y/useSemanticElements: the ARIA listbox pattern groups options with role="group"; a fieldset isn't allowed there
+                    <div
+                      key={group}
+                      role="group"
+                      aria-labelledby={`${baseId}-group-${group}`}
+                      className="pb-1 last:pb-0"
+                    >
                       <div
-                        key={group}
-                        role="group"
-                        aria-labelledby={`${baseId}-group-${group}`}
-                        className="pb-1 last:pb-0"
+                        id={`${baseId}-group-${group}`}
+                        className="px-3 pt-2.5 pb-1.5 font-nf text-[0.7rem] font-medium tracking-wide text-ctp-subtext0 latte:text-ctp-subtext1"
                       >
-                        <div
-                          id={`${baseId}-group-${group}`}
-                          className="px-3 pt-2.5 pb-1.5 font-nf text-[0.7rem] font-medium tracking-wide text-ctp-subtext0"
-                        >
-                          <span aria-hidden="true" className="text-ctp-overlay1">
-                            #{' '}
-                          </span>
-                          {t(`groups.${group}`)}
-                        </div>
-                        {items.map(({ command, match, index }) => {
-                          const active = index === activeIndex;
-                          return (
-                            // biome-ignore lint/a11y/useKeyWithClickEvents: the combobox input owns the keyboard (arrows + Enter)
-                            <div
-                              key={command.id}
-                              id={optionId(index)}
-                              role="option"
-                              aria-selected={active}
-                              tabIndex={-1}
-                              onMouseMove={() => {
-                                if (!active) setActiveIndex(index);
-                              }}
-                              // Keep focus in the input when picking with the mouse.
-                              onMouseDown={(event) => event.preventDefault()}
-                              onClick={() => run(command)}
+                        <span aria-hidden="true" className="text-ctp-overlay1">
+                          #{' '}
+                        </span>
+                        {t(`groups.${group}`)}
+                      </div>
+                      {items.map(({ command, match, index }) => {
+                        const active = index === activeIndex;
+                        return (
+                          // biome-ignore lint/a11y/useKeyWithClickEvents: the combobox input owns the keyboard (arrows + Enter)
+                          <div
+                            key={command.id}
+                            id={optionId(index)}
+                            role="option"
+                            aria-selected={active}
+                            tabIndex={-1}
+                            onMouseMove={() => {
+                              if (!active) setActiveIndex(index);
+                            }}
+                            // Keep focus in the input when picking with the mouse.
+                            onMouseDown={(event) => event.preventDefault()}
+                            onClick={() => run(command)}
+                            className={cn(
+                              'relative flex cursor-pointer items-center gap-3 rounded-xl py-2 pr-3 pl-6 text-sm',
+                              active
+                                ? 'bg-ctp-surface0/80 text-ctp-text ring-1 ring-ctp-surface1/80'
+                                : 'text-ctp-subtext1'
+                            )}
+                          >
+                            <span
+                              aria-hidden="true"
                               className={cn(
-                                'relative flex cursor-pointer items-center gap-3 rounded-xl py-2 pr-3 pl-6 text-sm',
-                                active
-                                  ? 'bg-ctp-surface0/80 text-ctp-text ring-1 ring-ctp-surface1/80'
-                                  : 'text-ctp-subtext1'
+                                'absolute left-2 font-nf text-xs text-ctp-lavender',
+                                !active && 'invisible'
                               )}
                             >
-                              <span
+                              ❯
+                            </span>
+                            {command.icon}
+                            <span className="min-w-0 flex-1 truncate">
+                              <Highlighted text={command.label} indices={match.indices} />
+                              {command.external && <span className="sr-only">, {t('newTab')}</span>}
+                            </span>
+                            {command.current && (
+                              <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-ctp-green/15 px-2 py-0.5 font-nf text-[0.65rem] font-medium text-ctp-green ring-1 ring-ctp-green/30 latte:text-ctp-green-900">
+                                <CheckIcon aria-hidden="true" className="size-3" />
+                                {t('current')}
+                              </span>
+                            )}
+                            {command.hint && (
+                              <span className="hidden shrink-0 font-nf text-xs text-ctp-subtext0 sm:inline latte:text-ctp-subtext1">
+                                {command.hint}
+                              </span>
+                            )}
+                            {command.external && (
+                              <ArrowUpRightIcon
                                 aria-hidden="true"
-                                className={cn(
-                                  'absolute left-2 font-nf text-xs text-ctp-lavender',
-                                  !active && 'invisible'
-                                )}
-                              >
-                                ❯
-                              </span>
-                              {command.icon}
-                              <span className="min-w-0 flex-1 truncate">
-                                <Highlighted text={command.label} indices={match.indices} />
-                                {command.external && (
-                                  <span className="sr-only">, {t('newTab')}</span>
-                                )}
-                              </span>
-                              {command.current && (
-                                <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-ctp-green/15 px-2 py-0.5 font-nf text-[0.65rem] font-medium text-ctp-green ring-1 ring-ctp-green/30">
-                                  <CheckIcon aria-hidden="true" className="size-3" />
-                                  {t('current')}
-                                </span>
-                              )}
-                              {command.hint && (
-                                <span className="hidden shrink-0 font-nf text-xs text-ctp-subtext0 sm:inline">
-                                  {command.hint}
-                                </span>
-                              )}
-                              {command.external && (
-                                <ArrowUpRightIcon
-                                  aria-hidden="true"
-                                  className="size-4 shrink-0 text-ctp-overlay1"
-                                />
-                              )}
-                            </div>
-                          );
-                        })}
-                      </div>
-                    ))
-                  )}
+                                className="size-4 shrink-0 text-ctp-overlay1"
+                              />
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  ))}
                 </div>
+                {flat.length === 0 && (
+                  <div className="px-5 py-10 font-nf text-sm">
+                    <p className="wrap-anywhere text-ctp-text">
+                      <span className="text-ctp-red">zsh: </span>
+                      {t('notFound', { query: query.trim() })}
+                    </p>
+                    <p className="mt-2 text-ctp-subtext0 latte:text-ctp-subtext1">
+                      {t('notFoundHint')}
+                    </p>
+                  </div>
+                )}
 
                 {/* Announces the filtered count to screen readers. */}
                 <p aria-live="polite" className="sr-only">
@@ -643,7 +683,7 @@ const CommandPalette: React.FC = () => {
                 {/* Key legend, for keyboards */}
                 <div
                   aria-hidden="true"
-                  className="hidden items-center gap-4 border-t border-ctp-surface0 bg-ctp-mantle/60 px-4 py-2.5 font-nf text-[0.7rem] text-ctp-subtext0 sm:flex"
+                  className="hidden items-center gap-4 border-t border-ctp-surface0 bg-ctp-mantle/60 px-4 py-2.5 font-nf text-[0.7rem] text-ctp-subtext0 sm:flex latte:text-ctp-subtext1"
                 >
                   <span className="inline-flex items-center gap-1.5">
                     <Kbd>↑</Kbd>

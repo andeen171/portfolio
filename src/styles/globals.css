@@ -138,8 +138,10 @@ body::-webkit-scrollbar {
   @apply w-60 font-bold text-transparent;
 }
 
+/* On latte the stock teal and lavender read at 3.3:1 and 2.8:1 on the base;
+   their deep shades keep the same sweep above 4.5:1, small text included. */
 .animated-gradient-text {
-  @apply animate-colorchange bg-linear-to-r from-ctp-teal via-ctp-lavender to-ctp-teal bg-clip-text text-transparent motion-reduce:animate-none;
+  @apply animate-colorchange bg-linear-to-r from-ctp-teal via-ctp-lavender to-ctp-teal bg-clip-text text-transparent motion-reduce:animate-none latte:from-ctp-teal-800 latte:via-ctp-lavender-900 latte:to-ctp-teal-800;
 }
 
 .nf {
