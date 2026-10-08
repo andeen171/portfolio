@@ -156,6 +156,16 @@ export default function ProjectCover({
     'relative isolate aspect-video overflow-hidden bg-ctp-crust lg:aspect-auto lg:h-full lg:min-h-64',
     className
   );
+  // The generated art holds 16:9 as a floor rather than a fixed size: a
+  // `::before` spacer sets the ratio and the content shares its grid cell, so
+  // a long name that wraps on a phone grows the frame instead of slicing the
+  // logo row off at the bottom. `grid-cols-1` pins the column to the frame's
+  // width; an auto column would let the spacer turn that extra height back
+  // into width.
+  const generatedFrame = cn(
+    "relative isolate grid grid-cols-1 overflow-hidden bg-ctp-crust before:aspect-video before:content-[''] before:[grid-area:1/1] lg:block lg:h-full lg:min-h-64 lg:before:hidden",
+    className
+  );
 
   if (image) {
     const src = urlFor(image).width(960).height(540).fit('crop').auto('format').url();
@@ -194,14 +204,14 @@ export default function ProjectCover({
   const scope = `cover-${hash(seed).toString(36)}`;
 
   return (
-    <div aria-hidden className={frame} style={meshStyle(seed)}>
+    <div aria-hidden className={generatedFrame} style={meshStyle(seed)}>
       <div className="absolute inset-0" style={GRID} />
       <div
         className="absolute inset-0 opacity-[0.14] mix-blend-overlay"
         style={{ backgroundImage: NOISE }}
       />
 
-      <div className="relative flex h-full flex-col justify-between gap-4 p-5 sm:p-6">
+      <div className="relative flex flex-col justify-between gap-4 p-5 [grid-area:1/1] sm:p-6 lg:h-full">
         <div className="flex min-w-0 items-center gap-1.5">
           <span className="size-2.5 shrink-0 rounded-full bg-ctp-red/80" />
           <span className="size-2.5 shrink-0 rounded-full bg-ctp-yellow/80" />

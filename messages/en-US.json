@@ -4,7 +4,7 @@
     "about": "About",
     "skills": "Skills",
     "projects": "Projects",
-    "experiences": "Experiences",
+    "experiences": "Experience",
     "contact": "Contact",
     "primary": "Main",
     "homeLink": "Anderson Lopes, home",
@@ -137,8 +137,8 @@
     "empty": "No projects here yet."
   },
   "experiences": {
-    "title": "Experiences",
-    "eyebrow": "experience",
+    "title": "Experience",
+    "eyebrow": "experiences",
     "subtitle": "Where I've worked",
     "lede": "Two startups co-founded, an edtech platform, a microservices migration in travel tech and, today, payments at PicPay.",
     "seeMore": "See the full journey",
