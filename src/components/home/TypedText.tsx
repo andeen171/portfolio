@@ -38,11 +38,12 @@ export default function TypedText({
   const key = strings.join('\u0000');
 
   useEffect(() => {
-    if (reduceMotion || !textRef.current) return;
+    const element = textRef.current;
+    if (reduceMotion || !element) return;
     // typed.js treats the element's current text as the first string and
     // starts by backspacing it, so the server-rendered value hands over
     // seamlessly.
-    const typed = new Typed(textRef.current, {
+    const typed = new Typed(element, {
       strings: key.split('\u0000'),
       typeSpeed,
       backSpeed,
@@ -52,8 +53,14 @@ export default function TypedText({
       smartBackspace: true,
       contentType: 'null',
     });
-    return () => typed.destroy();
-  }, [key, reduceMotion, typeSpeed, backSpeed, backDelay]);
+    return () => {
+      typed.destroy();
+      // destroy() empties the element. Put the initial text back so a re-run
+      // (new strings after a locale switch, Strict Mode's remount) starts
+      // from it again instead of from a blank line.
+      element.textContent = initial;
+    };
+  }, [initial, key, reduceMotion, typeSpeed, backSpeed, backDelay]);
 
   const longest = [initial, ...strings].reduce((a, b) => (b.length > a.length ? b : a));
 

@@ -28,7 +28,7 @@
   "contact": {
     "eyebrow": "contato",
     "title": "Bora trocar uma ideia?",
-    "invite": "Pagamentos, transações distribuídas, um monólito querendo virar microsserviços ou uma side quest em Rust: se é um problema difícil de backend, eu quero ouvir.",
+    "invite": "Pagamentos, transações distribuídas, um monólito querendo virar microsserviços ou uma side quest em Rust: se é um problema cabeludo de backend, quero saber.",
     "channels": "Onde me encontrar",
     "linkedin": "O melhor para falar de trabalho",
     "github": "Onde o código mora",
@@ -38,7 +38,7 @@
   "about": {
     "eyebrow": "sobre",
     "title": "A pessoa por trás dos commits",
-    "description": "Sou o Anderson, desenvolvedor autodidata de Belo Horizonte. Vivo principalmente no backend, onde um bug não é um botão torto: é um número errado no saldo de alguém. Desde 2024 trabalho com pagamentos no PicPay pela Onebrain: primeiro no Débito Automático, hoje no time do Assistente de Pagamentos (DDA), onde cuido de vários microsserviços em PHP, Hyperf e Go.\n\nAntes, na Onfly, migrei um monólito PHP para microsserviços em Hyperf e construí um gerenciador de transações distribuídas próprio, para que compra de passagens aéreas, pagamentos e saldo interno fossem confirmados ou desfeitos juntos. Antes disso, cofundei duas startups, a Mediallize (marketplace de influenciadores, finalista da aceleradora do COTEMIG) e a Borealis (marketplace de conserto de aparelhos), e construí na Edutec uma plataforma educacional em Laravel e React onde professores criam os próprios jogos.\n\nFora do expediente, uso Arch Linux e escrevo Rust por diversão: uma CLI que fala o protocolo USB do teclado e das ventoinhas do meu Dell G15 (descoberto por engenharia reversa e publicado no AUR) e uma simulação que dá a cada pessoa sua própria thread. Também sou pai, o melhor motivo que conheço para escrever código que não acorda ninguém às 3 da manhã.",
+    "description": "Sou o Anderson, desenvolvedor autodidata de Belo Horizonte. Vivo principalmente no backend, onde um bug não é um botão torto: é um número errado no saldo de alguém. Desde 2024 trabalho com pagamentos no PicPay pela Onebrain: primeiro no Débito Automático, hoje no time do Assistente de Pagamentos (DDA), onde mantenho vários microsserviços em Go e PHP com Hyperf e sou o principal responsável por alguns deles.\n\nAntes, na Onfly, migrei um monólito PHP para microsserviços em Hyperf e construí um gerenciador de transações distribuídas próprio, para que compra de passagens aéreas, pagamentos e saldo interno fossem confirmados ou desfeitos juntos. Antes disso, cofundei duas startups, a Mediallize (marketplace de influenciadores, finalista da aceleradora do COTEMIG) e a Borealis (marketplace de conserto de aparelhos), e construí na Edutec uma plataforma educacional em Laravel e React onde professores criam os próprios jogos.\n\nFora do expediente, uso Arch Linux e escrevo Rust por diversão: uma CLI que controla a iluminação do teclado, as ventoinhas e os modos de energia do meu Dell G15 (fiz engenharia reversa do protocolo USB da iluminação; está no AUR) e uma simulação que dá a cada pessoa sua própria thread. Também sou pai, o melhor motivo que conheço para escrever código que não acorda ninguém às 3 da manhã.",
     "readMore": "Continuar lendo",
     "readLess": "Mostrar menos",
     "rolesLabel": "Alguns dos chapéus que uso",

@@ -16,8 +16,9 @@ import {
 const options = { next: { revalidate: 16800 } };
 
 // Section ids are a contract: the command palette and the hero's links jump
-// to them. scroll-margin keeps a jumped-to section clear of the fixed header.
-const anchor = 'scroll-mt-16';
+// to them. scroll-margin keeps a jumped-to section clear of the fixed header,
+// which grows from 56px to 68px at `sm`.
+const anchor = 'scroll-mt-16 sm:scroll-mt-20';
 
 export default async function IndexPage() {
   const [hero, experiences, projects, skills, skillCategories] = await Promise.all([

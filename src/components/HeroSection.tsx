@@ -38,7 +38,9 @@ export default function HeroSection({ hero }: HeroSectionProps) {
   const locale = useLocale() as 'en-US' | 'pt-BR';
   const { getLocalizedValue } = useLocalization();
 
-  const role = getLocalizedValue(hero?.current?.title ?? undefined, locale).trim();
+  // The helper falls back to the first entry's value, which Sanity may leave
+  // unset, so it can hand back undefined despite its type.
+  const role = (getLocalizedValue(hero?.current?.title ?? undefined, locale) ?? '').trim();
   const company = hero?.current?.company?.trim() ?? '';
   const currentRole = [company, role].filter(Boolean).join(' · ');
 
