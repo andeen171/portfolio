@@ -1,19 +1,19 @@
 'use client';
 
 import { type CatppuccinColors, flavors } from '@catppuccin/palette';
+import { useReducedMotion } from 'motion/react';
 import type React from 'react';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { cn } from '@/lib/utils';
 import { useCtpStore } from '@/store';
 
 interface ShootingStar {
-  id: number;
   x: number;
   y: number;
   angle: number;
-  scale: number;
   speed: number;
   distance: number;
+  trail: number;
 }
 
 interface ShootingStarsProps {
@@ -21,30 +21,37 @@ interface ShootingStarsProps {
   maxSpeed?: number;
   minDelay?: number;
   maxDelay?: number;
-  starColor?: string;
-  trailColor?: string;
   starWidth?: number;
   starHeight?: number;
   className?: string;
 }
 
-const getRandomStartPoint = () => {
-  const side = Math.floor(Math.random() * 4);
-  const offset = Math.random() * window.innerWidth;
+type Rgb = { r: number; g: number; b: number };
 
-  switch (side) {
-    case 0:
-      return { x: offset, y: 0, angle: 45 };
-    case 1:
-      return { x: window.innerWidth, y: offset, angle: 135 };
-    case 2:
-      return { x: offset, y: window.innerHeight, angle: 225 };
-    case 3:
-      return { x: 0, y: offset, angle: 315 };
-    default:
-      return { x: 0, y: 0, angle: 45 };
-  }
-};
+/** Tail → middle → head colors of the three trails a star can leave. */
+function trails(colors: CatppuccinColors): [Rgb, Rgb, Rgb][] {
+  return [
+    [colors.teal.rgb, colors.sapphire.rgb, colors.lavender.rgb],
+    [colors.pink.rgb, colors.mauve.rgb, colors.pink.rgb],
+    [colors.sky.rgb, colors.blue.rgb, colors.teal.rgb],
+  ];
+}
+
+const rgba = ({ r, g, b }: Rgb, alpha: number) => `rgba(${r}, ${g}, ${b}, ${alpha})`;
+
+/** Enters from a random edge, heading diagonally across the viewport. */
+function spawn(width: number, height: number, speed: number, trail: number): ShootingStar {
+  const side = Math.floor(Math.random() * 4);
+  const along = Math.random();
+  const start = [
+    { x: along * width, y: 0, angle: 45 },
+    { x: width, y: along * height, angle: 135 },
+    { x: along * width, y: height, angle: 225 },
+    { x: 0, y: along * height, angle: 315 },
+  ][side]!;
+  return { ...start, speed, distance: 0, trail };
+}
+
 export const ShootingStars: React.FC<ShootingStarsProps> = ({
   minSpeed = 10,
   maxSpeed = 30,
@@ -55,166 +62,114 @@ export const ShootingStars: React.FC<ShootingStarsProps> = ({
   className,
 }) => {
   const flavor = useCtpStore((state) => state.flavor);
-  const [colors, setColors] = useState<CatppuccinColors>(flavors[flavor].colors);
-  const [star, setStar] = useState<ShootingStar | null>(null);
-  const svgRef = useRef<SVGSVGElement>(null);
+  const reduceMotion = useReducedMotion();
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const trailsRef = useRef(trails(flavors[flavor].colors));
 
-  // Update colors when flavor changes
   useEffect(() => {
-    setColors(flavors[flavor].colors);
+    trailsRef.current = trails(flavors[flavor].colors);
   }, [flavor]);
 
   useEffect(() => {
-    let timeoutId: NodeJS.Timeout;
+    // Reduced motion: no shooting stars at all.
+    if (reduceMotion) return;
+    const canvas = canvasRef.current;
+    const ctx = canvas?.getContext('2d');
+    if (!canvas || !ctx) return;
 
-    const createStar = () => {
-      const { x, y, angle } = getRandomStartPoint();
-      const newStar: ShootingStar = {
-        id: Date.now(),
-        x,
-        y,
-        angle,
-        scale: 1,
-        speed: Math.random() * (maxSpeed - minSpeed) + minSpeed,
-        distance: 0,
-      };
-      setStar(newStar);
+    let width = 0;
+    let height = 0;
+    let star: ShootingStar | null = null;
+    let frame = 0;
+    let timeout = 0;
 
-      const randomDelay = Math.random() * (maxDelay - minDelay) + minDelay;
-      timeoutId = setTimeout(createStar, randomDelay);
+    const resize = () => {
+      const rect = canvas.getBoundingClientRect();
+      width = rect.width;
+      height = rect.height;
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      canvas.width = Math.round(width * dpr);
+      canvas.height = Math.round(height * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     };
 
-    createStar();
+    const step = () => {
+      ctx.clearRect(0, 0, width, height);
+      if (!star) return;
+
+      const radians = (star.angle * Math.PI) / 180;
+      star.x += star.speed * Math.cos(radians);
+      star.y += star.speed * Math.sin(radians);
+      star.distance += star.speed;
+      if (star.x < -20 || star.x > width + 20 || star.y < -20 || star.y > height + 20) {
+        star = null;
+        ctx.clearRect(0, 0, width, height);
+        return;
+      }
+
+      // The trail stretches the further the star travels.
+      const length = starWidth * (1 + star.distance / 100);
+      const tailX = star.x - length * Math.cos(radians);
+      const tailY = star.y - length * Math.sin(radians);
+      const [tail, middle, head] = trailsRef.current[star.trail]!;
+      const gradient = ctx.createLinearGradient(tailX, tailY, star.x, star.y);
+      gradient.addColorStop(0, rgba(tail, 0));
+      gradient.addColorStop(0.5, rgba(middle, 0.5));
+      gradient.addColorStop(1, rgba(head, 0.85));
+
+      ctx.strokeStyle = gradient;
+      ctx.lineWidth = starHeight;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(tailX, tailY);
+      ctx.lineTo(star.x, star.y);
+      ctx.stroke();
+
+      frame = requestAnimationFrame(step);
+    };
+
+    const launch = () => {
+      // Background tabs skip a launch; the next one is scheduled regardless.
+      if (!document.hidden && !star) {
+        star = spawn(
+          width,
+          height,
+          Math.random() * (maxSpeed - minSpeed) + minSpeed,
+          Math.floor(Math.random() * 3)
+        );
+        frame = requestAnimationFrame(step);
+      }
+      timeout = window.setTimeout(launch, Math.random() * (maxDelay - minDelay) + minDelay);
+    };
+
+    const onVisibilityChange = () => {
+      if (!document.hidden) return;
+      cancelAnimationFrame(frame);
+      star = null;
+      ctx.clearRect(0, 0, width, height);
+    };
+
+    resize();
+    const observer = new ResizeObserver(resize);
+    observer.observe(canvas);
+    document.addEventListener('visibilitychange', onVisibilityChange);
+    launch();
 
     return () => {
-      if (timeoutId) clearTimeout(timeoutId);
+      window.clearTimeout(timeout);
+      cancelAnimationFrame(frame);
+      observer.disconnect();
+      document.removeEventListener('visibilitychange', onVisibilityChange);
+      // Don't leave a star frozen mid-flight if motion gets reduced.
+      ctx.clearRect(0, 0, width, height);
     };
-  }, [minSpeed, maxSpeed, minDelay, maxDelay]);
-
-  useEffect(() => {
-    const moveStar = () => {
-      if (star) {
-        setStar((prevStar) => {
-          if (!prevStar) return null;
-          const newX = prevStar.x + prevStar.speed * Math.cos((prevStar.angle * Math.PI) / 180);
-          const newY = prevStar.y + prevStar.speed * Math.sin((prevStar.angle * Math.PI) / 180);
-          const newDistance = prevStar.distance + prevStar.speed;
-          const newScale = 1 + newDistance / 100;
-          if (
-            newX < -20 ||
-            newX > window.innerWidth + 20 ||
-            newY < -20 ||
-            newY > window.innerHeight + 20
-          ) {
-            return null;
-          }
-          return {
-            ...prevStar,
-            x: newX,
-            y: newY,
-            distance: newDistance,
-            scale: newScale,
-          };
-        });
-      }
-    };
-
-    const animationFrame = requestAnimationFrame(moveStar);
-    return () => cancelAnimationFrame(animationFrame);
-  }, [star]);
+  }, [reduceMotion, minSpeed, maxSpeed, minDelay, maxDelay, starWidth, starHeight]);
 
   return (
-    <svg
-      ref={svgRef}
-      className={cn('w-full h-full absolute inset-0 pointer-events-none', className)}
-    >
-      <title>Shooting Stars</title>
-      {star && (
-        <rect
-          key={star.id}
-          x={star.x}
-          y={star.y}
-          width={starWidth * star.scale}
-          height={starHeight}
-          fill={`url(#gradient${star.id % 3})`}
-          transform={`rotate(${star.angle}, ${star.x + (starWidth * star.scale) / 2}, ${
-            star.y + starHeight / 2
-          })`}
-          opacity={0.8}
-        />
-      )}
-      <defs>
-        <linearGradient id="gradient0" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop
-            offset="0%"
-            style={{
-              stopColor: `rgb(${colors.teal.rgb.r}, ${colors.teal.rgb.g}, ${colors.teal.rgb.b})`,
-              stopOpacity: 0,
-            }}
-          />
-          <stop
-            offset="50%"
-            style={{
-              stopColor: `rgb(${colors.sapphire.rgb.r}, ${colors.sapphire.rgb.g}, ${colors.sapphire.rgb.b})`,
-              stopOpacity: 0.6,
-            }}
-          />
-          <stop
-            offset="100%"
-            style={{
-              stopColor: `rgb(${colors.lavender.rgb.r}, ${colors.lavender.rgb.g}, ${colors.lavender.rgb.b})`,
-              stopOpacity: 1,
-            }}
-          />
-        </linearGradient>
-        <linearGradient id="gradient1" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop
-            offset="0%"
-            style={{
-              stopColor: `rgb(${colors.pink.rgb.r}, ${colors.pink.rgb.g}, ${colors.pink.rgb.b})`,
-              stopOpacity: 0,
-            }}
-          />
-          <stop
-            offset="50%"
-            style={{
-              stopColor: `rgb(${colors.mauve.rgb.r}, ${colors.mauve.rgb.g}, ${colors.mauve.rgb.b})`,
-              stopOpacity: 0.6,
-            }}
-          />
-          <stop
-            offset="100%"
-            style={{
-              stopColor: `rgb(${colors.pink.rgb.r}, ${colors.pink.rgb.g}, ${colors.pink.rgb.b})`,
-              stopOpacity: 1,
-            }}
-          />
-        </linearGradient>
-        <linearGradient id="gradient2" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop
-            offset="0%"
-            style={{
-              stopColor: `rgb(${colors.sky.rgb.r}, ${colors.sky.rgb.g}, ${colors.sky.rgb.b})`,
-              stopOpacity: 0,
-            }}
-          />
-          <stop
-            offset="50%"
-            style={{
-              stopColor: `rgb(${colors.blue.rgb.r}, ${colors.blue.rgb.g}, ${colors.blue.rgb.b})`,
-              stopOpacity: 0.6,
-            }}
-          />
-          <stop
-            offset="100%"
-            style={{
-              stopColor: `rgb(${colors.teal.rgb.r}, ${colors.teal.rgb.g}, ${colors.teal.rgb.b})`,
-              stopOpacity: 1,
-            }}
-          />
-        </linearGradient>
-      </defs>
-    </svg>
+    <canvas
+      ref={canvasRef}
+      className={cn('pointer-events-none absolute inset-0 h-full w-full', className)}
+    />
   );
 };
 

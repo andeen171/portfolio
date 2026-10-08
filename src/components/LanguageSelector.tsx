@@ -1,32 +1,25 @@
 'use client';
 
-import {
-  Listbox,
-  ListboxButton,
-  ListboxOption,
-  ListboxOptions,
-  Transition,
-} from '@headlessui/react';
-import { useLocale } from 'next-intl';
-import { Fragment, useTransition } from 'react';
+import { Listbox, ListboxButton, ListboxOption, ListboxOptions } from '@headlessui/react';
+import { CheckIcon } from '@heroicons/react/20/solid';
+import { LanguageIcon } from '@heroicons/react/24/outline';
+import { useLocale, useTranslations } from 'next-intl';
+import { useTransition } from 'react';
 import { usePathname, useRouter } from '@/i18n/routing';
-import CheckCircle from './SVG/CheckCircle';
-import LanguageSVG from './SVG/LanguageSVG';
 
-function classNames(...classes: string[]) {
-  return classes.filter(Boolean).join(' ');
-}
-
-const languages: { code: string; label: string }[] = [
-  { code: 'en-US', label: 'English' },
-  { code: 'pt-BR', label: 'Português' },
-];
+/** Each language named in itself, as a visitor looking for theirs expects. */
+export const LANGUAGES = [
+  { code: 'en-US', label: 'English', short: 'EN' },
+  { code: 'pt-BR', label: 'Português', short: 'PT' },
+] as const;
 
 const LanguageSelector: React.FC = () => {
+  const t = useTranslations('navigation');
   const router = useRouter();
   const [, startTransition] = useTransition();
   const pathname = usePathname();
   const locale = useLocale();
+  const current = LANGUAGES.find((language) => language.code === locale) ?? LANGUAGES[0];
 
   const switchLanguage = (newLocale: string) => {
     startTransition(() => {
@@ -36,59 +29,42 @@ const LanguageSelector: React.FC = () => {
 
   return (
     <Listbox value={locale} onChange={switchLanguage}>
-      {({ open }) => (
-        <>
-          <div className="relative">
-            <ListboxButton className="relative flex items-center w-auto cursor-default rounded-full bg-ctp-matle/40 backdrop-blur-sm p-2 md:px-3 text-left text-ctp-text shadow-sm ring-1 ring-inset ring-ctp-overlay0/20 hover:bg-ctp-mantle/60 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-ctp-lavender">
-              <span className="pointer-events-none flex items-center">
-                <LanguageSVG />
-              </span>
-              <span
-                className="animate-colorchange bg-linear-to-r from-ctp-teal via-ctp-lavender bg-clip-text
-                  text-sm font-semibold text-transparent nf md:mr-3 ml-2 hidden sm:inline-block"
-              >
-                {locale.toUpperCase()}
-              </span>
-            </ListboxButton>
+      <ListboxButton
+        aria-label={`${t('language')}: ${current.label}`}
+        className="flex h-9 items-center gap-1.5 rounded-full bg-ctp-mantle/50 px-2.5 text-ctp-subtext1 ring-1 ring-ctp-surface1/70 backdrop-blur-sm transition-colors hover:text-ctp-text hover:ring-ctp-lavender/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ctp-lavender data-open:text-ctp-text data-open:ring-ctp-lavender/60"
+      >
+        <LanguageIcon aria-hidden="true" className="size-4 text-ctp-lavender" />
+        <span className="font-nf text-xs font-medium">{current.short}</span>
+      </ListboxButton>
 
-            <Transition
-              show={open}
-              as={Fragment}
-              leave="transition ease-in duration-100"
-              leaveFrom="opacity-100"
-              leaveTo="opacity-0"
-            >
-              <ListboxOptions className="absolute right-0 z-10 mt-2 max-h-56 w-full min-w-40 overflow-hidden rounded-xl bg-ctp-base/80 backdrop-blur-md text-base shadow-xl ring-1 ring-ctp-overlay0/20 transition-all focus:outline-none">
-                {languages.map((lang) => (
-                  <ListboxOption
-                    key={lang.code}
-                    className={({ focus }) =>
-                      classNames(
-                        focus ? 'bg-ctp-base/30 text-ctp-text' : 'text-ctp-text',
-                        'relative cursor-default select-none transition-colors duration-200'
-                      )
-                    }
-                    value={lang.code}
-                  >
-                    <div className="flex items-center justify-between p-2 px-3">
-                      <span className="flex items-center">
-                        {locale === lang.code ? <CheckCircle /> : <LanguageSVG />}
-                      </span>
-
-                      <span
-                        className="animate-colorchange bg-linear-to-r from-ctp-teal via-ctp-lavender
-                                   bg-clip-text font-semibold text-transparent nf ml-2 text-sm"
-                      >
-                        {lang.label}
-                      </span>
-                    </div>
-                  </ListboxOption>
-                ))}
-              </ListboxOptions>
-            </Transition>
-          </div>
-        </>
-      )}
+      <ListboxOptions
+        anchor="bottom end"
+        transition
+        className="z-60 w-48 rounded-xl bg-ctp-mantle/90 p-1.5 shadow-xl shadow-ctp-crust/30 ring-1 ring-ctp-surface1 backdrop-blur-xl transition duration-150 ease-out [--anchor-gap:0.5rem] focus:outline-none data-closed:-translate-y-1 data-closed:opacity-0 motion-reduce:transition-none motion-reduce:data-closed:translate-y-0"
+      >
+        <p
+          aria-hidden="true"
+          className="px-2.5 pt-1.5 pb-1 font-nf text-[0.7rem] text-ctp-subtext0"
+        >
+          <span className="text-ctp-overlay1"># </span>
+          {t('language')}
+        </p>
+        {LANGUAGES.map((language) => (
+          <ListboxOption
+            key={language.code}
+            value={language.code}
+            lang={language.code}
+            className="group flex cursor-pointer items-center gap-3 rounded-lg px-2.5 py-2 text-sm text-ctp-subtext1 select-none data-focus:bg-ctp-surface0/80 data-focus:text-ctp-text data-selected:text-ctp-text"
+          >
+            <span className="flex-1 font-medium">{language.label}</span>
+            <span className="font-nf text-[0.7rem] text-ctp-subtext0">{language.code}</span>
+            <CheckIcon
+              aria-hidden="true"
+              className="invisible size-4 text-ctp-lavender group-data-selected:visible"
+            />
+          </ListboxOption>
+        ))}
+      </ListboxOptions>
     </Listbox>
   );
 };
