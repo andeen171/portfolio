@@ -5,6 +5,8 @@
 
   Inputs, all custom properties:
   - `--accent` / `--tint`  set inline by SkillItem (category accent, logo colour)
+  - `--accent-ink`         the accent's 950 shade, also set by SkillItem; the
+                           name's colour on latte
   - `--pointer-x` / `-y`, `--rotate-x` / `-y`
                            written by TiltCard as the pointer moves
   - `data-active`          on the card while hovered, and always on the open
@@ -518,6 +520,13 @@
   --panel: color-mix(in oklab, var(--catppuccin-color-base) 70%, transparent);
   --foil-blend: multiply;
   --shadow: 0 12px 28px -16px rgb(76 79 105 / 0.45);
+}
+
+/* The raw accents are 2.3-3.3:1 on latte's pale panel, too faint for the
+   name. Only the text darkens: `--accent` itself still drives the frame,
+   rules, rarity symbol and `currentColor` logos at full strength. */
+.latte .skill-card__header {
+  color: var(--accent-ink);
 }
 
 .latte .skill-card__art {

@@ -74,11 +74,21 @@
     "title": "Habilidades",
     "subtitle": "As cartas do meu deck",
     "seeMore": "Ver o deck completo",
-    "searchPlaceholder": "Buscar habilidades ou tags...",
+    "searchPlaceholder": "Buscar habilidades ou tags…",
     "allCategories": "Todas",
+    "categoryPlural": {
+      "skillCategory-language": "Linguagens",
+      "skillCategory-framework": "Frameworks",
+      "skillCategory-database": "Bancos de dados",
+      "skillCategory-tool": "Ferramentas",
+      "skillCategory-soft-skill": "Soft skills",
+      "skillCategory-concepts": "Conceitos"
+    },
     "noResults": "Nenhuma habilidade corresponde à sua busca.",
     "previousSkills": "Habilidades anteriores",
     "nextSkills": "Próximas habilidades",
+    "carouselLabel": "Carrossel de habilidades",
+    "carouselRole": "carrossel",
     "proficiency": {
       "beginner": "Iniciante",
       "intermediate": "Intermediário",
@@ -216,7 +226,7 @@
     "pages": {
       "skills": {
         "title": "Habilidades",
-        "description": "As linguagens, frameworks e ferramentas com que Anderson Lopes trabalha, reunidas em um baralho de cartas holográficas."
+        "description": "As linguagens, frameworks e ferramentas com que Anderson Lopes trabalha, reunidas em um deck de cartas holográficas."
       },
       "projects": {
         "title": "Projetos",

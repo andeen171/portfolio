@@ -58,6 +58,8 @@ const SkillsSection: React.FC<Props> = ({ skills, categories }) => {
             the vertical padding leaves room for an active card's lift. */}
         <Carousel
           key={activeCategory ?? 'all'}
+          label={t('carouselLabel')}
+          roleDescription={t('carouselRole')}
           opts={{
             // Mobile centres one card at a time; sm+ keeps a start-aligned row.
             align: 'center',
@@ -94,9 +96,10 @@ const SkillsSection: React.FC<Props> = ({ skills, categories }) => {
               <CarouselNext label={t('nextSkills')} />
             </div>
             <CarouselProgress className="max-w-md" />
+            {/* Raw lavender is 2.8:1 on latte's base; its 900 shade reads. */}
             <Link
               href="/skills"
-              className="group col-span-2 inline-flex items-center gap-1.5 justify-self-center rounded-sm font-semibold text-ctp-lavender transition-colors hover:text-ctp-pink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ctp-lavender sm:col-span-1 sm:justify-self-end"
+              className="group col-span-2 inline-flex items-center gap-1.5 justify-self-center rounded-sm font-semibold text-ctp-lavender transition-colors hover:text-ctp-pink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ctp-lavender sm:col-span-1 sm:justify-self-end latte:text-ctp-lavender-900 latte:hover:text-ctp-pink-950"
             >
               {t('seeMore')}
               <span

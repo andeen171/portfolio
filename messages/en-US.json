@@ -74,11 +74,21 @@
     "title": "Skills",
     "subtitle": "The cards in my deck",
     "seeMore": "Browse the full deck",
-    "searchPlaceholder": "Search skills or tags...",
+    "searchPlaceholder": "Search skills or tags…",
     "allCategories": "All",
+    "categoryPlural": {
+      "skillCategory-language": "Languages",
+      "skillCategory-framework": "Frameworks",
+      "skillCategory-database": "Databases",
+      "skillCategory-tool": "Tools",
+      "skillCategory-soft-skill": "Soft Skills",
+      "skillCategory-concepts": "Concepts"
+    },
     "noResults": "No skills match your search.",
     "previousSkills": "Previous skills",
     "nextSkills": "Next skills",
+    "carouselLabel": "Skills carousel",
+    "carouselRole": "carousel",
     "proficiency": {
       "beginner": "Beginner",
       "intermediate": "Intermediate",
