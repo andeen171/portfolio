@@ -1,5 +1,6 @@
 import type { SanityImageSource } from '@sanity/image-url';
 import type React from 'react';
+import { rgbToHsl } from '@/lib/logoColor';
 import { cn } from '@/lib/utils';
 import { urlFor } from '@/sanity/lib/image';
 
@@ -45,6 +46,64 @@ function hash(value: string): number {
   }
   return h >>> 0;
 }
+
+/**
+ * Prefixes the ids an inline SVG defines (gradients, clip paths) and every
+ * reference to them. Two covers showing the same logo would otherwise define
+ * the same id twice, and each would paint with whichever came first.
+ */
+function scopeSvgIds(svg: string, scope: string): string {
+  const ids = new Set([...svg.matchAll(/\bid=(["'])(.+?)\1/g)].map((match) => match[2]));
+  if (ids.size === 0) return svg;
+  const scoped = (id: string) => (ids.has(id) ? `${scope}-${id}` : id);
+  return svg
+    .replace(/\bid=(["'])(.+?)\1/g, (_, quote, id) => `id=${quote}${scoped(id)}${quote}`)
+    .replace(/url\((["']?)#(.+?)\1\)/g, (_, quote, id) => `url(${quote}#${scoped(id)}${quote})`)
+    .replace(/href=(["'])#(.+?)\1/g, (_, quote, id) => `href=${quote}#${scoped(id)}${quote}`);
+}
+
+const PAINT =
+  /(?:fill|stroke|stop-color)\s*[:=]\s*["']?\s*(#[0-9a-f]{3,8}|white|black|currentcolor)\b/gi;
+
+/** Lightness (0–1) of a hex or named paint. */
+function paintLightness(paint: string): number | null {
+  if (paint === 'white') return 1;
+  if (paint === 'black') return 0;
+  let hex = paint.slice(1);
+  if (hex.length <= 4) hex = [...hex.slice(0, 3)].map((digit) => digit + digit).join('');
+  if (hex.length < 6) return null;
+  const [r, g, b] = [0, 2, 4].map((at) => Number.parseInt(hex.slice(at, at + 2), 16));
+  return rgbToHsl(r ?? 0, g ?? 0, b ?? 0).l;
+}
+
+/**
+ * Whether a logo is painted only in near-black (Hyperf, MySQL) or only in
+ * white (Rust, PHP) — the two kinds that vanish on a tile of the wrong
+ * flavor. Logos drawn in `currentColor` follow the tile's text and are fine.
+ */
+function logoTone(svg: string): 'dark' | 'light' | null {
+  let min = 1;
+  let max = 0;
+  for (const [, raw = ''] of svg.matchAll(PAINT)) {
+    const paint = raw.toLowerCase();
+    if (paint === 'currentcolor') return null;
+    const lightness = paintLightness(paint);
+    if (lightness === null) continue;
+    min = Math.min(min, lightness);
+    max = Math.max(max, lightness);
+  }
+  if (min > max) return null;
+  if (max <= 0.3) return 'dark';
+  if (min >= 0.9) return 'light';
+  return null;
+}
+
+// A logo that would vanish gets the tile inverted: light behind a dark logo in
+// the dark flavors, dark behind a white logo in latte.
+const TILE_TONE = {
+  dark: 'bg-ctp-subtext1/90 latte:bg-ctp-base/70',
+  light: 'latte:bg-ctp-subtext1/90',
+} as const;
 
 /** The accent at `index` (wrapping), mixed down to `amount` percent. */
 const accent = (index: number, amount: number) =>
@@ -132,6 +191,7 @@ export default function ProjectCover({
       return true;
     })
     .slice(0, MAX_LOGOS);
+  const scope = `cover-${hash(seed).toString(36)}`;
 
   return (
     <div aria-hidden className={frame} style={meshStyle(seed)}>
@@ -146,7 +206,7 @@ export default function ProjectCover({
           <span className="size-2.5 shrink-0 rounded-full bg-ctp-red/80" />
           <span className="size-2.5 shrink-0 rounded-full bg-ctp-yellow/80" />
           <span className="size-2.5 shrink-0 rounded-full bg-ctp-green/80" />
-          <span className="ml-2 truncate font-nf text-[0.6875rem] text-ctp-subtext0">
+          <span className="ml-2 truncate font-nf text-[0.6875rem] text-ctp-subtext0 latte:text-ctp-subtext1">
             <span className="text-ctp-teal">~/</span>
             {slug}
           </span>
@@ -160,14 +220,20 @@ export default function ProjectCover({
 
           {logos.length > 0 && (
             <ul className="flex flex-wrap gap-2">
-              {logos.map((skill) => (
-                <li
-                  key={skill._id}
-                  className="size-9 rounded-lg bg-ctp-base/70 p-2 text-ctp-text shadow-sm ring-1 ring-ctp-surface1/70 backdrop-blur-sm sm:size-10 [&_svg]:size-full"
-                  // biome-ignore lint/security/noDangerouslySetInnerHtml: Sanity content
-                  dangerouslySetInnerHTML={{ __html: skill.svgCode }}
-                />
-              ))}
+              {logos.map((skill) => {
+                const tone = logoTone(skill.svgCode);
+                return (
+                  <li
+                    key={skill._id}
+                    className={cn(
+                      'size-9 rounded-lg bg-ctp-base/70 p-2 text-ctp-text shadow-sm ring-1 ring-ctp-surface1/70 backdrop-blur-sm sm:size-10 [&_svg]:size-full',
+                      tone && TILE_TONE[tone]
+                    )}
+                    // biome-ignore lint/security/noDangerouslySetInnerHtml: Sanity content
+                    dangerouslySetInnerHTML={{ __html: scopeSvgIds(skill.svgCode, scope) }}
+                  />
+                );
+              })}
             </ul>
           )}
         </div>

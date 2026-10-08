@@ -17,7 +17,10 @@ export default function SeeMoreLink({
       href={href}
       className="group inline-flex items-center gap-3 rounded-full bg-ctp-mantle/60 py-2.5 pr-4 pl-5 text-sm font-semibold text-ctp-text ring-1 ring-ctp-surface1 backdrop-blur-md transition-colors hover:bg-ctp-mantle hover:ring-ctp-lavender/60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ctp-lavender"
     >
-      <span aria-hidden className="hidden font-nf text-xs font-normal text-ctp-subtext0 sm:inline">
+      <span
+        aria-hidden
+        className="hidden font-nf text-xs font-normal text-ctp-subtext0 latte:text-ctp-subtext1 sm:inline"
+      >
         <span className="text-ctp-teal">cd</span> ~/{path}
       </span>
       <span>{children}</span>

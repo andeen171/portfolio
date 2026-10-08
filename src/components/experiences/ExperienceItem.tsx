@@ -106,7 +106,7 @@ const ExperienceItem: React.FC<ExperienceProps> = ({ experience, now, titleAs: T
         </div>
       </header>
 
-      <dl className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1.5 font-nf text-xs text-ctp-subtext0">
+      <dl className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1.5 font-nf text-xs text-ctp-subtext0 latte:text-ctp-subtext1">
         {start && (
           <div>
             <dt className="sr-only">{t('period')}</dt>
@@ -148,7 +148,7 @@ const ExperienceItem: React.FC<ExperienceProps> = ({ experience, now, titleAs: T
         lines={4}
         moreLabel={t('readMore')}
         lessLabel={t('showLess')}
-        className="mt-4"
+        className="mt-4 max-w-3xl"
       />
 
       <TechChips skills={experience.skills} label={t('stack')} className="mt-5" />

@@ -72,7 +72,7 @@ export const Timeline = ({ data, yearAs: Year = 'h3' }: TimelineProps) => {
                   {item.title}
                 </Year>
                 {item.meta && (
-                  <p className="mt-2 font-nf text-xs text-ctp-subtext0">
+                  <p className="mt-2 font-nf text-xs text-ctp-subtext0 latte:text-ctp-subtext1">
                     <span aria-hidden className="text-ctp-overlay1">
                       {'// '}
                     </span>
@@ -89,7 +89,7 @@ export const Timeline = ({ data, yearAs: Year = 'h3' }: TimelineProps) => {
                   {item.title}
                 </Year>
                 {item.meta && (
-                  <p className="font-nf text-xs text-ctp-subtext0">
+                  <p className="font-nf text-xs text-ctp-subtext0 latte:text-ctp-subtext1">
                     <span aria-hidden className="text-ctp-overlay1">
                       {'// '}
                     </span>

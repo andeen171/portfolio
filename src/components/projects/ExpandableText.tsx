@@ -81,7 +81,7 @@ export default function ExpandableText({
         id={id}
         style={
           measured
-            ? { height: expanded ? fullHeight : Math.min(fullHeight, collapsedHeight) }
+            ? { height: clipped ? collapsedHeight : fullHeight }
             : { maxHeight: `${lines * LINE_REM}rem` }
         }
         className={cn(
@@ -107,7 +107,7 @@ export default function ExpandableText({
           aria-expanded={expanded}
           aria-controls={id}
           onClick={() => setExpanded((value) => !value)}
-          className="mt-2 -ml-1 inline-flex items-center gap-1 rounded-md px-1 py-0.5 font-nf text-xs font-medium text-ctp-subtext0 transition-colors hover:text-ctp-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ctp-lavender"
+          className="mt-2 -ml-1 inline-flex items-center gap-1 rounded-md px-1 py-0.5 font-nf text-xs font-medium text-ctp-subtext0 latte:text-ctp-subtext1 transition-colors hover:text-ctp-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ctp-lavender"
         >
           {expanded ? lessLabel : moreLabel}
           <ChevronDownIcon

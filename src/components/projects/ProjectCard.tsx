@@ -40,7 +40,7 @@ function projectSlug(project: Project, name: string): string {
   }
   return name
     .normalize('NFD')
-    .replace(/[̀-ͯ]/g, '')
+    .replace(/[\u0300-\u036f]/g, '')
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-|-$/g, '');
@@ -125,7 +125,7 @@ export default function ProjectCard({ project, titleAs: Title = 'h3' }: ProjectC
 
         <div className="flex min-w-0 flex-col p-5 sm:p-6">
           {date && (
-            <p className="flex items-center gap-1.5 font-nf text-xs text-ctp-subtext0">
+            <p className="flex items-center gap-1.5 font-nf text-xs text-ctp-subtext0 latte:text-ctp-subtext1">
               <CalendarIcon aria-hidden className="size-3.5 text-ctp-teal" />
               <time dateTime={isoYearMonth(date)}>{formatMonthYear(locale, date)}</time>
             </p>

@@ -18,7 +18,7 @@ const ProjectTimeline: React.FC<ProjectTimelineProps> = ({ projects, yearAs = 'h
 
   if (projects.length === 0) {
     return (
-      <p className="mx-auto max-w-md rounded-xl bg-ctp-mantle/60 px-5 py-4 text-center font-nf text-sm text-ctp-subtext0 ring-1 ring-ctp-surface1/60">
+      <p className="mx-auto max-w-md rounded-xl bg-ctp-mantle/60 px-5 py-4 text-center font-nf text-sm text-ctp-subtext0 latte:text-ctp-subtext1 ring-1 ring-ctp-surface1/60">
         <span aria-hidden className="text-ctp-teal">
           ❯{' '}
         </span>
