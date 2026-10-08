@@ -20,14 +20,16 @@ type Props = {
   categories: ListSkillCategoriesQueryResult;
 };
 
-// Static class strings so Tailwind's compiler can see them.
+// Static class strings so Tailwind's compiler can see them. On latte the
+// heading text takes the accent's 950 shade (the raw accents are 2.3-3.3:1
+// there); the rule beside it keeps the full-strength accent.
 const ACCENT_HEADING: Record<string, string> = {
-  teal: 'text-ctp-teal from-ctp-teal/40',
-  lavender: 'text-ctp-lavender from-ctp-lavender/40',
-  pink: 'text-ctp-pink from-ctp-pink/40',
-  peach: 'text-ctp-peach from-ctp-peach/40',
-  green: 'text-ctp-green from-ctp-green/40',
-  sky: 'text-ctp-sky from-ctp-sky/40',
+  teal: 'text-ctp-teal from-ctp-teal/40 latte:text-ctp-teal-950',
+  lavender: 'text-ctp-lavender from-ctp-lavender/40 latte:text-ctp-lavender-950',
+  pink: 'text-ctp-pink from-ctp-pink/40 latte:text-ctp-pink-950',
+  peach: 'text-ctp-peach from-ctp-peach/40 latte:text-ctp-peach-950',
+  green: 'text-ctp-green from-ctp-green/40 latte:text-ctp-green-950',
+  sky: 'text-ctp-sky from-ctp-sky/40 latte:text-ctp-sky-950',
 };
 
 const prefersReducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -53,7 +55,9 @@ const SkillsExplorer: React.FC<Props> = ({ skills, categories }) => {
 
   const toolbarRef = useRef<HTMLDivElement>(null);
   const searchRef = useRef<HTMLInputElement>(null);
+  const endRef = useRef<HTMLDivElement>(null);
   const toolbarVisible = useInView(toolbarRef);
+  const reachedEnd = useReached(endRef);
 
   const filtered = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
@@ -147,7 +151,7 @@ const SkillsExplorer: React.FC<Props> = ({ skills, categories }) => {
                 setQuery('');
                 searchRef.current?.focus();
               }}
-              className="absolute right-3 top-1/2 z-10 -translate-y-1/2 rounded-full p-1.5 text-ctp-subtext0 transition-colors hover:bg-ctp-surface0 hover:text-ctp-text"
+              className="absolute right-3 top-1/2 z-10 -translate-y-1/2 rounded-full p-1.5 text-ctp-subtext0 transition-colors hover:bg-ctp-surface0 hover:text-ctp-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ctp-lavender"
             >
               <XMarkIcon className="size-4" />
               <span className="sr-only">{t('clearSearch')}</span>
@@ -173,13 +177,18 @@ const SkillsExplorer: React.FC<Props> = ({ skills, categories }) => {
 
       {/* Results row: what you're looking at, and how it's ordered. */}
       <div className="mt-10 flex items-center justify-between gap-4 border-b border-ctp-surface0 pb-3">
-        <p aria-live="polite" className="text-sm text-ctp-subtext0">
+        {/* Left-aligned against the page's centred text, and wrapping as a
+            unit when a long count and the clear link don't share a line. */}
+        <p
+          aria-live="polite"
+          className="flex flex-wrap items-baseline gap-x-3 text-left text-sm text-ctp-subtext0"
+        >
           {t('results', { count: filtered.length })}
           {hasFilters && (
             <button
               type="button"
               onClick={clearFilters}
-              className="ml-3 font-medium text-ctp-lavender underline-offset-4 hover:underline"
+              className="rounded-sm font-medium text-ctp-lavender underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ctp-lavender latte:text-ctp-lavender-900"
             >
               {t('clearFilters')}
             </button>
@@ -221,7 +230,7 @@ const SkillsExplorer: React.FC<Props> = ({ skills, categories }) => {
             <button
               type="button"
               onClick={clearFilters}
-              className="rounded-full border border-ctp-lavender/50 px-4 py-1.5 text-sm font-medium text-ctp-lavender transition-colors hover:bg-ctp-lavender/10"
+              className="rounded-full border border-ctp-lavender/50 px-4 py-1.5 text-sm font-medium text-ctp-lavender transition-colors hover:bg-ctp-lavender/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ctp-lavender latte:text-ctp-lavender-900"
             >
               {t('clearFilters')}
             </button>
@@ -230,7 +239,8 @@ const SkillsExplorer: React.FC<Props> = ({ skills, categories }) => {
           <div className="space-y-14">
             {groups.map(({ category, skills: groupSkills }) => (
               <section key={category._id} aria-labelledby={`skills-${category._id}`}>
-                <h3
+                {/* h2: the page's h1 is the title; cards are h3 within. */}
+                <h2
                   id={`skills-${category._id}`}
                   className={cn(
                     'mb-6 flex items-center gap-3 text-left font-nf text-lg font-semibold',
@@ -242,7 +252,7 @@ const SkillsExplorer: React.FC<Props> = ({ skills, categories }) => {
                     {groupSkills.length}
                   </span>
                   <span aria-hidden className="h-px flex-1 bg-linear-to-r to-transparent" />
-                </h3>
+                </h2>
                 <SkillList skills={groupSkills} />
               </section>
             ))}
@@ -252,8 +262,12 @@ const SkillsExplorer: React.FC<Props> = ({ skills, categories }) => {
         )}
       </div>
 
+      {/* Past the last card there's nothing left to filter, and the button
+          would sit on the footer's text, so it bows out here. */}
+      <div ref={endRef} aria-hidden />
+
       <BackToFilters
-        visible={!toolbarVisible}
+        visible={!toolbarVisible && !reachedEnd}
         label={t('backToFilters')}
         summary={
           activeCategoryDoc
@@ -290,7 +304,7 @@ const BackToFilters = ({
     aria-hidden={!visible}
     tabIndex={visible ? 0 : -1}
     className={cn(
-      'fixed bottom-5 left-5 z-40 flex items-center gap-2 rounded-full border border-ctp-overlay0/20 bg-ctp-base/80 p-3.5 text-sm font-medium text-ctp-text shadow-lg backdrop-blur-lg transition-[opacity,translate] duration-300 hover:border-ctp-lavender/50 hover:text-ctp-lavender motion-reduce:transition-none sm:left-1/2 sm:-translate-x-1/2 sm:px-4 sm:py-2.5',
+      'fixed bottom-5 left-5 z-40 flex items-center gap-2 rounded-full border border-ctp-overlay0/20 bg-ctp-base/80 p-3.5 text-sm font-medium text-ctp-text shadow-lg backdrop-blur-lg transition-[opacity,translate] duration-300 hover:border-ctp-lavender/50 hover:text-ctp-lavender focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ctp-lavender motion-reduce:transition-none sm:left-1/2 sm:-translate-x-1/2 sm:px-4 sm:py-2.5',
       visible ? 'translate-y-0 opacity-100' : 'pointer-events-none translate-y-4 opacity-0'
     )}
   >
@@ -327,6 +341,28 @@ function useInView(ref: React.RefObject<HTMLElement | null>) {
   }, [ref]);
 
   return inView;
+}
+
+/** Whether an element has come up past the bottom of the screen, including
+ *  when it has since scrolled off the top. */
+function useReached(ref: React.RefObject<HTMLElement | null>) {
+  const [reached, setReached] = useState(false);
+
+  useEffect(() => {
+    const element = ref.current;
+    if (!element) return;
+    const observer = new IntersectionObserver(([entry]) => setReached(!!entry?.isIntersecting), {
+      // Stretch the root far above the viewport so "intersecting" means "above
+      // its bottom edge". A jump from past the top straight back below (the
+      // footer's "Back to top") then still crosses an edge and reports; with
+      // the plain viewport both ends are off-screen and no entry fires.
+      rootMargin: '1000000px 0px 0px 0px',
+    });
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [ref]);
+
+  return reached;
 }
 
 export default SkillsExplorer;

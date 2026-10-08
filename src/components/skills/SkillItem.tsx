@@ -51,14 +51,15 @@ function fitTags(tags: string[]): string[] {
 const TRANSITION_NAME = 'skill-card';
 
 // Filled tag-pill styles, cycled by tag index. Static strings so Tailwind's
-// compiler can see them.
+// compiler can see them. The raw accents are too pale to read at 9px on
+// latte, so the text takes their 950 shade there.
 const TAG_STYLES = [
-  'bg-ctp-teal/15 text-ctp-teal border-ctp-teal/35',
-  'bg-ctp-lavender/15 text-ctp-lavender border-ctp-lavender/35',
-  'bg-ctp-pink/15 text-ctp-pink border-ctp-pink/35',
-  'bg-ctp-peach/15 text-ctp-peach border-ctp-peach/35',
-  'bg-ctp-green/15 text-ctp-green border-ctp-green/35',
-  'bg-ctp-sky/15 text-ctp-sky border-ctp-sky/35',
+  'bg-ctp-teal/15 text-ctp-teal border-ctp-teal/35 latte:text-ctp-teal-950',
+  'bg-ctp-lavender/15 text-ctp-lavender border-ctp-lavender/35 latte:text-ctp-lavender-950',
+  'bg-ctp-pink/15 text-ctp-pink border-ctp-pink/35 latte:text-ctp-pink-950',
+  'bg-ctp-peach/15 text-ctp-peach border-ctp-peach/35 latte:text-ctp-peach-950',
+  'bg-ctp-green/15 text-ctp-green border-ctp-green/35 latte:text-ctp-green-950',
+  'bg-ctp-sky/15 text-ctp-sky border-ctp-sky/35 latte:text-ctp-sky-950',
 ] as const;
 
 const TAG_BASE =
@@ -200,6 +201,7 @@ function useCardStyle(skill: Skill): React.CSSProperties {
 
   return {
     '--accent': `var(--catppuccin-color-${accent})`,
+    '--accent-ink': `var(--catppuccin-color-${accent}-950)`,
     ...(tint && { '--tint': tint }),
   } as React.CSSProperties;
 }
@@ -208,10 +210,12 @@ function useCardStyle(skill: Skill): React.CSSProperties {
  * The printed side of the card. Two colours drive it, set on the card by
  * {@link useCardStyle}:
  * - `--accent` — the category (or per-skill) accent: frame, name, rules.
+ *   `--accent-ink` is its darkest shade, for the name on latte.
  * - `--tint`   — the logo's own colour, when it has one: the face and the art
  *   window's backlight. Falls back to the accent.
  *
- * `compact` fits the grid; `detail` grows to its content for the dialog.
+ * `compact` fits the grid; `detail` is the larger copy in the dialog, which
+ * also prints the skill's flavor text under the rules.
  */
 const SkillCardFace = ({
   skill,
@@ -230,6 +234,9 @@ const SkillCardFace = ({
 
   const compact = variant === 'compact';
   const description = getLocalizedValue(skill.description, locale);
+  // Flavor text is a reward for opening the card, so only the detail face
+  // prints it. Optional in Sanity, and may be missing from either language.
+  const flavorText = compact ? '' : getLocalizedValue(skill.flavorText, locale)?.trim();
   const categoryName = skill.category ? getLocalizedValue(skill.category.name, locale) : undefined;
   const svgCode = skill.svgCode ?? skill.category?.fallbackSvgCode;
   const tags = skill.tags ?? [];
@@ -324,9 +331,14 @@ const SkillCardFace = ({
             </p>
           </div>
         ) : (
-          <p className="text-left text-[0.8125rem] leading-relaxed text-ctp-subtext1">
-            {description}
-          </p>
+          <>
+            {description && (
+              <p className="text-left text-[0.8125rem] leading-relaxed text-ctp-subtext1">
+                {description}
+              </p>
+            )}
+            {flavorText && <p className="skill-card__flavor">{flavorText}</p>}
+          </>
         )}
       </div>
 

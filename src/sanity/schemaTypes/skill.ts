@@ -7,6 +7,7 @@ import { defineField, defineType } from 'sanity';
  */
 const CARD_DESCRIPTION_CHARS = 180;
 const CARD_TAG_CHARS = 16;
+const CARD_FLAVOR_CHARS = 100;
 
 export const skill = defineType({
   name: 'skill',
@@ -37,6 +38,23 @@ export const skill = defineType({
             : true;
         }).warning(),
       ],
+    }),
+    defineField({
+      name: 'flavorText',
+      title: 'Flavor Text',
+      type: 'internationalizedArrayString',
+      description: `Optional one-liner printed in italics at the bottom of the opened card, like trading-card flavor text. Keep it under ${CARD_FLAVOR_CHARS} characters.`,
+      validation: (Rule) =>
+        Rule.custom((value?: { _key: string; value?: string }[]) => {
+          const long = (value ?? []).filter(
+            (item) => (item.value?.length ?? 0) > CARD_FLAVOR_CHARS
+          );
+          return long.length
+            ? `Longer than ${CARD_FLAVOR_CHARS} characters (${long
+                .map((item) => `${item._key}: ${item.value?.length}`)
+                .join(', ')}) — it will wrap onto several lines.`
+            : true;
+        }).warning(),
     }),
     defineField({
       name: 'category',

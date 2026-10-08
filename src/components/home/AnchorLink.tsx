@@ -1,0 +1,36 @@
+'use client';
+
+import type { AnchorHTMLAttributes, MouseEvent } from 'react';
+
+type AnchorLinkProps = AnchorHTMLAttributes<HTMLAnchorElement> & {
+  /** Id of the element on this page to scroll to, without the `#`. */
+  to: string;
+};
+
+/**
+ * A same-page `#hash` link that glides instead of jumping, unless the visitor
+ * prefers reduced motion, and hands keyboard focus to the target like a plain
+ * fragment link does. Without JS it is a plain anchor, and the target's
+ * `scroll-margin` keeps it clear of the fixed header either way.
+ */
+export default function AnchorLink({ to, onClick, ...props }: AnchorLinkProps) {
+  const handleClick = (event: MouseEvent<HTMLAnchorElement>) => {
+    onClick?.(event);
+    if (event.defaultPrevented || event.metaKey || event.ctrlKey || event.shiftKey) return;
+    const target = document.getElementById(to);
+    if (!target) return;
+
+    event.preventDefault();
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    target.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
+    // preventDefault() also cancels the browser moving the sequential focus
+    // start to the target, which would leave the next Tab back up in the
+    // hero. Focus the section ourselves (no ring: globals.css hides it for
+    // tabindex=-1) without fighting the smooth scroll.
+    if (!target.hasAttribute('tabindex')) target.setAttribute('tabindex', '-1');
+    target.focus({ preventScroll: true });
+    window.history.pushState(window.history.state, '', `#${to}`);
+  };
+
+  return <a href={`#${to}`} onClick={handleClick} {...props} />;
+}

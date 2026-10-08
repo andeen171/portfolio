@@ -2,14 +2,14 @@ import { defineQuery } from 'next-sanity';
 
 // Projects
 export const listProjectsQuery = defineQuery(`
-  *[_type == "project"] { 
+  *[_type == "project"] {
     ...,
     skills[]->
   } | order(date desc)
 `);
 
 export const previewProjectsQuery = defineQuery(`
-  *[_type == "project"] { 
+  *[_type == "project"] {
     ...,
     skills[]->
   } | order(date desc)[0..1]
@@ -17,11 +17,31 @@ export const previewProjectsQuery = defineQuery(`
 
 // Experiences
 export const listExperiencesQuery = defineQuery(`
-  *[_type == "experience"] | order(endDate desc)
+  *[_type == "experience"] {
+    ...,
+    skills[]->{ _id, name }
+  } | order(endDate desc)
 `);
 
 export const previewExperiencesQuery = defineQuery(`
-  *[_type == "experience"] | order(endDate desc)[0..2]
+  *[_type == "experience"] {
+    ...,
+    skills[]->{ _id, name }
+  } | order(endDate desc)[0..2]
+`);
+
+// Home hero: the current role and a few headline numbers.
+export const heroQuery = defineQuery(`
+  {
+    "current": *[_type == "experience" && !defined(endDate)] | order(startDate desc)[0] {
+      title,
+      company
+    },
+    "careerStart": *[_type == "experience"] | order(startDate asc)[0].startDate,
+    "projectCount": count(*[_type == "project"]),
+    "skillCount": count(*[_type == "skill"]),
+    "companyCount": count(array::unique(*[_type == "experience"].company))
+  }
 `);
 
 // Skills
