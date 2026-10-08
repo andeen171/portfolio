@@ -20,14 +20,16 @@ type Props = {
   categories: ListSkillCategoriesQueryResult;
 };
 
-// Static class strings so Tailwind's compiler can see them.
+// Static class strings so Tailwind's compiler can see them. On latte the
+// heading text takes the accent's 950 shade (the raw accents are 2.3-3.3:1
+// there); the rule beside it keeps the full-strength accent.
 const ACCENT_HEADING: Record<string, string> = {
-  teal: 'text-ctp-teal from-ctp-teal/40',
-  lavender: 'text-ctp-lavender from-ctp-lavender/40',
-  pink: 'text-ctp-pink from-ctp-pink/40',
-  peach: 'text-ctp-peach from-ctp-peach/40',
-  green: 'text-ctp-green from-ctp-green/40',
-  sky: 'text-ctp-sky from-ctp-sky/40',
+  teal: 'text-ctp-teal from-ctp-teal/40 latte:text-ctp-teal-950',
+  lavender: 'text-ctp-lavender from-ctp-lavender/40 latte:text-ctp-lavender-950',
+  pink: 'text-ctp-pink from-ctp-pink/40 latte:text-ctp-pink-950',
+  peach: 'text-ctp-peach from-ctp-peach/40 latte:text-ctp-peach-950',
+  green: 'text-ctp-green from-ctp-green/40 latte:text-ctp-green-950',
+  sky: 'text-ctp-sky from-ctp-sky/40 latte:text-ctp-sky-950',
 };
 
 const prefersReducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -53,7 +55,9 @@ const SkillsExplorer: React.FC<Props> = ({ skills, categories }) => {
 
   const toolbarRef = useRef<HTMLDivElement>(null);
   const searchRef = useRef<HTMLInputElement>(null);
+  const endRef = useRef<HTMLDivElement>(null);
   const toolbarVisible = useInView(toolbarRef);
+  const reachedEnd = useReached(endRef);
 
   const filtered = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
@@ -184,7 +188,7 @@ const SkillsExplorer: React.FC<Props> = ({ skills, categories }) => {
             <button
               type="button"
               onClick={clearFilters}
-              className="rounded-sm font-medium text-ctp-lavender underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ctp-lavender"
+              className="rounded-sm font-medium text-ctp-lavender underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ctp-lavender latte:text-ctp-lavender-900"
             >
               {t('clearFilters')}
             </button>
@@ -226,7 +230,7 @@ const SkillsExplorer: React.FC<Props> = ({ skills, categories }) => {
             <button
               type="button"
               onClick={clearFilters}
-              className="rounded-full border border-ctp-lavender/50 px-4 py-1.5 text-sm font-medium text-ctp-lavender transition-colors hover:bg-ctp-lavender/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ctp-lavender"
+              className="rounded-full border border-ctp-lavender/50 px-4 py-1.5 text-sm font-medium text-ctp-lavender transition-colors hover:bg-ctp-lavender/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ctp-lavender latte:text-ctp-lavender-900"
             >
               {t('clearFilters')}
             </button>
@@ -258,8 +262,12 @@ const SkillsExplorer: React.FC<Props> = ({ skills, categories }) => {
         )}
       </div>
 
+      {/* Past the last card there's nothing left to filter, and the button
+          would sit on the footer's text, so it bows out here. */}
+      <div ref={endRef} aria-hidden />
+
       <BackToFilters
-        visible={!toolbarVisible}
+        visible={!toolbarVisible && !reachedEnd}
         label={t('backToFilters')}
         summary={
           activeCategoryDoc
@@ -333,6 +341,28 @@ function useInView(ref: React.RefObject<HTMLElement | null>) {
   }, [ref]);
 
   return inView;
+}
+
+/** Whether an element has come up past the bottom of the screen, including
+ *  when it has since scrolled off the top. */
+function useReached(ref: React.RefObject<HTMLElement | null>) {
+  const [reached, setReached] = useState(false);
+
+  useEffect(() => {
+    const element = ref.current;
+    if (!element) return;
+    const observer = new IntersectionObserver(([entry]) => setReached(!!entry?.isIntersecting), {
+      // Stretch the root far above the viewport so "intersecting" means "above
+      // its bottom edge". A jump from past the top straight back below (the
+      // footer's "Back to top") then still crosses an edge and reports; with
+      // the plain viewport both ends are off-screen and no entry fires.
+      rootMargin: '1000000px 0px 0px 0px',
+    });
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [ref]);
+
+  return reached;
 }
 
 export default SkillsExplorer;

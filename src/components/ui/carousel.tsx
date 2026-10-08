@@ -47,15 +47,20 @@ function useCarousel() {
   return context;
 }
 
+// Like the nav buttons below, the region's name and role description come
+// from the caller, localized: a hard-coded English pair here was read out
+// as-is on pt-BR.
 const Carousel = ({
   orientation = 'horizontal',
   opts,
   setApi,
   plugins,
+  label,
+  roleDescription,
   className,
   children,
   ...props
-}: HTMLAttributes<HTMLDivElement> & CarouselProps) => {
+}: HTMLAttributes<HTMLDivElement> & CarouselProps & { label: string; roleDescription: string }) => {
   const [carouselRef, api] = useEmblaCarousel(
     {
       ...opts,
@@ -131,8 +136,8 @@ const Carousel = ({
       <section
         onKeyDownCapture={handleKeyDown}
         className={cn('relative', className)}
-        aria-label="Skills carousel"
-        aria-roledescription="carousel"
+        aria-label={label}
+        aria-roledescription={roleDescription}
         {...props}
       >
         {children}
