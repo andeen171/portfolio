@@ -83,13 +83,15 @@ export default async function OpengraphImage({ params }: { params: Promise<{ loc
     readFile(join(fontDir, 'SourceCodePro-Bold.ttf')),
   ]);
 
+  // Real cards from the deck, with their real rarity: one pip per
+  // proficiency step, and the foil on the expert one, as on /skills.
   const cards: CardSpec[] = [
     {
-      name: 'PHP',
-      kind: t('language'),
-      glyph: '<?php',
-      accent: c.lavender,
-      rarity: 4,
+      name: 'Redis',
+      kind: t('database'),
+      glyph: 'SET',
+      accent: c.red,
+      rarity: 3,
       rotate: -12,
       left: -8,
       top: 64,
@@ -105,11 +107,11 @@ export default async function OpengraphImage({ params }: { params: Promise<{ loc
       top: 64,
     },
     {
-      name: 'Go',
+      name: 'PHP',
       kind: t('language'),
-      glyph: ':=',
-      accent: c.teal,
-      rarity: 3,
+      glyph: '<?php',
+      accent: c.lavender,
+      rarity: 4,
       rotate: 0,
       left: 122,
       top: 0,
@@ -202,7 +204,8 @@ export default async function OpengraphImage({ params }: { params: Promise<{ loc
           left: 80,
           top: 0,
           bottom: 0,
-          width: 640,
+          // Ends short of the fanned cards, so longer copy wraps instead of running under them.
+          width: 600,
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'center',
@@ -360,7 +363,7 @@ function SkillCard({ name, kind, glyph, accent, rarity, rotate, left, top, foil 
           }}
         >
           <span style={{ fontSize: 18, fontWeight: 700, color: accent.hex }}>{name}</span>
-          <span style={{ marginTop: 2, fontSize: 10, letterSpacing: 2, color: c.subtext0.hex }}>
+          <span style={{ marginTop: 2, fontSize: 10, letterSpacing: 1.5, color: c.subtext0.hex }}>
             {kind.toUpperCase()}
           </span>
         </div>

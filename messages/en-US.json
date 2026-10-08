@@ -73,9 +73,10 @@
   },
   "og": {
     "role": "Backend-leaning full-stack developer",
-    "tagline": "Payments and microservices by day, Rust side quests on Arch Linux by night.",
+    "tagline": "Payments, microservices and integrations built to hold up in production.",
     "location": "Belo Horizonte, Brazil",
-    "language": "Language"
+    "language": "Language",
+    "database": "Database"
   },
   "projects": {
     "title": "Projects",
