@@ -12,7 +12,7 @@ const ExperiencesSection: React.FC<Props> = ({ experiences }) => {
   const t = useTranslations('experiences');
 
   return (
-    <section id="experiences" className="scroll-mt-16 py-24 sm:py-32">
+    <div className="py-24 sm:py-32">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <SectionHeading index="03" eyebrow={t('eyebrow')} title={t('subtitle')} />
         <p className="mx-auto mt-4 max-w-2xl text-center text-pretty text-ctp-subtext1">
@@ -29,7 +29,7 @@ const ExperiencesSection: React.FC<Props> = ({ experiences }) => {
           </SeeMoreLink>
         </div>
       </div>
-    </section>
+    </div>
   );
 };
 

@@ -7,5 +7,7 @@ export default createMiddleware({
 });
 
 export const config = {
-  matcher: ['/((?!api|_next|_vercel|studio|.*\\..*).*)'],
+  // opengraph-image routes are served as-is: redirecting the default locale's
+  // image (/en-US/… → /…) would hand crawlers a 307 instead of the PNG.
+  matcher: ['/((?!api|_next|_vercel|studio|.*opengraph-image|.*\\..*).*)'],
 };

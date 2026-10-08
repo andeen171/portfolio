@@ -1,10 +1,19 @@
+import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
 import ProjectTimeline from '@/components/projects/ProjectTimeline';
 import SectionHeading from '@/components/ui/SectionHeading';
+import { pageMetadata } from '@/lib/metadata';
 import { client } from '@/sanity/lib/client';
 import { listProjectsQuery } from '@/sanity/queries';
 
 const options = { next: { revalidate: 16800 } };
+
+type Props = { params: Promise<{ locale: string }> };
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { locale } = await params;
+  return pageMetadata(locale, 'projects');
+}
 
 export default async function ProjectsPage() {
   const projects = await client.fetch(listProjectsQuery, {}, options);

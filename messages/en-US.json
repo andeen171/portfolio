@@ -101,9 +101,7 @@
     "close": "Close",
     "moreTags": "{count, plural, one {# more tag} other {# more tags}}",
     "eyebrow": "skills",
-    "lede": "Languages, frameworks, databases, tools and soft skills, each dealt as a card. The rarer the foil, the deeper the know-how. Open any card to read it in full.",
-    "metaTitle": "Skills",
-    "metaDescription": "The languages, frameworks, databases and tools of Anderson Ribeiro Lopes, a backend-leaning full-stack developer from Belo Horizonte, Brazil, dealt as a deck of trading cards."
+    "lede": "Languages, frameworks, databases, tools and soft skills, each dealt as a card. The rarer the foil, the deeper the know-how. Open any card to read it in full."
   },
   "og": {
     "role": "Backend-leaning full-stack developer",

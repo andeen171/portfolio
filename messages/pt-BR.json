@@ -101,9 +101,7 @@
     "close": "Fechar",
     "moreTags": "{count, plural, one {mais # tag} other {mais # tags}}",
     "eyebrow": "habilidades",
-    "lede": "Linguagens, frameworks, bancos de dados, ferramentas e habilidades interpessoais, cada qual em sua carta. Quanto mais rara a carta, maior o domínio. Abra qualquer carta para lê-la por completo.",
-    "metaTitle": "Habilidades",
-    "metaDescription": "Linguagens, frameworks, bancos de dados e ferramentas de Anderson Ribeiro Lopes, desenvolvedor full-stack de Belo Horizonte com foco em backend, reunidos em um deck de cartas colecionáveis."
+    "lede": "Linguagens, frameworks, bancos de dados, ferramentas e habilidades interpessoais, cada qual em sua carta. Quanto mais rara a carta, maior o domínio. Abra qualquer carta para lê-la por completo."
   },
   "og": {
     "role": "Dev full-stack com foco em backend",

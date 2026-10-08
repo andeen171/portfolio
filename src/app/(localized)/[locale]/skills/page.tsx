@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
 import SkillsExplorer from '@/components/skills/SkillsExplorer';
 import SectionHeading from '@/components/ui/SectionHeading';
+import { pageMetadata } from '@/lib/metadata';
 import { client } from '@/sanity/lib/client';
 import { listSkillCategoriesQuery, listSkillsQuery } from '@/sanity/queries';
 
@@ -11,11 +12,7 @@ type Props = { params: Promise<{ locale: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
-  const t = await getTranslations({ locale, namespace: 'skills' });
-  return {
-    title: t('metaTitle'),
-    description: t('metaDescription'),
-  };
+  return pageMetadata(locale, 'skills');
 }
 
 export default async function SkillsPage() {
