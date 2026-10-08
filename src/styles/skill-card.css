@@ -240,10 +240,9 @@
 }
 
 /* Art window, base: a silver sheen that sweeps across as the pointer moves.
-   Untiered cards get a faint version; uncommon gets it at full strength. */
+   Unlit by default — untiered cards only get the card-wide glare — and
+   switched on from uncommon up (higher tiers replace the image). */
 .foil--art {
-  --foil-lit: 0.45;
-
   background: linear-gradient(
     115deg,
     transparent 30%,

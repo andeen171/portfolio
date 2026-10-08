@@ -46,7 +46,9 @@ const SkillItem: React.FC<SkillItemProps> = ({ skill }) => {
   const accent = (skill.accentColor ?? skill.category?.accentColor ?? 'lavender') as Accent;
   const svgCode = skill.svgCode ?? skill.category?.fallbackSvgCode;
   const tags = (skill.tags ?? []).slice(0, 3);
-  const years = skill.yearsOfExperience;
+  // "0 years" reads as a typo rather than a fact, so only positive figures show.
+  const years =
+    skill.yearsOfExperience && skill.yearsOfExperience > 0 ? skill.yearsOfExperience : null;
 
   // Scanning the SVG source is cheap but not free, and it never changes for a
   // given skill.
@@ -111,7 +113,7 @@ const SkillItem: React.FC<SkillItemProps> = ({ skill }) => {
           </p>
         </div>
 
-        {(proficiency || years != null) && (
+        {(proficiency || years) && (
           <footer className="skill-card__footer">
             {proficiency && tier ? (
               <span className="skill-card__rarity">
@@ -123,7 +125,7 @@ const SkillItem: React.FC<SkillItemProps> = ({ skill }) => {
             ) : (
               <span />
             )}
-            {years != null && years > 0 && <span>{t('years', { count: years })}</span>}
+            {years && <span>{t('years', { count: years })}</span>}
           </footer>
         )}
       </article>
