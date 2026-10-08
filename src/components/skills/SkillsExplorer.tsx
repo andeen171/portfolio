@@ -343,16 +343,20 @@ function useInView(ref: React.RefObject<HTMLElement | null>) {
   return inView;
 }
 
-/** Whether an element has come on screen from below, and stays true once it
- *  has scrolled past the top. */
+/** Whether an element has come up past the bottom of the screen, including
+ *  when it has since scrolled off the top. */
 function useReached(ref: React.RefObject<HTMLElement | null>) {
   const [reached, setReached] = useState(false);
 
   useEffect(() => {
     const element = ref.current;
     if (!element) return;
-    const observer = new IntersectionObserver(([entry]) => {
-      if (entry) setReached(entry.isIntersecting || entry.boundingClientRect.top < 0);
+    const observer = new IntersectionObserver(([entry]) => setReached(!!entry?.isIntersecting), {
+      // Stretch the root far above the viewport so "intersecting" means "above
+      // its bottom edge". A jump from past the top straight back below (the
+      // footer's "Back to top") then still crosses an edge and reports; with
+      // the plain viewport both ends are off-screen and no entry fires.
+      rootMargin: '1000000px 0px 0px 0px',
     });
     observer.observe(element);
     return () => observer.disconnect();
