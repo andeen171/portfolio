@@ -164,7 +164,7 @@
       },
       "projects": {
         "title": "Projects",
-        "description": "Side projects by Anderson Lopes: a Rust CLI that reverse-engineered a Dell G15’s keyboard and fan protocol, a thread-per-person simulation, an Atomic Habits monorepo and more."
+        "description": "Side projects by Anderson Lopes: a Rust CLI built on a reverse-engineered Dell G15 keyboard protocol, a thread-per-person simulation, a habit tracker inspired by Atomic Habits and more."
       },
       "experiences": {
         "title": "Experience",

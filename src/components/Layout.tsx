@@ -1,7 +1,7 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { type ReactNode, useEffect } from 'react';
+import { type ReactNode, useLayoutEffect } from 'react';
 import CommandPalette from '@/components/CommandPalette';
 import Footer from '@/components/Footer';
 import Header from '@/components/Header';
@@ -17,14 +17,19 @@ interface LayoutProps {
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   const t = useTranslations('navigation');
 
-  // The store owns the flavor; the document follows it. The inline script in
-  // the layout already painted the stored flavor, so this only has to track
-  // changes: rehydrating (now that hydration is done) and every swap after.
-  useEffect(() => {
+  // The store owns the flavor; the document follows it. Rehydrating here, after
+  // hydration, keeps the first client render equal to the server's mocha HTML.
+  // The flavor is re-applied on every mount, not only on change: switching
+  // language remounts the locale layout, and React resets <html>'s attributes
+  // to the server's class while the store still holds the stored flavor. A
+  // layout effect, so that reset is never painted.
+  useLayoutEffect(() => {
     const unsubscribe = useCtpStore.subscribe((state, previous) => {
       if (state.flavor !== previous.flavor) applyFlavor(state.flavor);
     });
+    // Synchronous with localStorage, so the state below is already the stored one.
     void useCtpStore.persist.rehydrate();
+    applyFlavor(useCtpStore.getState().flavor);
     return unsubscribe;
   }, []);
 

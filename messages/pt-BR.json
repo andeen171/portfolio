@@ -164,7 +164,7 @@
       },
       "projects": {
         "title": "Projetos",
-        "description": "Projetos pessoais de Anderson Lopes: uma CLI em Rust que fez engenharia reversa do protocolo de teclado e ventoinhas de um Dell G15, uma simulação com uma thread por pessoa, um monorepo de Hábitos Atômicos e mais."
+        "description": "Projetos pessoais de Anderson Lopes: uma CLI em Rust construída sobre a engenharia reversa do protocolo de teclado de um Dell G15, uma simulação com uma thread por pessoa, um app de hábitos inspirado em Hábitos Atômicos e mais."
       },
       "experiences": {
         "title": "Experiência",

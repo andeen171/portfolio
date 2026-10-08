@@ -45,7 +45,9 @@ const Footer: React.FC = () => {
   };
 
   return (
-    <footer className="relative mt-16 border-t border-ctp-surface0/80 bg-ctp-mantle/60 backdrop-blur-md sm:mt-24">
+    // No backdrop blur: over the full-width sky it leaves light seams down
+    // both edges on latte; a denser fill does the same job.
+    <footer className="relative mt-16 border-t border-ctp-surface0/80 bg-ctp-mantle/80 sm:mt-24">
       {/* A teal → lavender horizon along the top edge. */}
       <div
         aria-hidden="true"
