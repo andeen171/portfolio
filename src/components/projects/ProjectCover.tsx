@@ -50,7 +50,9 @@ function hash(value: string): number {
 /**
  * Prefixes the ids an inline SVG defines (gradients, clip paths) and every
  * reference to them. Two covers showing the same logo would otherwise define
- * the same id twice, and each would paint with whichever came first.
+ * the same id twice, and each would paint with whichever came first; the
+ * scope is per logo too, since different logos often reuse generic ids such
+ * as `a` or `paint0_linear`.
  */
 function scopeSvgIds(svg: string, scope: string): string {
   const ids = new Set([...svg.matchAll(/\bid=(["'])(.+?)\1/g)].map((match) => match[2]));
@@ -240,7 +242,12 @@ export default function ProjectCover({
                       tone && TILE_TONE[tone]
                     )}
                     // biome-ignore lint/security/noDangerouslySetInnerHtml: Sanity content
-                    dangerouslySetInnerHTML={{ __html: scopeSvgIds(skill.svgCode, scope) }}
+                    dangerouslySetInnerHTML={{
+                      __html: scopeSvgIds(
+                        skill.svgCode,
+                        `${scope}-${hash(skill._id).toString(36)}`
+                      ),
+                    }}
                   />
                 );
               })}

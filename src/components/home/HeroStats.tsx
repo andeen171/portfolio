@@ -1,14 +1,8 @@
 'use client';
 
-import {
-  animate,
-  type MotionValue,
-  motion,
-  useMotionValue,
-  useReducedMotion,
-  useTransform,
-} from 'motion/react';
+import { animate, type MotionValue, motion, useMotionValue, useTransform } from 'motion/react';
 import { useEffect, useRef, useState } from 'react';
+import { usePrefersReducedMotion } from '@/lib/usePrefersReducedMotion';
 import { cn } from '@/lib/utils';
 
 export interface HeroStat {
@@ -43,6 +37,9 @@ function StatValue({ value, phase, delay }: { value: number; phase: Phase; delay
   const rounded: MotionValue<number> = useTransform(count, (v) => Math.round(v));
 
   useEffect(() => {
+    // Back to idle (reduced motion switched on mid-way) shows the final value
+    // again; the cleanup below has already stopped any running count.
+    if (phase === 'idle') count.jump(value);
     if (phase === 'armed') count.jump(0);
     if (phase !== 'play') return;
     const controls = animate(count, value, { duration: 1.6, delay, ease: [0.16, 1, 0.3, 1] });
@@ -61,12 +58,16 @@ function StatValue({ value, phase, delay }: { value: number; phase: Phase; delay
  */
 export default function HeroStats({ stats, label }: { stats: HeroStat[]; label: string }) {
   const ref = useRef<HTMLDListElement>(null);
-  const reduceMotion = useReducedMotion();
+  const reduceMotion = usePrefersReducedMotion();
   const [phase, setPhase] = useState<Phase>('idle');
 
   useEffect(() => {
     const element = ref.current;
-    if (!element || reduceMotion) return;
+    if (!element) return;
+    if (reduceMotion) {
+      setPhase('idle');
+      return;
+    }
 
     const rect = element.getBoundingClientRect();
     const onScreen = rect.bottom > 0 && rect.top < window.innerHeight;
