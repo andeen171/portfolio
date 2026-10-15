@@ -231,21 +231,13 @@
   /* The hairline light rim keeps near-black logos readable on the dark
      window; on coloured logos it's invisible. */
   filter: drop-shadow(0 0 0.75px rgb(255 255 255 / 0.4)) drop-shadow(0 6px 10px rgb(0 0 0 / 0.35));
-  transition:
-    transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1),
-    translate 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+  transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
-/* Lit, the logo lifts and drifts against the pointer, so it reads as sitting
-   above the window rather than printed on it. The offsets are percentages of
-   the logo's own size: a few pixels at most. */
+/* Lit, the logo lifts slightly but holds still; the card's tilt and foil
+   carry the motion. */
 .skill-card[data-active] .skill-svg-container {
-  transform: scale(1.08);
-  translate: calc((50% - var(--pointer-x)) * 0.3) calc((50% - var(--pointer-y)) * 0.3);
-}
-
-.skill-card[data-tracking] .skill-svg-container {
-  transition-duration: 0.12s;
+  transform: scale(1.06);
 }
 
 .skill-card__art + ul {
@@ -970,7 +962,6 @@ html:has(.skill-dialog[open]) {
   .skill-card,
   .skill-card[data-active] .skill-svg-container {
     transform: none;
-    translate: none;
   }
 
   /* The card still turns over, just without the half-revolution. */
