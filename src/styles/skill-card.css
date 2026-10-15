@@ -141,6 +141,10 @@
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
   transform: translateZ(0.5px);
+  /* Grid tracks and the carousel size the card from 14rem up; the back reads
+     its own width to fit the description (see `@container` under Back). A
+     side is a leaf of the 3D scene, so its containment flattens nothing. */
+  container-type: inline-size;
 }
 
 .skill-card__side--back {
@@ -263,19 +267,10 @@
   margin-bottom: 0.75rem;
 }
 
-/* Compact card: the text fills the box and fades out over its last line, so
-   a long description ends softly instead of being cut mid-line. Short text
-   never reaches the fade. */
-.skill-card__rules-fit {
-  height: 100%;
-  overflow: hidden;
-  mask-image: linear-gradient(to bottom, #000 calc(100% - 1.25rem), transparent);
-}
-
-/* Flavor text (detail card only): the italic aside at the foot of the rules,
-   set off by a hairline in the accent that fades out at both ends. Subtext0
-   keeps it a step quieter than the rules without dropping below AA, on the
-   dark panels and on latte's lightened one alike. */
+/* Flavor text: alone in the compact front's text box, and on the detail card
+   the italic aside at the foot of the rules, set off by a hairline in the
+   accent that fades out at both ends. Subtext0 keeps it a step quieter than
+   the rules on the dark flavors; latte needs subtext1 to hold AA (below). */
 .skill-card__flavor {
   margin-top: 0.875rem;
   padding-top: 0.75rem;
@@ -360,20 +355,48 @@
   /* Room on the right for the inspect button. */
   padding: 0.75rem 2.75rem 0.5rem 0.875rem;
   color: var(--accent);
+  background: var(--panel);
+  border-bottom: 1px solid color-mix(in oklab, var(--accent) 30%, transparent);
 }
 
 .skill-card__back-body {
   flex: 0 1 auto;
   min-height: 0;
-  margin: 0.25rem 0.75rem 0;
+  margin: 0.625rem 0.75rem 0;
   padding: 0.75rem 0.875rem;
   overflow: hidden;
   border-radius: 0.5rem;
   border: 1px solid color-mix(in oklab, var(--accent) 22%, transparent);
   background: var(--panel);
-  /* Descriptions are capped to fit; if one ever runs long, it fades out
-     rather than cutting a line in half. */
-  mask-image: linear-gradient(to bottom, #000 calc(100% - 0.75rem), transparent);
+}
+
+/* Sanity caps descriptions at a length that fits in about seven lines at
+   either card width below; the clamp is a backstop that ends a longer one
+   with an ellipsis (the full text is one click away, in the dialog) instead
+   of hiding its end without a trace. */
+.skill-card__back-body p {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 8;
+  line-clamp: 8;
+  overflow: hidden;
+}
+
+/* The narrowest cards (a 14rem grid track): smaller text, and the stats lose
+   the tags row, which the front already shows. */
+@container (width < 16rem) {
+  .skill-card__back-body {
+    padding: 0.625rem 0.75rem;
+  }
+
+  .skill-card__back-body p {
+    font-size: 0.75rem;
+    line-height: 1.45;
+  }
+
+  .skill-card__stats [data-stat="tags"] {
+    display: none;
+  }
 }
 
 /* The card's stats as a terminal readout, pinned to the bottom edge; whatever
@@ -477,8 +500,9 @@
   outline-offset: 3px;
 }
 
-/* A small "expand" mark in the header corner, shown when the card is lit or
-   focused, and always (dimmer) on touch screens, which have no hover. */
+/* A small "turn over" mark in the front's header corner, shown when the card
+   is lit or focused, and always (dimmer) on touch screens, which have no
+   hover. */
 .skill-card__hint {
   position: absolute;
   top: 0.625rem;
@@ -753,6 +777,15 @@
   color: var(--catppuccin-color-subtext1);
 }
 
+/* Subtext0 sits around 4:1 on latte's pale panels and face, under AA for
+   this small text; one step darker clears it. */
+.latte .skill-card__flavor,
+.latte .skill-card__footer,
+.latte .skill-card__header p,
+.latte .skill-card__back-header p {
+  color: var(--catppuccin-color-subtext1);
+}
+
 .latte .skill-card__inspect {
   background: color-mix(in oklab, var(--catppuccin-color-base) 80%, transparent);
 }
@@ -894,15 +927,12 @@ html:has(.skill-dialog[open]) {
    settles square. The stagger caps out after a dozen cards so a long grid
    doesn't take seconds to settle. */
 .skill-deal {
+  /* Which way a card is turned as it lands; set inline per card, alternating. */
   --deal-turn: 1;
   /* `backwards`, not `both`: a filled animation would leave every card in its
      own stacking context and trap the active card's z-index. */
   animation: skill-deal 0.65s cubic-bezier(0.2, 0.9, 0.3, 1.08) backwards;
   animation-delay: calc(min(var(--i, 0), 12) * 45ms);
-}
-
-.skill-deal:nth-child(even) {
-  --deal-turn: -1;
 }
 
 @keyframes skill-deal {
@@ -915,9 +945,9 @@ html:has(.skill-dialog[open]) {
 }
 
 /* The carousel waits to deal until it scrolls into view (SkillsSection sets
-   `data-deal` once it does). Only with scripting: without it nothing would
-   ever reveal the cards. */
-@media (scripting: enabled) {
+   `data-deal` once it does). Only on screen and with scripting: without it
+   nothing would ever reveal the cards, and print has no scrolling. */
+@media screen and (scripting: enabled) {
   [data-deal="waiting"] .skill-deal {
     opacity: 0;
     animation: none;

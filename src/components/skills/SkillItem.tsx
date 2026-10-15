@@ -147,15 +147,20 @@ const SkillItem: React.FC<{ skill: Skill }> = ({ skill }) => {
             <div aria-hidden className="skill-card__glare" />
           </div>
 
-          <div className="skill-card__side skill-card__side--back" inert={!flipped}>
+          {/* Esc from anywhere on the back (either button) turns it over. */}
+          {/* biome-ignore lint/a11y/noStaticElementInteractions: catches Esc bubbling up from the back's own buttons */}
+          <div
+            className="skill-card__side skill-card__side--back"
+            inert={!flipped}
+            onKeyDown={(event) => {
+              if (event.key === 'Escape') turn(false);
+            }}
+          >
             <SkillCardBack skill={skill} />
             <button
               ref={backButton}
               type="button"
               onClick={() => turn(false)}
-              onKeyDown={(event) => {
-                if (event.key === 'Escape') turn(false);
-              }}
               className="skill-card__open"
             >
               <span className="sr-only">{t('flipBack', { name })}</span>
@@ -400,7 +405,8 @@ const SkillCardFace = ({
   );
 };
 
-/** Rarity and years along the bottom edge, the same on both sides. */
+/** Rarity and years along the front's bottom edge (the back has them in its
+ *  stats readout). */
 const CardFooter = ({ skill, tier }: { skill: Skill; tier?: RarityTier }) => {
   const t = useTranslations('skills');
   const proficiency = isProficiency(skill.proficiency) ? skill.proficiency : undefined;
@@ -453,7 +459,12 @@ const SkillCardBack = ({ skill }: { skill: Skill }) => {
         戦
       </span>
       <header className="skill-card__back-header">
-        <h3 className="truncate text-[0.9375rem] leading-tight font-bold">{skill.name}</h3>
+        <h3
+          className="truncate text-[0.9375rem] leading-tight font-bold"
+          title={skill.name ?? undefined}
+        >
+          {skill.name}
+        </h3>
         {categoryName && (
           <p className="mt-0.5 truncate text-[0.625rem] tracking-[0.14em] text-ctp-subtext0 uppercase">
             {categoryName}
@@ -493,8 +504,8 @@ const SkillCardBack = ({ skill }: { skill: Skill }) => {
           )}
           {tags.length > 0 && (
             <>
-              <dt>{t('stats.tags')}</dt>
-              <dd>{tags.join(' · ')}</dd>
+              <dt data-stat="tags">{t('stats.tags')}</dt>
+              <dd data-stat="tags">{tags.join(' · ')}</dd>
             </>
           )}
         </dl>

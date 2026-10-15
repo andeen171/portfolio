@@ -40,21 +40,29 @@ const SkillsSection: React.FC<Props> = ({ skills, categories }) => {
   // The cards are dealt when the section scrolls into view, not on page load
   // far above it, where the animation would play to nobody. A category
   // change re-keys the carousel, so the new hand is dealt in turn.
+  //
+  // "Into view" is the section's top edge passing the lower 15% of the
+  // viewport, not a share of its height: a share of a section this tall may
+  // never fit on a short or zoomed-in screen. Focus arriving inside (a
+  // keyboard user tabbing ahead of the scroll) deals too.
   const sectionRef = useRef<HTMLDivElement>(null);
   const [dealt, setDealt] = useState(false);
   useEffect(() => {
     const section = sectionRef.current;
     if (!section) return;
+    const deal = () => setDealt(true);
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (!entry?.isIntersecting) return;
-        setDealt(true);
-        observer.disconnect();
+        if (entry?.isIntersecting) deal();
       },
-      { threshold: 0.25 }
+      { rootMargin: '0px 0px -15% 0px' }
     );
     observer.observe(section);
-    return () => observer.disconnect();
+    section.addEventListener('focusin', deal);
+    return () => {
+      observer.disconnect();
+      section.removeEventListener('focusin', deal);
+    };
   }, []);
 
   return (

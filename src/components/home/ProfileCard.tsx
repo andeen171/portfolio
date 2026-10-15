@@ -83,7 +83,7 @@ export default function ProfileCard({
               <span className="absolute inline-flex size-full rounded-full bg-ctp-green opacity-60 motion-safe:animate-ping" />
               <span className="relative inline-flex size-2 rounded-full bg-ctp-green" />
             </span>
-            <span className="font-semibold tracking-wider text-ctp-green uppercase latte:text-ctp-green-800">
+            <span className="font-semibold tracking-wider text-ctp-green uppercase latte:text-ctp-green-900">
               {status.label}
             </span>
             <span className="truncate font-semibold text-ctp-text" title={status.company}>
