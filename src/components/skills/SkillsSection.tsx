@@ -1,7 +1,7 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Carousel,
   CarouselContent,
@@ -37,8 +37,28 @@ const SkillsSection: React.FC<Props> = ({ skills, categories }) => {
     return skills.filter((skill) => skill.category?._id === activeCategory);
   }, [skills, activeCategory]);
 
+  // The cards are dealt when the section scrolls into view, not on page load
+  // far above it, where the animation would play to nobody. A category
+  // change re-keys the carousel, so the new hand is dealt in turn.
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const [dealt, setDealt] = useState(false);
+  useEffect(() => {
+    const section = sectionRef.current;
+    if (!section) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry?.isIntersecting) return;
+        setDealt(true);
+        observer.disconnect();
+      },
+      { threshold: 0.25 }
+    );
+    observer.observe(section);
+    return () => observer.disconnect();
+  }, []);
+
   return (
-    <div className="py-24 sm:py-32">
+    <div ref={sectionRef} data-deal={dealt ? 'dealt' : 'waiting'} className="py-24 sm:py-32">
       <div className="mx-auto max-w-7xl px-6 text-center lg:px-8">
         <SectionHeading index="04" eyebrow={t('eyebrow')} title={t('subtitle')} />
         <p className="mx-auto mt-4 max-w-2xl text-pretty text-ctp-subtext1">{t('lede')}</p>
@@ -79,9 +99,12 @@ const SkillsSection: React.FC<Props> = ({ skills, categories }) => {
           className="-mx-6 mt-12 px-6 sm:mt-14 lg:mt-16"
         >
           <CarouselContent className="py-10">
-            {filtered.map((skill) => (
+            {filtered.map((skill, i) => (
               <CarouselItem key={skill._id} className={SLIDE}>
-                <div className="flex justify-center">
+                <div
+                  className="skill-deal flex justify-center"
+                  style={{ '--i': i, '--deal-turn': i % 2 ? -1 : 1 } as React.CSSProperties}
+                >
                   <SkillItem skill={skill} />
                 </div>
               </CarouselItem>

@@ -1,5 +1,5 @@
 import { ArrowDownIcon, ChevronDownIcon } from '@heroicons/react/20/solid';
-import { useLocale, useTranslations } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import AnchorLink from '@/components/home/AnchorLink';
 import HeroStats, { type HeroStat } from '@/components/home/HeroStats';
 import TypedText from '@/components/home/TypedText';
@@ -7,7 +7,6 @@ import ProgrammingSVG from '@/components/SVG/ProgrammingSVG';
 import { SOCIALS } from '@/lib/social';
 import { cn } from '@/lib/utils';
 import type { HeroQueryResult } from '@/sanity/types';
-import { useLocalization } from '@/utils/localization';
 import BackgroundBlurSVG from './SVG/BackgroundBlurSVG';
 
 const FULL_NAME = 'Anderson Ribeiro Lopes';
@@ -35,15 +34,6 @@ interface HeroSectionProps {
 export default function HeroSection({ hero }: HeroSectionProps) {
   const t = useTranslations('home.hero');
   const tContact = useTranslations('contact');
-  const locale = useLocale() as 'en-US' | 'pt-BR';
-  const { getLocalizedValue } = useLocalization();
-
-  // The helper falls back to the first entry's value, which Sanity may leave
-  // unset, so it can hand back undefined despite its type.
-  const role = (getLocalizedValue(hero?.current?.title ?? undefined, locale) ?? '').trim();
-  const company = hero?.current?.company?.trim() ?? '';
-  const currentRole = [company, role].filter(Boolean).join(' · ');
-
   // Whole years, floored: "6+" stays true until the seventh anniversary.
   // Rendered on the server, so the client never recomputes it differently.
   const careerStart = hero?.careerStart ? Date.parse(hero.careerStart) : Number.NaN;
@@ -74,42 +64,10 @@ export default function HeroSection({ hero }: HeroSectionProps) {
 
       <div className="mx-auto grid w-full max-w-7xl items-center gap-x-12 gap-y-12 px-4 sm:px-6 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)] lg:px-8">
         <div className="min-w-0">
-          {currentRole && (
-            <p
-              className={cn(
-                reveal,
-                'inline-flex max-w-full items-center gap-2.5 rounded-full bg-ctp-mantle/60 py-1.5 pr-4 pl-3 font-nf text-xs ring-1 ring-ctp-surface1/70 backdrop-blur-md sm:text-sm'
-              )}
-            >
-              <span aria-hidden="true" className="relative flex size-2 shrink-0">
-                <span className="absolute inline-flex size-full rounded-full bg-ctp-green opacity-60 motion-safe:animate-ping" />
-                <span className="relative inline-flex size-2 rounded-full bg-ctp-green" />
-              </span>
-              <span className="shrink-0 font-semibold uppercase tracking-wider text-ctp-green latte:text-ctp-text">
-                {t('now')}
-              </span>
-              <span aria-hidden="true" className="h-3.5 w-px shrink-0 bg-ctp-surface2" />
-              {/* Company first: on a narrow screen the truncation eats the
-                  title, not who he works for. */}
-              <span className="min-w-0 truncate text-ctp-subtext1" title={currentRole}>
-                {company && <span className="text-ctp-text">{company}</span>}
-                {company && role && (
-                  <>
-                    <span aria-hidden="true" className="px-2 text-ctp-overlay1">
-                      ·
-                    </span>
-                    <span className="sr-only">, </span>
-                  </>
-                )}
-                {role}
-              </span>
-            </p>
-          )}
-
           {/* A shell prompt whose "output" is the name below. */}
           <p
             aria-hidden="true"
-            className={cn(reveal, 'mt-8 font-nf text-sm text-ctp-subtext0 delay-75 sm:text-base')}
+            className={cn(reveal, 'font-nf text-sm text-ctp-subtext0 sm:text-base')}
           >
             <span className="text-ctp-green">anderson</span>
             <span className="text-ctp-overlay1">@</span>

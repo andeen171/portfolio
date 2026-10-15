@@ -393,11 +393,12 @@ export type PreviewExperiencesQueryResult = Array<{
 
 // Source: src/sanity/queries.ts
 // Variable: heroQuery
-// Query: {    "current": *[_type == "experience" && !defined(endDate)] | order(startDate desc)[0] {      title,      company    },    "careerStart": *[_type == "experience"] | order(startDate asc)[0].startDate,    "projectCount": count(*[_type == "project"]),    "skillCount": count(*[_type == "skill"]),    "companyCount": count(array::unique(*[_type == "experience"].company))  }
+// Query: {    "current": *[_type == "experience" && !defined(endDate)] | order(startDate desc)[0] {      title,      company,      startDate    },    "careerStart": *[_type == "experience"] | order(startDate asc)[0].startDate,    "projectCount": count(*[_type == "project"]),    "skillCount": count(*[_type == "skill"]),    "companyCount": count(array::unique(*[_type == "experience"].company))  }
 export type HeroQueryResult = {
   current: {
     title: InternationalizedArrayString | null;
     company: string | null;
+    startDate: string | null;
   } | null;
   careerStart: string | null;
   projectCount: number;
@@ -460,7 +461,7 @@ declare module '@sanity/client' {
     '\n  *[_type == "project"] {\n    ...,\n    skills[]->\n  } | order(date desc)[0..1]\n': PreviewProjectsQueryResult;
     '\n  *[_type == "experience"] {\n    ...,\n    skills[]->{ _id, name }\n  } | order(endDate desc)\n': ListExperiencesQueryResult;
     '\n  *[_type == "experience"] {\n    ...,\n    skills[]->{ _id, name }\n  } | order(endDate desc)[0..2]\n': PreviewExperiencesQueryResult;
-    '\n  {\n    "current": *[_type == "experience" && !defined(endDate)] | order(startDate desc)[0] {\n      title,\n      company\n    },\n    "careerStart": *[_type == "experience"] | order(startDate asc)[0].startDate,\n    "projectCount": count(*[_type == "project"]),\n    "skillCount": count(*[_type == "skill"]),\n    "companyCount": count(array::unique(*[_type == "experience"].company))\n  }\n': HeroQueryResult;
+    '\n  {\n    "current": *[_type == "experience" && !defined(endDate)] | order(startDate desc)[0] {\n      title,\n      company,\n      startDate\n    },\n    "careerStart": *[_type == "experience"] | order(startDate asc)[0].startDate,\n    "projectCount": count(*[_type == "project"]),\n    "skillCount": count(*[_type == "skill"]),\n    "companyCount": count(array::unique(*[_type == "experience"].company))\n  }\n': HeroQueryResult;
     '\n  *[ _type == "skill"] {\n    ...,\n    category->\n  } | order(category->order asc, name asc)\n': ListSkillsQueryResult;
     '\n  *[ _type == "skillCategory"] | order(order asc)\n': ListSkillCategoriesQueryResult;
   }

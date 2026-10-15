@@ -20,7 +20,6 @@
   },
   "home": {
     "hero": {
-      "now": "now",
       "tagline": "I build backend systems that <hl>move money</hl>.",
       "lead": "Payments at PicPay today; distributed transactions for flight purchases at Onfly before that. Off the clock: Rust side quests on Arch Linux.",
       "exploreProjects": "Explore projects",
@@ -64,7 +63,10 @@
     },
     "card": {
       "name": "Anderson Lopes",
-      "type": "Human — Backend Developer",
+      "type": "Human — {role}",
+      "typeFallback": "Human — Backend Developer",
+      "now": "now",
+      "since": "since {date}",
       "origin": "Belo Horizonte, BR",
       "flavor": "Self-taught. Runs Arch, btw.",
       "photoAlt": "Illustrated portrait of Anderson Lopes"
@@ -107,11 +109,18 @@
       "proficiency": "Highest proficiency"
     },
     "backToFilters": "Search & filters",
-    "showDetails": "Show details: {name}",
+    "flip": "Turn {name} over to read about it",
+    "flipBack": "Turn {name} back over",
+    "inspect": "See {name} up close",
+    "stats": {
+      "mastery": "mastery",
+      "inUse": "in use",
+      "tags": "tags"
+    },
     "close": "Close",
     "moreTags": "{count, plural, one {# more tag} other {# more tags}}",
     "eyebrow": "skills",
-    "lede": "Languages, frameworks, databases, tools and soft skills, each dealt as a card. The rarer the foil, the deeper the know-how. Open any card to read it in full."
+    "lede": "Languages, frameworks, databases, tools and soft skills, each dealt as a card. The rarer the foil, the deeper the know-how. Turn a card over to read it, or inspect it up close."
   },
   "og": {
     "role": "Backend-leaning full-stack developer",

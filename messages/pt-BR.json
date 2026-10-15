@@ -20,7 +20,6 @@
   },
   "home": {
     "hero": {
-      "now": "agora",
       "tagline": "Construo sistemas backend que <hl>movimentam dinheiro</hl>.",
       "lead": "Hoje, pagamentos no PicPay; antes, transações distribuídas para compra de passagens aéreas na Onfly. Nas horas vagas: side quests em Rust no Arch Linux.",
       "exploreProjects": "Explorar projetos",
@@ -64,7 +63,10 @@
     },
     "card": {
       "name": "Anderson Lopes",
-      "type": "Humano — Desenvolvedor Backend",
+      "type": "Humano — {role}",
+      "typeFallback": "Humano — Desenvolvedor Backend",
+      "now": "agora",
+      "since": "desde {date}",
       "origin": "Belo Horizonte, BR",
       "flavor": "Autodidata. Usa Arch, btw.",
       "photoAlt": "Retrato ilustrado de Anderson Lopes"
@@ -107,11 +109,18 @@
       "proficiency": "Maior proficiência"
     },
     "backToFilters": "Busca e filtros",
-    "showDetails": "Ver detalhes: {name}",
+    "flip": "Virar a carta {name} para ler sobre ela",
+    "flipBack": "Desvirar a carta {name}",
+    "inspect": "Ver {name} de perto",
+    "stats": {
+      "mastery": "domínio",
+      "inUse": "em uso",
+      "tags": "tags"
+    },
     "close": "Fechar",
     "moreTags": "{count, plural, one {mais # tag} other {mais # tags}}",
     "eyebrow": "habilidades",
-    "lede": "Linguagens, frameworks, bancos de dados, ferramentas e habilidades interpessoais, cada qual em sua carta. Quanto mais rara a carta, maior o domínio. Abra qualquer carta para lê-la por completo."
+    "lede": "Linguagens, frameworks, bancos de dados, ferramentas e habilidades interpessoais, cada qual em sua carta. Quanto mais rara a carta, maior o domínio. Vire uma carta para lê-la ou veja-a de perto."
   },
   "og": {
     "role": "Dev full-stack com foco em backend",

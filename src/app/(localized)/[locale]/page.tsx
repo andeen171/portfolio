@@ -33,7 +33,7 @@ export default async function IndexPage() {
     <>
       <HeroSection hero={hero} />
       <section id="about" className={anchor}>
-        <AboutSection />
+        <AboutSection current={hero?.current} />
       </section>
       <section id="projects" className={anchor}>
         <ProjectsSection projects={projects} />

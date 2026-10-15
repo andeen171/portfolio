@@ -1,13 +1,15 @@
 'use client';
 
 import { ChevronDownIcon } from '@heroicons/react/20/solid';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { useEffect, useId, useRef, useState } from 'react';
 import ProfileCard from '@/components/home/ProfileCard';
 import TypedText from '@/components/home/TypedText';
 import SectionHeading from '@/components/ui/SectionHeading';
 import { SOCIALS } from '@/lib/social';
 import { cn } from '@/lib/utils';
+import type { HeroQueryResult } from '@/sanity/types';
+import { useLocalization } from '@/utils/localization';
 
 const ROLE_KEYS = ['backend', 'fullstack', 'linux', 'entrepreneur', 'father', 'thinker'] as const;
 
@@ -17,14 +19,39 @@ const KEEP_DESKTOP = 2;
 
 type Heights = { collapsed: number; full: number };
 
-const AboutSection: React.FC = () => {
+interface AboutSectionProps {
+  /** The open-ended experience in Sanity, printed on the profile card. */
+  current?: HeroQueryResult['current'];
+}
+
+const AboutSection: React.FC<AboutSectionProps> = ({ current }) => {
   const t = useTranslations('about');
+  const locale = useLocale() as 'en-US' | 'pt-BR';
+  const { getLocalizedValue } = useLocalization();
   const bodyId = useId();
   const innerRef = useRef<HTMLDivElement>(null);
   const [isExpanded, setIsExpanded] = useState(false);
   const [heights, setHeights] = useState<Heights | null>(null);
 
   const roles = ROLE_KEYS.map((key) => t(`typedStrings.${key}`));
+
+  // The helper falls back to the first entry's value, which Sanity may leave
+  // unset, so it can hand back undefined despite its type.
+  const role = (getLocalizedValue(current?.title ?? undefined, locale) ?? '').trim();
+  const company = current?.company?.trim();
+  // A plain YYYY-MM-DD date: formatted in UTC so the server and the browser
+  // land on the same month whatever their time zones.
+  const startedAt = current?.startDate ? new Date(current.startDate) : null;
+  const since =
+    startedAt && !Number.isNaN(startedAt.getTime())
+      ? t('card.since', {
+          date: new Intl.DateTimeFormat(locale, {
+            month: 'short',
+            year: 'numeric',
+            timeZone: 'UTC',
+          }).format(startedAt),
+        })
+      : undefined;
   const paragraphs = t('description')
     .split('\n\n')
     .map((p) => p.trim())
@@ -75,7 +102,8 @@ const AboutSection: React.FC = () => {
 
         <ProfileCard
           name={t('card.name')}
-          type={t('card.type')}
+          type={role ? t('card.type', { role }) : t('card.typeFallback')}
+          status={company ? { label: t('card.now'), company, since } : undefined}
           flavor={t('card.flavor')}
           origin={t('card.origin')}
           handle={SOCIALS.github.handle}

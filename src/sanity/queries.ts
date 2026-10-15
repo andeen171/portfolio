@@ -35,7 +35,8 @@ export const heroQuery = defineQuery(`
   {
     "current": *[_type == "experience" && !defined(endDate)] | order(startDate desc)[0] {
       title,
-      company
+      company,
+      startDate
     },
     "careerStart": *[_type == "experience"] | order(startDate asc)[0].startDate,
     "projectCount": count(*[_type == "project"]),
