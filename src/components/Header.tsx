@@ -2,7 +2,7 @@
 
 import { Popover, PopoverButton, PopoverPanel } from '@headlessui/react';
 import { Bars3Icon, CommandLineIcon, XMarkIcon } from '@heroicons/react/24/outline';
-import { motion, useReducedMotion } from 'motion/react';
+import { motion } from 'motion/react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useEffect, useId, useState } from 'react';
 import { PaletteShortcut } from '@/components/CommandPalette';
@@ -11,6 +11,7 @@ import ThemeSelector, { FlavorSwatch } from '@/components/ThemeSelector';
 import { Link, usePathname } from '@/i18n/routing';
 import { isActivePath, NAV_ITEMS } from '@/lib/navigation';
 import { FLAVOR_NAMES, FLAVORS } from '@/lib/theme';
+import { usePrefersReducedMotion } from '@/lib/usePrefersReducedMotion';
 import { cn } from '@/lib/utils';
 import { useCommandPalette, useCtpStore } from '@/store';
 
@@ -56,7 +57,7 @@ function PaletteTrigger() {
 
 function DesktopNav({ pathname }: { pathname: string }) {
   const t = useTranslations('navigation');
-  const reduceMotion = useReducedMotion();
+  const reduceMotion = usePrefersReducedMotion();
 
   return (
     <nav aria-label={t('primary')} className="hidden lg:block">

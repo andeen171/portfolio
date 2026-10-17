@@ -1,8 +1,8 @@
 'use client';
 
-import { useReducedMotion } from 'motion/react';
 import { useEffect, useRef } from 'react';
 import Typed from 'typed.js';
+import { usePrefersReducedMotion } from '@/lib/usePrefersReducedMotion';
 import { cn } from '@/lib/utils';
 
 interface TypedTextProps {
@@ -33,7 +33,7 @@ export default function TypedText({
   className,
 }: TypedTextProps) {
   const textRef = useRef<HTMLSpanElement>(null);
-  const reduceMotion = useReducedMotion();
+  const reduceMotion = usePrefersReducedMotion();
   // A stable dependency: callers pass fresh arrays on every render.
   const key = strings.join('\u0000');
 

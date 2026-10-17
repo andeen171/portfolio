@@ -1,9 +1,9 @@
 'use client';
 
 import { type CatppuccinColors, flavors } from '@catppuccin/palette';
-import { useReducedMotion } from 'motion/react';
 import type React from 'react';
 import { useEffect, useRef } from 'react';
+import { usePrefersReducedMotion } from '@/lib/usePrefersReducedMotion';
 import { cn } from '@/lib/utils';
 import { useCtpStore } from '@/store';
 
@@ -55,7 +55,7 @@ export const StarsBackground: React.FC<StarBackgroundProps> = ({
   className,
 }) => {
   const flavor = useCtpStore((state) => state.flavor);
-  const reduceMotion = useReducedMotion();
+  const reduceMotion = usePrefersReducedMotion();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const paletteRef = useRef(starPalette(flavors[flavor].colors));
   // Repaints one frame; the sky's effect points it at its current closure.
