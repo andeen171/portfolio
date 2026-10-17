@@ -21,6 +21,11 @@ interface TimelineProps {
 
 const clamp = (value: number) => Math.min(1, Math.max(0, value));
 
+/** Where reading happens: this share of the viewport below the rail's sticky
+ *  line. A year counts as reached once its heading crosses it, so the year
+ *  in front of you is lit, not only one that has scrolled to the very top. */
+const READING_LINE = 0.35;
+
 /**
  * A vertical timeline grouped by year. The year sits in a sticky column on
  * the left while its entries scroll past.
@@ -28,8 +33,9 @@ const clamp = (value: number) => Math.min(1, Math.max(0, value));
  * Beside it runs a rail that stays put on screen: a map of the whole list,
  * with a dot for each year at the point where that year starts. A comet
  * fills the rail as you read, so it moves at a fraction of the page's speed
- * and you can see how far through the list you are. Each dot lights up as its
- * year reaches the top, and the latest one glows.
+ * and you can see how far through the list you are. Each dot lights up as the
+ * comet reaches it, when its year comes up to be read, and the latest one
+ * glows.
  */
 export const Timeline = ({ data, yearAs: Year = 'h3' }: TimelineProps) => {
   const listRef = useRef<HTMLDivElement>(null);
@@ -43,8 +49,8 @@ export const Timeline = ({ data, yearAs: Year = 'h3' }: TimelineProps) => {
   const { scrollY } = useScroll();
 
   /**
-   * Reading progress: 0 until the list's top reaches the rail's sticky line,
-   * then 1 once its bottom is on screen. A short list (one that fits on
+   * Reading progress: 0 until the list's top reaches the reading line, then
+   * 1 once its bottom is on screen. A short list (one that fits on
    * screen) still gets half its own height to fill over, and the span never
    * outruns the page, so the rail always fills by the time the page ends.
    * Measured live, so content loading or expanding above or inside the list
@@ -55,8 +61,9 @@ export const Timeline = ({ data, yearAs: Year = 'h3' }: TimelineProps) => {
     const rail = railRef.current;
     if (!list || !rail) return;
     const rect = list.getBoundingClientRect();
-    const line = Number.parseFloat(getComputedStyle(rail).top) || 0;
     const viewport = window.innerHeight;
+    const sticky = Number.parseFloat(getComputedStyle(rail).top) || 0;
+    const line = sticky + (viewport - sticky) * READING_LINE;
     const pageEnd =
       document.documentElement.scrollHeight - viewport + line - (rect.top + window.scrollY);
     const span = Math.max(
