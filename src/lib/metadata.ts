@@ -1,11 +1,10 @@
 import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
 import { getPathname, routing } from '@/i18n/routing';
+import { getProfile } from '@/lib/getProfile';
+import { type AppLocale, type Profile, xHandle } from '@/lib/profile';
 
-/** The X handle, for Twitter-card attribution. */
-export const X_HANDLE = '@Andeen171';
-
-export type AppLocale = (typeof routing.locales)[number];
+export type { AppLocale };
 
 const OG_LOCALES: Record<AppLocale, string> = { 'en-US': 'en_US', 'pt-BR': 'pt_BR' };
 
@@ -27,11 +26,10 @@ export function alternatesFor(locale: AppLocale, href: string): Metadata['altern
  * file convention, which only fills a segment's own openGraph/twitter: each
  * sub-page folder re-exports the locale's card for that reason.
  */
-export async function baseOpenGraph(locale: AppLocale) {
-  const t = await getTranslations({ locale, namespace: 'meta' });
+export function baseOpenGraph(locale: AppLocale, profile: Profile) {
   return {
     type: 'website',
-    siteName: t('siteName'),
+    siteName: profile.shortName,
     locale: OG_LOCALES[locale],
     alternateLocale: routing.locales
       .filter((other) => other !== locale)
@@ -41,9 +39,13 @@ export async function baseOpenGraph(locale: AppLocale) {
 
 type Page = 'skills' | 'projects' | 'experiences';
 
+/** The title template: "Skills · Anderson Lopes". */
+export const titleTemplate = (profile: Profile) =>
+  profile.shortName ? `%s · ${profile.shortName}` : '%s';
+
 /**
  * Metadata for a sub-page: a localized title (the layout's template adds
- * " · Anderson Lopes"), description, its own canonical/hreflang links and
+ * " · <short name>"), its description from the Sanity profile, its own canonical/hreflang links and
  * Open Graph. Pages must set these themselves, since a page that doesn't
  * inherits the home page's canonical from the layout. Setting openGraph and
  * twitter here drops the layout's share image, so the page's folder needs its
@@ -58,22 +60,30 @@ export async function pageMetadata(locale: string, page: Page): Promise<Metadata
   const appLocale = (routing.locales as readonly string[]).includes(locale)
     ? (locale as AppLocale)
     : routing.defaultLocale;
-  const t = await getTranslations({ locale: appLocale, namespace: 'meta' });
+  const [t, profile] = await Promise.all([
+    getTranslations({ locale: appLocale, namespace: 'meta' }),
+    getProfile(appLocale),
+  ]);
   const href = `/${page}`;
   const title = t(`pages.${page}.title`);
-  const description = t(`pages.${page}.description`);
-  const socialTitle = t('titleTemplate').replace('%s', title);
+  const description = profile.pageDescriptions[page] || undefined;
+  const socialTitle = titleTemplate(profile).replace('%s', title);
 
   return {
     title,
     description,
     alternates: alternatesFor(appLocale, href),
     openGraph: {
-      ...(await baseOpenGraph(appLocale)),
+      ...baseOpenGraph(appLocale, profile),
       title: socialTitle,
       description,
       url: getPathname({ locale: appLocale, href }),
     },
-    twitter: { card: 'summary_large_image', creator: X_HANDLE, title: socialTitle, description },
+    twitter: {
+      card: 'summary_large_image',
+      creator: xHandle(profile),
+      title: socialTitle,
+      description,
+    },
   };
 }

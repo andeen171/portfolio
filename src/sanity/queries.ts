@@ -56,3 +56,44 @@ export const listSkillsQuery = defineQuery(`
 export const listSkillCategoriesQuery = defineQuery(`
   *[ _type == "skillCategory"] | order(order asc)
 `);
+
+// Profile: the single document of everything the site says about Anderson
+// that isn't an experience, project or skill. `knowsAbout` (structured data)
+// is derived from the deck rather than kept as a second list.
+export const profileQuery = defineQuery(`
+  *[_type == "profile" && _id == "profile"][0] {
+    fullName,
+    shortName,
+    nickname,
+    jobTitle,
+    headline,
+    location,
+    terminal,
+    photo {
+      alt,
+      crop,
+      hotspot,
+      asset->{ _id, metadata { lqip, dimensions { width, height } } }
+    },
+    nameVariants,
+    tagline,
+    lead,
+    aboutTitle,
+    roles,
+    bio,
+    cardFlavor,
+    contactTitle,
+    contactInvite,
+    socials[] { _key, platform, url, handle, blurb, inContact, inHero },
+    projectsIntro,
+    experiencesIntro,
+    skillsIntro,
+    seoDescription,
+    shareTagline,
+    pageDescriptions,
+    quote,
+    quoteCredit,
+    footerTagline,
+    "knowsAbout": *[_type == "skill" && proficiency in ["advanced", "expert"]] | order(name asc).name
+  }
+`);

@@ -1,14 +1,17 @@
 import Layout from '@/components/Layout';
+import { ProfileProvider } from '@/components/ProfileProvider';
 import { getPathname, routing } from '@/i18n/routing';
-import { alternatesFor, baseOpenGraph, X_HANDLE } from '@/lib/metadata';
-import { SITE_URL, SOCIAL_IDS, SOCIALS } from '@/lib/social';
+import { getProfile } from '@/lib/getProfile';
+import { alternatesFor, baseOpenGraph, titleTemplate } from '@/lib/metadata';
+import { xHandle } from '@/lib/profile';
+import { SITE_URL } from '@/lib/social';
 import { DEFAULT_FLAVOR, themeScript } from '@/lib/theme';
 import '@/styles/globals.css';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { hasLocale, NextIntlClientProvider } from 'next-intl';
-import { getMessages, getTranslations, setRequestLocale } from 'next-intl/server';
+import { getMessages, setRequestLocale } from 'next-intl/server';
 
 type Props = {
   children: React.ReactNode;
@@ -28,28 +31,31 @@ export const dynamicParams = false;
 export async function generateMetadata({ params }: Omit<Props, 'children'>): Promise<Metadata> {
   const { locale } = await params;
   if (!hasLocale(routing.locales, locale)) return {};
-  const t = await getTranslations({ locale, namespace: 'meta' });
+  const profile = await getProfile(locale);
+  // "Anderson Lopes · Full-stack developer", or whichever half exists.
+  const title = [profile.shortName, profile.jobTitle].filter(Boolean).join(' · ');
+  const description = profile.seoDescription || undefined;
 
   return {
     metadataBase: new URL(SITE_URL),
-    title: { default: t('title'), template: t('titleTemplate') },
-    description: t('description'),
-    applicationName: t('siteName'),
-    authors: [{ name: 'Anderson Ribeiro Lopes', url: SITE_URL }],
-    creator: 'Anderson Ribeiro Lopes',
+    title: { default: title, template: titleTemplate(profile) },
+    description,
+    applicationName: profile.shortName || undefined,
+    authors: profile.fullName ? [{ name: profile.fullName, url: SITE_URL }] : undefined,
+    creator: profile.fullName || undefined,
     // The home page's; sub-pages replace these with their own (lib/metadata).
     alternates: alternatesFor(locale, '/'),
     openGraph: {
-      ...(await baseOpenGraph(locale)),
-      title: t('title'),
-      description: t('description'),
+      ...baseOpenGraph(locale, profile),
+      title,
+      description,
       url: getPathname({ locale, href: '/' }),
     },
     twitter: {
       card: 'summary_large_image',
-      creator: X_HANDLE,
-      title: t('title'),
-      description: t('description'),
+      creator: xHandle(profile),
+      title,
+      description,
     },
   };
 }
@@ -62,9 +68,9 @@ export default async function LocaleLayout({ children, params }: Props) {
   }
 
   setRequestLocale(locale);
-  const messages = await getMessages();
-  const t = await getTranslations({ locale, namespace: 'meta' });
+  const [messages, profile] = await Promise.all([getMessages(), getProfile(locale)]);
   const home = new URL(getPathname({ locale, href: '/' }), SITE_URL).href;
+  const { location } = profile;
 
   const jsonLd = {
     '@context': 'https://schema.org',
@@ -72,41 +78,33 @@ export default async function LocaleLayout({ children, params }: Props) {
       {
         '@type': 'Person',
         '@id': `${SITE_URL}/#person`,
-        name: 'Anderson Ribeiro Lopes',
-        alternateName: ['Anderson Lopes', 'Andeen'],
+        name: profile.fullName,
+        alternateName: [...new Set([profile.shortName, profile.nickname].filter(Boolean))].filter(
+          (name) => name !== profile.fullName
+        ),
         url: home,
-        jobTitle: t('jobTitle'),
-        description: t('description'),
-        sameAs: SOCIAL_IDS.map((id) => SOCIALS[id].url),
-        knowsAbout: [
-          'PHP',
-          'Hyperf',
-          'Go',
-          'Rust',
-          'TypeScript',
-          'React',
-          'Laravel',
-          'Microservices',
-          'Distributed transactions',
-          'Payments',
-          'Linux',
-        ],
-        homeLocation: {
-          '@type': 'Place',
-          name: 'Belo Horizonte, Brazil',
-          address: {
-            '@type': 'PostalAddress',
-            addressLocality: 'Belo Horizonte',
-            addressRegion: 'MG',
-            addressCountry: 'BR',
-          },
-        },
+        jobTitle: profile.jobTitle || undefined,
+        description: profile.seoDescription || undefined,
+        sameAs: profile.socials.map((social) => social.url),
+        knowsAbout: profile.knowsAbout,
+        homeLocation: location.city
+          ? {
+              '@type': 'Place',
+              name: location.label || location.city,
+              address: {
+                '@type': 'PostalAddress',
+                addressLocality: location.city,
+                addressRegion: location.region || undefined,
+                addressCountry: location.countryCode || undefined,
+              },
+            }
+          : undefined,
       },
       {
         '@type': 'WebSite',
         '@id': `${SITE_URL}/#website`,
         url: home,
-        name: t('siteName'),
+        name: profile.shortName,
         inLanguage: locale,
         author: { '@id': `${SITE_URL}/#person` },
       },
@@ -129,11 +127,13 @@ export default async function LocaleLayout({ children, params }: Props) {
       <body>
         <script
           type="application/ld+json"
-          // biome-ignore lint/security/noDangerouslySetInnerHtml: JSON-LD built from constants and messages, with "<" escaped
+          // biome-ignore lint/security/noDangerouslySetInnerHtml: JSON-LD built from the Sanity profile, with "<" escaped
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }}
         />
         <NextIntlClientProvider messages={messages}>
-          <Layout>{children}</Layout>
+          <ProfileProvider profile={profile}>
+            <Layout>{children}</Layout>
+          </ProfileProvider>
           <SpeedInsights />
         </NextIntlClientProvider>
       </body>

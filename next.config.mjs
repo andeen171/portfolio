@@ -23,6 +23,13 @@ const config = {
 
   images: {
     remotePatterns: [
+      // Sanity's image CDN: the profile photo.
+      {
+        protocol: 'https',
+        hostname: 'cdn.sanity.io',
+        port: '',
+        pathname: '/images/**',
+      },
       {
         protocol: 'https',
         hostname: 'source.unsplash.com',

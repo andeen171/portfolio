@@ -4,15 +4,11 @@ import AnchorLink from '@/components/home/AnchorLink';
 import HeroStats, { type HeroStat } from '@/components/home/HeroStats';
 import TypedText from '@/components/home/TypedText';
 import ProgrammingSVG from '@/components/SVG/ProgrammingSVG';
-import { SOCIALS } from '@/lib/social';
+import type { Profile } from '@/lib/profile';
+import { SOCIAL_NETWORKS } from '@/lib/social';
 import { cn } from '@/lib/utils';
 import type { HeroQueryResult } from '@/sanity/types';
 import BackgroundBlurSVG from './SVG/BackgroundBlurSVG';
-
-const FULL_NAME = 'Anderson Ribeiro Lopes';
-// smartBackspace only erases what differs from the next string, so this order
-// reads as the name being trimmed and regrown rather than retyped.
-const NAME_VARIANTS = ['Anderson Ribeiro', 'Anderson Lopes', 'Andeen', 'Anderson'];
 
 const YEAR_MS = 365.2425 * 24 * 60 * 60 * 1000;
 
@@ -27,11 +23,26 @@ const reveal =
 const iconButton =
   'inline-flex size-12 items-center justify-center rounded-full bg-ctp-mantle/60 text-ctp-subtext1 ring-1 ring-ctp-surface1 backdrop-blur-md transition hover:-translate-y-0.5 hover:text-ctp-text hover:ring-ctp-lavender/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ctp-lavender motion-reduce:hover:translate-y-0';
 
-interface HeroSectionProps {
-  hero: HeroQueryResult | null;
+/** The tagline with its `*starred*` words lit, as written in the Studio. */
+function highlight(text: string) {
+  return text.split(/\*([^*]+)\*/).map((part, index) =>
+    index % 2 ? (
+      // biome-ignore lint/suspicious/noArrayIndexKey: a fixed split of one string
+      <span key={index} className="animated-gradient-text">
+        {part}
+      </span>
+    ) : (
+      part
+    )
+  );
 }
 
-export default function HeroSection({ hero }: HeroSectionProps) {
+interface HeroSectionProps {
+  hero: HeroQueryResult | null;
+  profile: Profile;
+}
+
+export default function HeroSection({ hero, profile }: HeroSectionProps) {
   const t = useTranslations('home.hero');
   const tContact = useTranslations('contact');
   // Whole years, floored: "6+" stays true until the seventh anniversary.
@@ -58,6 +69,10 @@ export default function HeroSection({ hero }: HeroSectionProps) {
     },
   ].filter((stat) => stat.value > 0);
 
+  const { fullName, terminal } = profile;
+  const firstName = fullName.split(' ')[0] ?? '';
+  const heroSocials = profile.socials.filter((social) => social.inHero);
+
   return (
     <section className="relative isolate flex min-h-svh items-center pt-24 pb-28 sm:pt-28 lg:pb-24">
       <BackgroundBlurSVG />
@@ -69,10 +84,19 @@ export default function HeroSection({ hero }: HeroSectionProps) {
             aria-hidden="true"
             className={cn(reveal, 'font-nf text-sm text-ctp-subtext0 sm:text-base')}
           >
-            <span className="text-ctp-green">anderson</span>
-            <span className="text-ctp-overlay1">@</span>
-            <span className="text-ctp-blue">arch</span> <span className="text-ctp-mauve">~</span>{' '}
-            <span className="text-ctp-teal">❯</span> <span className="text-ctp-text">whoami</span>
+            {terminal.user && (
+              <>
+                <span className="text-ctp-green">{terminal.user}</span>
+                {terminal.host && (
+                  <>
+                    <span className="text-ctp-overlay1">@</span>
+                    <span className="text-ctp-blue">{terminal.host}</span>
+                  </>
+                )}{' '}
+              </>
+            )}
+            <span className="text-ctp-mauve">~</span> <span className="text-ctp-teal">❯</span>{' '}
+            <span className="text-ctp-text">whoami</span>
           </p>
 
           <h1
@@ -81,15 +105,21 @@ export default function HeroSection({ hero }: HeroSectionProps) {
               'mt-3 font-nf text-4xl font-bold leading-[1.1] tracking-tight delay-150 sm:text-5xl lg:text-4xl xl:text-5xl'
             )}
           >
-            <span className="sr-only">{FULL_NAME}</span>
-            <TypedText
-              initial={FULL_NAME}
-              strings={NAME_VARIANTS}
-              className="animated-gradient-text"
-              typeSpeed={45}
-              backSpeed={35}
-              backDelay={2600}
-            />
+            <span className="sr-only">{fullName}</span>
+            {profile.nameVariants.length > 0 ? (
+              <TypedText
+                initial={fullName}
+                strings={profile.nameVariants}
+                className="animated-gradient-text"
+                typeSpeed={45}
+                backSpeed={35}
+                backDelay={2600}
+              />
+            ) : (
+              <span aria-hidden="true" className="animated-gradient-text">
+                {fullName}
+              </span>
+            )}
           </h1>
 
           <p
@@ -98,9 +128,7 @@ export default function HeroSection({ hero }: HeroSectionProps) {
               'mt-6 max-w-xl text-2xl font-semibold leading-snug tracking-tight text-balance text-ctp-text delay-200 sm:text-3xl'
             )}
           >
-            {t.rich('tagline', {
-              hl: (chunks) => <span className="animated-gradient-text">{chunks}</span>,
-            })}
+            {highlight(profile.tagline)}
           </p>
           <p
             className={cn(
@@ -108,7 +136,7 @@ export default function HeroSection({ hero }: HeroSectionProps) {
               'mt-4 max-w-xl text-base leading-relaxed text-pretty text-ctp-subtext0 delay-300 sm:text-lg latte:text-ctp-subtext1'
             )}
           >
-            {t('lead')}
+            {profile.lead}
           </p>
 
           <div className={cn(reveal, 'mt-8 flex flex-wrap items-center gap-3 delay-[400ms]')}>
@@ -122,24 +150,24 @@ export default function HeroSection({ hero }: HeroSectionProps) {
                 className="size-4 transition-transform group-hover:translate-y-0.5 motion-reduce:transition-none"
               />
             </AnchorLink>
-            {[
-              { ...SOCIALS.github, label: t('github') },
-              { ...SOCIALS.linkedin, label: t('linkedin') },
-            ].map(({ name, url, Icon, label }) => (
-              <a
-                key={name}
-                href={url}
-                target="_blank"
-                rel="noopener noreferrer"
-                title={name}
-                className={iconButton}
-              >
-                <Icon className="size-5" />
-                <span className="sr-only">
-                  {label} {tContact('newTab')}
-                </span>
-              </a>
-            ))}
+            {heroSocials.map(({ platform, url }) => {
+              const { name, Icon } = SOCIAL_NETWORKS[platform];
+              return (
+                <a
+                  key={platform}
+                  href={url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  title={name}
+                  className={iconButton}
+                >
+                  <Icon className="size-5" />
+                  <span className="sr-only">
+                    {t('socialLabel', { name: firstName, network: name })} {tContact('newTab')}
+                  </span>
+                </a>
+              );
+            })}
           </div>
 
           {stats.length > 0 && (

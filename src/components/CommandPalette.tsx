@@ -31,10 +31,11 @@ import {
   useSyncExternalStore,
 } from 'react';
 import { LANGUAGES, useSwitchLocale } from '@/components/LanguageSelector';
+import { useProfile } from '@/components/ProfileProvider';
 import { FlavorSwatch } from '@/components/ThemeSelector';
 import { getPathname, usePathname, useRouter } from '@/i18n/routing';
 import { NAV_ITEMS, type NavKey } from '@/lib/navigation';
-import { SOCIAL_IDS, SOCIALS } from '@/lib/social';
+import { SOCIAL_NETWORKS } from '@/lib/social';
 import { FLAVOR_NAMES, FLAVORS } from '@/lib/theme';
 import { cn } from '@/lib/utils';
 import { useCommandPalette, useCtpStore } from '@/store';
@@ -252,6 +253,7 @@ function iconTile(Icon: ComponentType<{ className?: string }>) {
 const CommandPalette: React.FC = () => {
   const t = useTranslations('palette');
   const tNav = useTranslations('navigation');
+  const profile = useProfile();
   const locale = useLocale();
   const pathname = usePathname();
   const router = useRouter();
@@ -394,14 +396,14 @@ const CommandPalette: React.FC = () => {
       perform: () => switchLocale(language.code),
     }));
 
-    const socials: Command[] = SOCIAL_IDS.map((id) => {
-      const social = SOCIALS[id];
+    const socials: Command[] = profile.socials.map((social) => {
+      const { name, Icon } = SOCIAL_NETWORKS[social.platform];
       return {
-        id: `social-${id}`,
+        id: `social-${social.platform}`,
         group: 'social',
-        label: t('commands.social', { name: social.name }),
-        keywords: `social redes ${id} ${social.handle}`,
-        icon: iconTile(social.Icon),
+        label: t('commands.social', { name }),
+        keywords: `social redes ${social.platform} ${social.handle}`,
+        icon: iconTile(Icon),
         hint: social.handle,
         external: true,
         timing: 'now',
@@ -434,6 +436,7 @@ const CommandPalette: React.FC = () => {
     locale,
     switchLocale,
     copyLink,
+    profile.socials,
   ]);
 
   // Filtered, grouped in a fixed order, best match first within a group.

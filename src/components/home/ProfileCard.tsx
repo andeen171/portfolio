@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import ProfilePic from '@/img/icon.png';
+import type { Profile } from '@/lib/profile';
 import { cn } from '@/lib/utils';
 
 interface ProfileCardProps {
@@ -10,7 +11,9 @@ interface ProfileCardProps {
   status?: { label: string; company: string; since?: string };
   flavor: string;
   origin: string;
-  handle: string;
+  handle?: string;
+  /** The Sanity photo; without one, the bundled portrait. */
+  photo: Profile['photo'];
   photoAlt: string;
   className?: string;
 }
@@ -27,6 +30,7 @@ export default function ProfileCard({
   flavor,
   origin,
   handle,
+  photo,
   photoAlt,
   className,
 }: ProfileCardProps) {
@@ -58,9 +62,18 @@ export default function ProfileCard({
 
         <div className="relative overflow-hidden rounded-xl ring-1 ring-ctp-surface1">
           <Image
-            src={ProfilePic}
+            {...(photo
+              ? {
+                  src: photo.src,
+                  width: 720,
+                  height: 720,
+                  ...(photo.blurDataURL && {
+                    placeholder: 'blur' as const,
+                    blurDataURL: photo.blurDataURL,
+                  }),
+                }
+              : { src: ProfilePic, placeholder: 'blur' as const })}
             alt={photoAlt}
-            placeholder="blur"
             sizes="(min-width: 1024px) 22rem, 20rem"
             className="aspect-square w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03] motion-reduce:transition-none"
           />
@@ -71,9 +84,11 @@ export default function ProfileCard({
           />
         </div>
 
-        <p className="rounded-md bg-ctp-crust/70 px-3 py-1.5 font-nf text-[0.6875rem] font-semibold tracking-wide text-ctp-subtext1 ring-1 ring-ctp-surface0 latte:bg-ctp-base">
-          {type}
-        </p>
+        {type && (
+          <p className="rounded-md bg-ctp-crust/70 px-3 py-1.5 font-nf text-[0.6875rem] font-semibold tracking-wide text-ctp-subtext1 ring-1 ring-ctp-surface0 latte:bg-ctp-base">
+            {type}
+          </p>
+        )}
 
         {status && (
           // The company comes first and never truncates for the date: the
@@ -97,13 +112,15 @@ export default function ProfileCard({
           </p>
         )}
 
-        <div className="rounded-lg bg-ctp-base/60 px-3 py-3 ring-1 ring-ctp-surface0 latte:bg-ctp-crust/40">
-          <p className="text-sm text-ctp-subtext1 italic">“{flavor}”</p>
-        </div>
+        {flavor && (
+          <div className="rounded-lg bg-ctp-base/60 px-3 py-3 ring-1 ring-ctp-surface0 latte:bg-ctp-crust/40">
+            <p className="text-sm text-ctp-subtext1 italic">“{flavor}”</p>
+          </div>
+        )}
 
         <div className="flex items-center justify-between gap-3 px-1 font-nf text-[0.625rem] tracking-wider text-ctp-overlay1 uppercase latte:text-ctp-subtext1">
           <span className="truncate">{origin}</span>
-          <span className="shrink-0 normal-case">{handle}</span>
+          {handle && <span className="shrink-0 normal-case">{handle}</span>}
         </div>
       </div>
     </div>
