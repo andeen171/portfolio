@@ -111,7 +111,15 @@
     "backToFilters": "Busca e filtros",
     "flip": "Virar a carta {name} para ler sobre ela",
     "flipBack": "Desvirar a carta {name}",
-    "inspect": "Ver {name} de perto",
+    "inspect": "Pegar {name} para ver de perto",
+    "viewer": {
+      "side": "Lado da carta",
+      "front": "Frente",
+      "back": "Verso",
+      "hintPointer": "Arraste para girar · clique ou ← → para virar",
+      "hintTouch": "Arraste para girar · toque para virar",
+      "showing": "{side, select, front {Mostrando a frente} other {Mostrando o verso}}"
+    },
     "stats": {
       "mastery": "domínio",
       "inUse": "em uso",
@@ -120,7 +128,7 @@
     "close": "Fechar",
     "moreTags": "{count, plural, one {mais # tag} other {mais # tags}}",
     "eyebrow": "habilidades",
-    "lede": "Linguagens, frameworks, bancos de dados, ferramentas e habilidades interpessoais, cada qual em sua carta. Quanto mais rara a carta, maior o domínio. Vire uma carta para lê-la ou veja-a de perto."
+    "lede": "Linguagens, frameworks, bancos de dados, ferramentas e habilidades interpessoais, cada qual em sua carta. Quanto mais rara a carta, maior o domínio. Vire uma carta para lê-la ou pegue-a na mão e gire."
   },
   "og": {
     "role": "Dev full-stack com foco em backend",
