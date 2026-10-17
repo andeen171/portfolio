@@ -1,4 +1,5 @@
-import type { SVGProps } from 'react';
+import type { ReactNode, SVGProps } from 'react';
+import type { SocialPlatform } from '@/lib/profile';
 
 type IconProps = SVGProps<SVGSVGElement>;
 
@@ -35,34 +36,17 @@ export const InstagramIcon = (props: IconProps) => (
 );
 
 /**
- * The public profiles every part of the site links to (footer, command
- * palette, structured data). No email on purpose.
+ * What the site knows about each network: its name and icon. The profiles
+ * themselves (URL, handle, order, where they show) live in the Sanity profile.
  */
-export const SOCIALS = {
-  github: {
-    name: 'GitHub',
-    handle: '@andeen171',
-    url: 'https://github.com/andeen171',
-    Icon: GitHubIcon,
-  },
-  linkedin: {
-    name: 'LinkedIn',
-    handle: 'in/anderson-lopes-dev',
-    url: 'https://www.linkedin.com/in/anderson-lopes-dev/',
-    Icon: LinkedInIcon,
-  },
-  x: { name: 'X', handle: '@Andeen171', url: 'https://x.com/Andeen171', Icon: XIcon },
-  instagram: {
-    name: 'Instagram',
-    handle: '@eulmesmo',
-    url: 'https://www.instagram.com/eulmesmo/',
-    Icon: InstagramIcon,
-  },
-} as const;
-
-export type SocialId = keyof typeof SOCIALS;
-
-/** Display order wherever the profiles are listed together. */
-export const SOCIAL_IDS: readonly SocialId[] = ['github', 'linkedin', 'x', 'instagram'];
+export const SOCIAL_NETWORKS = {
+  github: { name: 'GitHub', Icon: GitHubIcon },
+  linkedin: { name: 'LinkedIn', Icon: LinkedInIcon },
+  x: { name: 'X', Icon: XIcon },
+  instagram: { name: 'Instagram', Icon: InstagramIcon },
+} as const satisfies Record<
+  SocialPlatform,
+  { name: string; Icon: (props: IconProps) => ReactNode }
+>;
 
 export const SITE_URL = 'https://anderson-lopes.dev.br';

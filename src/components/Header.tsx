@@ -7,6 +7,7 @@ import { useLocale, useTranslations } from 'next-intl';
 import { useEffect, useId, useState } from 'react';
 import { PaletteShortcut } from '@/components/CommandPalette';
 import LanguageSelector, { LANGUAGES, useSwitchLocale } from '@/components/LanguageSelector';
+import { useProfile } from '@/components/ProfileProvider';
 import ThemeSelector, { FlavorSwatch } from '@/components/ThemeSelector';
 import { Link, usePathname } from '@/i18n/routing';
 import { isActivePath, NAV_ITEMS } from '@/lib/navigation';
@@ -19,9 +20,10 @@ const focusRing = 'focus-visible:outline-none focus-visible:ring-2 focus-visible
 
 /** Logo: the wordmark plus a blinking terminal caret. */
 function Wordmark({ className }: { className?: string }) {
+  const { nickname, shortName } = useProfile();
   return (
     <span className={cn('inline-flex items-baseline font-extrabold', className)}>
-      <span className="animated-gradient-text">戦え Andeen</span>
+      <span className="animated-gradient-text">戦え {nickname || shortName}</span>
       <span
         aria-hidden="true"
         className="caret-blink ml-0.5 inline-block h-[0.85em] w-[0.45em] translate-y-[0.1em] rounded-[1px] bg-ctp-lavender/80"
@@ -296,6 +298,9 @@ const Header: React.FC = () => {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
+  const { nickname, shortName } = useProfile();
+  const homeName = [nickname, shortName].filter(Boolean).join(', ');
+
   return (
     <header
       className={cn(
@@ -308,7 +313,7 @@ const Header: React.FC = () => {
       <div className="mx-auto flex h-16 max-w-7xl items-center gap-3 px-4 sm:px-6 lg:grid lg:grid-cols-[1fr_auto_1fr] lg:gap-6 lg:px-8">
         <Link
           href="/"
-          aria-label={t('homeLink')}
+          aria-label={t('homeLink', { name: homeName })}
           className={cn(
             'mr-auto justify-self-start rounded-lg text-xl transition-transform duration-300 hover:scale-[1.03] motion-reduce:transition-none motion-reduce:hover:scale-100 sm:text-2xl',
             focusRing

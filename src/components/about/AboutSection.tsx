@@ -5,13 +5,11 @@ import { useLocale, useTranslations } from 'next-intl';
 import { useEffect, useId, useRef, useState } from 'react';
 import ProfileCard from '@/components/home/ProfileCard';
 import TypedText from '@/components/home/TypedText';
+import { useProfile } from '@/components/ProfileProvider';
 import SectionHeading from '@/components/ui/SectionHeading';
-import { SOCIALS } from '@/lib/social';
 import { cn } from '@/lib/utils';
 import type { HeroQueryResult } from '@/sanity/types';
 import { useLocalization } from '@/utils/localization';
-
-const ROLE_KEYS = ['backend', 'fullstack', 'linux', 'entrepreneur', 'father', 'thinker'] as const;
 
 /** Paragraphs left showing while collapsed, by breakpoint. */
 const KEEP_MOBILE = 1;
@@ -26,6 +24,7 @@ interface AboutSectionProps {
 
 const AboutSection: React.FC<AboutSectionProps> = ({ current }) => {
   const t = useTranslations('about');
+  const profile = useProfile();
   const locale = useLocale() as 'en-US' | 'pt-BR';
   const { getLocalizedValue } = useLocalization();
   const bodyId = useId();
@@ -33,11 +32,16 @@ const AboutSection: React.FC<AboutSectionProps> = ({ current }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [heights, setHeights] = useState<Heights | null>(null);
 
-  const roles = ROLE_KEYS.map((key) => t(`typedStrings.${key}`));
+  const { roles, bio: paragraphs } = profile;
+  // The card's handle: the GitHub one where the code is, else the first listed.
+  const handle = (
+    profile.socials.find((social) => social.platform === 'github') ?? profile.socials[0]
+  )?.handle;
 
   // The helper falls back to the first entry's value, which Sanity may leave
   // unset, so it can hand back undefined despite its type.
-  const role = (getLocalizedValue(current?.title ?? undefined, locale) ?? '').trim();
+  const role =
+    (getLocalizedValue(current?.title ?? undefined, locale) ?? '').trim() || profile.jobTitle;
   const company = current?.company?.trim();
   // A plain YYYY-MM-DD date: formatted in UTC so the server and the browser
   // land on the same month whatever their time zones.
@@ -52,10 +56,6 @@ const AboutSection: React.FC<AboutSectionProps> = ({ current }) => {
           }).format(startedAt),
         })
       : undefined;
-  const paragraphs = t('description')
-    .split('\n\n')
-    .map((p) => p.trim())
-    .filter(Boolean);
 
   // Measure the live text rather than hidden copies: the inner wrapper is
   // never clamped, so its height is the full text, and the last paragraph we
@@ -96,42 +96,52 @@ const AboutSection: React.FC<AboutSectionProps> = ({ current }) => {
           align="left"
           index="01"
           eyebrow={t('eyebrow')}
-          title={t('title')}
+          title={profile.aboutTitle}
           className="lg:col-start-1 lg:row-start-1"
         />
 
         <ProfileCard
-          name={t('card.name')}
-          type={role ? t('card.type', { role }) : t('card.typeFallback')}
+          name={profile.shortName}
+          type={role ? t('card.type', { role }) : ''}
           status={company ? { label: t('card.now'), company, since } : undefined}
-          flavor={t('card.flavor')}
-          origin={t('card.origin')}
-          handle={SOCIALS.github.handle}
-          photoAlt={t('card.photoAlt')}
+          flavor={profile.cardFlavor}
+          origin={profile.location.short || profile.location.label}
+          handle={handle}
+          photo={profile.photo}
+          photoAlt={
+            profile.photo?.alt ||
+            (profile.shortName ? t('card.photoAlt', { name: profile.shortName }) : '')
+          }
           className="mx-auto w-full max-w-[19rem] sm:max-w-[21rem] lg:sticky lg:top-28 lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:max-w-none lg:self-start"
         />
 
         <div className="min-w-0 lg:col-start-1 lg:row-start-2">
-          <p className="font-nf text-lg font-semibold sm:text-xl">
-            <span className="sr-only">
-              {/* Semicolons: a role may contain a comma of its own
+          {roles.length > 0 && (
+            <p className="font-nf text-lg font-semibold sm:text-xl">
+              <span className="sr-only">
+                {/* Semicolons: a role may contain a comma of its own
                   ("Full-stack, backend at heart"). */}
-              {t('rolesLabel')}: {roles.join('; ')}
-            </span>
-            <span aria-hidden="true" className="flex gap-3">
-              <span className="text-ctp-teal">❯</span>
-              <span className="min-w-0 flex-1">
-                <TypedText
-                  initial={roles[0]!}
-                  strings={roles.slice(1)}
-                  className="animated-gradient-text"
-                  typeSpeed={55}
-                  backSpeed={30}
-                  backDelay={1800}
-                />
+                {t('rolesLabel')}: {roles.join('; ')}
               </span>
-            </span>
-          </p>
+              <span aria-hidden="true" className="flex gap-3">
+                <span className="text-ctp-teal">❯</span>
+                <span className="min-w-0 flex-1">
+                  {roles.length > 1 ? (
+                    <TypedText
+                      initial={roles[0]!}
+                      strings={roles.slice(1)}
+                      className="animated-gradient-text"
+                      typeSpeed={55}
+                      backSpeed={30}
+                      backDelay={1800}
+                    />
+                  ) : (
+                    <span className="animated-gradient-text">{roles[0]}</span>
+                  )}
+                </span>
+              </span>
+            </p>
+          )}
 
           <div
             id={bodyId}

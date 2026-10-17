@@ -2,7 +2,9 @@ import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
 import ExperienceTimeline from '@/components/experiences/ExperienceTimeline';
 import SectionHeading from '@/components/ui/SectionHeading';
+import { getProfile } from '@/lib/getProfile';
 import { pageMetadata } from '@/lib/metadata';
+import type { AppLocale } from '@/lib/profile';
 import { client } from '@/sanity/lib/client';
 import { listExperiencesQuery } from '@/sanity/queries';
 
@@ -15,17 +17,29 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return pageMetadata(locale, 'experiences');
 }
 
-export default async function ExperiencesPage() {
+export default async function ExperiencesPage({ params }: Props) {
+  const { locale } = await params;
   const experiences = await client.fetch(listExperiencesQuery, {}, options);
-  const t = await getTranslations('experiences');
+  const [t, tMeta, profile] = await Promise.all([
+    getTranslations('experiences'),
+    getTranslations('meta'),
+    getProfile(locale as AppLocale),
+  ]);
+  const intro = profile.intros.experiences;
 
   return (
     <div className="py-24 sm:py-32">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
-        <SectionHeading as="h1" eyebrow={t('eyebrow')} title={t('subtitle')} />
-        <p className="mx-auto mt-4 max-w-2xl text-center text-pretty text-ctp-subtext1">
-          {t('lede')}
-        </p>
+        <SectionHeading
+          as="h1"
+          eyebrow={t('eyebrow')}
+          title={intro.title || tMeta('pages.experiences.title')}
+        />
+        {intro.lede && (
+          <p className="mx-auto mt-4 max-w-2xl text-center text-pretty text-ctp-subtext1">
+            {intro.lede}
+          </p>
+        )}
 
         <div className="mt-14 sm:mt-20">
           <ExperienceTimeline experiences={experiences} yearAs="h2" />

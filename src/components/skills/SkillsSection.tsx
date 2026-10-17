@@ -2,6 +2,7 @@
 
 import { useTranslations } from 'next-intl';
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { useProfile } from '@/components/ProfileProvider';
 import {
   Carousel,
   CarouselContent,
@@ -27,6 +28,7 @@ type Props = {
 
 const SkillsSection: React.FC<Props> = ({ skills, categories }) => {
   const t = useTranslations('skills');
+  const intro = useProfile().intros.skills;
   // No "All" here — the carousel is always a single category, defaulting to the first one.
   const [activeCategory, setActiveCategory] = useState<string | null>(
     () => categories[0]?._id ?? null
@@ -68,8 +70,10 @@ const SkillsSection: React.FC<Props> = ({ skills, categories }) => {
   return (
     <div ref={sectionRef} data-deal={dealt ? 'dealt' : 'waiting'} className="py-24 sm:py-32">
       <div className="mx-auto max-w-7xl px-6 text-center lg:px-8">
-        <SectionHeading index="04" eyebrow={t('eyebrow')} title={t('subtitle')} />
-        <p className="mx-auto mt-4 max-w-2xl text-pretty text-ctp-subtext1">{t('lede')}</p>
+        <SectionHeading index="04" eyebrow={t('eyebrow')} title={intro.title} />
+        {intro.lede && (
+          <p className="mx-auto mt-4 max-w-2xl text-pretty text-ctp-subtext1">{intro.lede}</p>
+        )}
 
         <CategoryChips
           categories={categories}

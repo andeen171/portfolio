@@ -5,9 +5,10 @@ import { CommandLineIcon } from '@heroicons/react/24/outline';
 import { useTranslations } from 'next-intl';
 import { type ReactNode, useId } from 'react';
 import { PaletteShortcut } from '@/components/CommandPalette';
+import { useProfile } from '@/components/ProfileProvider';
 import { Link } from '@/i18n/routing';
 import { NAV_ITEMS } from '@/lib/navigation';
-import { SOCIAL_IDS, SOCIALS } from '@/lib/social';
+import { SOCIAL_NETWORKS } from '@/lib/social';
 import { cn } from '@/lib/utils';
 import { useCommandPalette } from '@/store';
 
@@ -35,6 +36,7 @@ function ColumnTitle({ id, children }: { id: string; children: ReactNode }) {
 const Footer: React.FC = () => {
   const t = useTranslations('footer');
   const tNav = useTranslations('navigation');
+  const profile = useProfile();
   const setOpen = useCommandPalette((state) => state.setOpen);
   const sitemapId = useId();
   const socialId = useId();
@@ -63,43 +65,53 @@ const Footer: React.FC = () => {
 
       <div className="relative mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         {/* The motto, served the way a terminal serves wisdom. */}
-        <figure className="mx-auto max-w-3xl py-16 text-center sm:py-20">
-          <p
-            aria-hidden="true"
-            className="font-nf text-xs text-ctp-subtext0 latte:text-ctp-subtext1"
-          >
-            <span className="text-ctp-mauve">~</span> <span className="text-ctp-teal">❯</span>{' '}
-            fortune
-          </p>
-          <blockquote className="mt-5">
-            <p className="text-2xl leading-snug font-semibold tracking-tight text-balance sm:text-4xl">
-              <span aria-hidden="true" className="text-ctp-overlay1">
-                “
-              </span>
-              <span className="animated-gradient-text">{t('quote')}</span>
-              <span aria-hidden="true" className="text-ctp-overlay1">
-                ”
-              </span>
+        {profile.quote && (
+          <figure className="mx-auto max-w-3xl py-16 text-center sm:py-20">
+            <p
+              aria-hidden="true"
+              className="font-nf text-xs text-ctp-subtext0 latte:text-ctp-subtext1"
+            >
+              <span className="text-ctp-mauve">~</span> <span className="text-ctp-teal">❯</span>{' '}
+              fortune
             </p>
-          </blockquote>
-          <figcaption className="mt-4 font-nf text-sm text-ctp-subtext0 latte:text-ctp-subtext1">
-            — Anderson Lopes, 2022
-          </figcaption>
-        </figure>
+            <blockquote className="mt-5">
+              <p className="text-2xl leading-snug font-semibold tracking-tight text-balance sm:text-4xl">
+                <span aria-hidden="true" className="text-ctp-overlay1">
+                  “
+                </span>
+                <span className="animated-gradient-text">{profile.quote}</span>
+                <span aria-hidden="true" className="text-ctp-overlay1">
+                  ”
+                </span>
+              </p>
+            </blockquote>
+            {profile.quoteCredit && (
+              <figcaption className="mt-4 font-nf text-sm text-ctp-subtext0 latte:text-ctp-subtext1">
+                — {profile.quoteCredit}
+              </figcaption>
+            )}
+          </figure>
+        )}
 
         <div className="grid gap-12 border-t border-ctp-surface0/80 py-12 sm:grid-cols-2 lg:grid-cols-12 lg:gap-8">
           {/* Who + the palette */}
           <div className="sm:col-span-2 lg:col-span-5">
             <Link
               href="/"
-              aria-label={tNav('homeLink')}
+              aria-label={tNav('homeLink', {
+                name: [profile.nickname, profile.shortName].filter(Boolean).join(', '),
+              })}
               className={cn('inline-block rounded-lg text-2xl font-extrabold', focusRing)}
             >
-              <span className="animated-gradient-text">戦え Andeen</span>
+              <span className="animated-gradient-text">
+                戦え {profile.nickname || profile.shortName}
+              </span>
             </Link>
-            <p className="mt-3 max-w-sm text-sm leading-relaxed text-pretty text-ctp-subtext1">
-              {t('tagline')}
-            </p>
+            {profile.footerTagline && (
+              <p className="mt-3 max-w-sm text-sm leading-relaxed text-pretty text-ctp-subtext1">
+                {profile.footerTagline}
+              </p>
+            )}
 
             <div className="mt-6">
               <p className="font-nf text-xs text-ctp-subtext0 latte:text-ctp-subtext1">
@@ -152,10 +164,10 @@ const Footer: React.FC = () => {
           <section aria-labelledby={socialId} className="lg:col-span-4">
             <ColumnTitle id={socialId}>{t('social')}</ColumnTitle>
             <ul className="mt-4 space-y-1">
-              {SOCIAL_IDS.map((id) => {
-                const { name, handle, url, Icon } = SOCIALS[id];
+              {profile.socials.map(({ platform, handle, url }) => {
+                const { name, Icon } = SOCIAL_NETWORKS[platform];
                 return (
-                  <li key={id}>
+                  <li key={platform}>
                     <a
                       href={url}
                       target="_blank"
@@ -168,7 +180,7 @@ const Footer: React.FC = () => {
                       <Icon
                         className={cn(
                           'size-4 shrink-0 text-ctp-subtext0 transition-colors',
-                          SOCIAL_ACCENTS[id]
+                          SOCIAL_ACCENTS[platform]
                         )}
                       />
                       <span className="text-ctp-subtext1 transition-colors group-hover:text-ctp-text">
@@ -194,7 +206,10 @@ const Footer: React.FC = () => {
           <p>
             {/* The year is rendered at build time; a client in a new year may differ. */}
             <span suppressHydrationWarning>
-              {t('copyright', { year: new Date().getFullYear() })}
+              {t('copyright', {
+                year: new Date().getFullYear(),
+                name: profile.fullName || profile.shortName,
+              })}
             </span>
           </p>
           <div className="flex items-center justify-between gap-4 sm:justify-end">

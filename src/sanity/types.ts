@@ -13,6 +13,79 @@
  */
 
 // Source: src/sanity/extract.json
+export type Profile = {
+  _id: string;
+  _type: 'profile';
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  fullName?: string;
+  shortName?: string;
+  nickname?: string;
+  jobTitle?: InternationalizedArrayString;
+  headline?: InternationalizedArrayString;
+  location?: {
+    city?: string;
+    region?: string;
+    countryCode?: string;
+    label?: InternationalizedArrayString;
+    short?: string;
+  };
+  photo?: {
+    asset?: SanityImageAssetReference;
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    alt?: InternationalizedArrayString;
+    _type: 'image';
+  };
+  terminal?: {
+    user?: string;
+    host?: string;
+  };
+  nameVariants?: Array<string>;
+  tagline?: InternationalizedArrayString;
+  lead?: InternationalizedArrayText;
+  aboutTitle?: InternationalizedArrayString;
+  roles?: InternationalizedArrayText;
+  bio?: InternationalizedArrayText;
+  cardFlavor?: InternationalizedArrayString;
+  contactTitle?: InternationalizedArrayString;
+  contactInvite?: InternationalizedArrayText;
+  socials?: Array<{
+    platform?: 'github' | 'linkedin' | 'x' | 'instagram';
+    url?: string;
+    handle?: string;
+    blurb?: InternationalizedArrayString;
+    inContact?: boolean;
+    inHero?: boolean;
+    _type: 'socialProfile';
+    _key: string;
+  }>;
+  projectsIntro?: {
+    title?: InternationalizedArrayString;
+    lede?: InternationalizedArrayText;
+  };
+  experiencesIntro?: {
+    title?: InternationalizedArrayString;
+    lede?: InternationalizedArrayText;
+  };
+  skillsIntro?: {
+    title?: InternationalizedArrayString;
+    lede?: InternationalizedArrayText;
+  };
+  seoDescription?: InternationalizedArrayText;
+  shareTagline?: InternationalizedArrayString;
+  pageDescriptions?: {
+    projects?: InternationalizedArrayText;
+    experiences?: InternationalizedArrayText;
+    skills?: InternationalizedArrayText;
+  };
+  quote?: InternationalizedArrayString;
+  quoteCredit?: string;
+  footerTagline?: InternationalizedArrayText;
+};
+
 export type SkillCategoryReference = {
   _ref: string;
   _type: 'reference';
@@ -239,7 +312,19 @@ export type Geopoint = {
   alt?: number;
 };
 
+export type InternationalizedArrayText = Array<
+  {
+    _key: string;
+  } & InternationalizedArrayTextValue
+>;
+
+export type InternationalizedArrayTextValue = {
+  _type: 'internationalizedArrayTextValue';
+  value?: string;
+};
+
 export type AllSanitySchemaTypes =
+  | Profile
   | SkillCategoryReference
   | Skill
   | SkillCategory
@@ -259,7 +344,9 @@ export type AllSanitySchemaTypes =
   | SanityFileAsset
   | SanityAssetSourceData
   | SanityImageAsset
-  | Geopoint;
+  | Geopoint
+  | InternationalizedArrayText
+  | InternationalizedArrayTextValue;
 
 export declare const internalGroqTypeReferenceTo: unique symbol;
 
@@ -453,6 +540,84 @@ export type ListSkillCategoriesQueryResult = Array<{
   fallbackSvgCode?: string;
 }>;
 
+// Source: src/sanity/queries.ts
+// Variable: profileQuery
+// Query: *[_type == "profile" && _id == "profile"][0] {    fullName,    shortName,    nickname,    jobTitle,    headline,    location,    terminal,    photo {      alt,      crop,      hotspot,      asset->{ _id, metadata { lqip, dimensions { width, height } } }    },    nameVariants,    tagline,    lead,    aboutTitle,    roles,    bio,    cardFlavor,    contactTitle,    contactInvite,    socials[] { _key, platform, url, handle, blurb, inContact, inHero },    projectsIntro,    experiencesIntro,    skillsIntro,    seoDescription,    shareTagline,    pageDescriptions,    quote,    quoteCredit,    footerTagline,    "knowsAbout": *[_type == "skill" && proficiency in ["advanced", "expert"]] | order(name asc).name  }
+export type ProfileQueryResult = {
+  fullName: string | null;
+  shortName: string | null;
+  nickname: string | null;
+  jobTitle: InternationalizedArrayString | null;
+  headline: InternationalizedArrayString | null;
+  location: {
+    city?: string;
+    region?: string;
+    countryCode?: string;
+    label?: InternationalizedArrayString;
+    short?: string;
+  } | null;
+  terminal: {
+    user?: string;
+    host?: string;
+  } | null;
+  photo: {
+    alt: InternationalizedArrayString | null;
+    crop: SanityImageCrop | null;
+    hotspot: SanityImageHotspot | null;
+    asset: {
+      _id: string;
+      metadata: {
+        lqip: string | null;
+        dimensions: {
+          width: number | null;
+          height: number | null;
+        } | null;
+      } | null;
+    } | null;
+  } | null;
+  nameVariants: Array<string> | null;
+  tagline: InternationalizedArrayString | null;
+  lead: InternationalizedArrayText | null;
+  aboutTitle: InternationalizedArrayString | null;
+  roles: InternationalizedArrayText | null;
+  bio: InternationalizedArrayText | null;
+  cardFlavor: InternationalizedArrayString | null;
+  contactTitle: InternationalizedArrayString | null;
+  contactInvite: InternationalizedArrayText | null;
+  socials: Array<{
+    _key: string;
+    platform: 'github' | 'instagram' | 'linkedin' | 'x' | null;
+    url: string | null;
+    handle: string | null;
+    blurb: InternationalizedArrayString | null;
+    inContact: boolean | null;
+    inHero: boolean | null;
+  }> | null;
+  projectsIntro: {
+    title?: InternationalizedArrayString;
+    lede?: InternationalizedArrayText;
+  } | null;
+  experiencesIntro: {
+    title?: InternationalizedArrayString;
+    lede?: InternationalizedArrayText;
+  } | null;
+  skillsIntro: {
+    title?: InternationalizedArrayString;
+    lede?: InternationalizedArrayText;
+  } | null;
+  seoDescription: InternationalizedArrayText | null;
+  shareTagline: InternationalizedArrayString | null;
+  pageDescriptions: {
+    projects?: InternationalizedArrayText;
+    experiences?: InternationalizedArrayText;
+    skills?: InternationalizedArrayText;
+  } | null;
+  quote: InternationalizedArrayString | null;
+  quoteCredit: string | null;
+  footerTagline: InternationalizedArrayText | null;
+  knowsAbout: Array<string | null>;
+} | null;
+
 // Query TypeMap
 import '@sanity/client';
 declare module '@sanity/client' {
@@ -464,5 +629,6 @@ declare module '@sanity/client' {
     '\n  {\n    "current": *[_type == "experience" && !defined(endDate)] | order(startDate desc)[0] {\n      title,\n      company,\n      startDate\n    },\n    "careerStart": *[_type == "experience"] | order(startDate asc)[0].startDate,\n    "projectCount": count(*[_type == "project"]),\n    "skillCount": count(*[_type == "skill"]),\n    "companyCount": count(array::unique(*[_type == "experience"].company))\n  }\n': HeroQueryResult;
     '\n  *[ _type == "skill"] {\n    ...,\n    category->\n  } | order(category->order asc, name asc)\n': ListSkillsQueryResult;
     '\n  *[ _type == "skillCategory"] | order(order asc)\n': ListSkillCategoriesQueryResult;
+    '\n  *[_type == "profile" && _id == "profile"][0] {\n    fullName,\n    shortName,\n    nickname,\n    jobTitle,\n    headline,\n    location,\n    terminal,\n    photo {\n      alt,\n      crop,\n      hotspot,\n      asset->{ _id, metadata { lqip, dimensions { width, height } } }\n    },\n    nameVariants,\n    tagline,\n    lead,\n    aboutTitle,\n    roles,\n    bio,\n    cardFlavor,\n    contactTitle,\n    contactInvite,\n    socials[] { _key, platform, url, handle, blurb, inContact, inHero },\n    projectsIntro,\n    experiencesIntro,\n    skillsIntro,\n    seoDescription,\n    shareTagline,\n    pageDescriptions,\n    quote,\n    quoteCredit,\n    footerTagline,\n    "knowsAbout": *[_type == "skill" && proficiency in ["advanced", "expert"]] | order(name asc).name\n  }\n': ProfileQueryResult;
   }
 }

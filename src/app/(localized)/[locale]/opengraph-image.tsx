@@ -4,6 +4,8 @@ import { flavors } from '@catppuccin/palette';
 import { ImageResponse } from 'next/og';
 import { getTranslations } from 'next-intl/server';
 import { routing } from '@/i18n/routing';
+import { getProfile } from '@/lib/getProfile';
+import { SITE_URL } from '@/lib/social';
 
 // Name and address read the same in either language, so one alt serves both.
 export const alt = 'Anderson Ribeiro Lopes · anderson-lopes.dev.br';
@@ -75,7 +77,14 @@ type CardSpec = {
  */
 export default async function OpengraphImage({ params }: { params: Promise<{ locale: string }> }) {
   const locale = toLocale((await params).locale);
-  const t = await getTranslations({ locale, namespace: 'og' });
+  const [t, profile] = await Promise.all([
+    getTranslations({ locale, namespace: 'og' }),
+    getProfile(locale),
+  ]);
+  // The name on two lines: the first name, then the rest.
+  const [first = '', ...rest] = profile.fullName.split(' ');
+  const nameLines = [first, rest.join(' ')].filter(Boolean);
+  const domain = new URL(SITE_URL).host;
 
   const fontDir = join(process.cwd(), 'src/assets/fonts');
   const [regular, bold] = await Promise.all([
@@ -236,7 +245,7 @@ export default async function OpengraphImage({ params }: { params: Promise<{ loc
             letterSpacing: -2,
           }}
         >
-          {['Anderson', 'Ribeiro Lopes'].map((line) => (
+          {nameLines.map((line) => (
             <span
               key={line}
               style={{
@@ -260,7 +269,7 @@ export default async function OpengraphImage({ params }: { params: Promise<{ loc
             color: c.text.hex,
           }}
         >
-          {t('role')}
+          {profile.headline || profile.jobTitle}
         </div>
         <div
           style={{
@@ -271,7 +280,7 @@ export default async function OpengraphImage({ params }: { params: Promise<{ loc
             color: c.subtext0.hex,
           }}
         >
-          {t('tagline')}
+          {profile.shareTagline}
         </div>
       </div>
 
@@ -288,9 +297,9 @@ export default async function OpengraphImage({ params }: { params: Promise<{ loc
           color: c.overlay1.hex,
         }}
       >
-        <span style={{ color: c.teal.hex, fontWeight: 700 }}>anderson-lopes.dev.br</span>
-        <span style={{ margin: '0 14px' }}>·</span>
-        <span>{t('location')}</span>
+        <span style={{ color: c.teal.hex, fontWeight: 700 }}>{domain}</span>
+        {profile.location.label ? <span style={{ margin: '0 14px' }}>·</span> : null}
+        {profile.location.label ? <span>{profile.location.label}</span> : null}
       </div>
 
       {/* A fanned hand of skill cards. */}

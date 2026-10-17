@@ -4,7 +4,20 @@ import { NextIntlClientProvider } from 'next-intl';
 import { getLocale, getMessages, getTranslations } from 'next-intl/server';
 import NotFound from '@/app/(localized)/[locale]/not-found';
 import Layout from '@/components/Layout';
+import { ProfileProvider } from '@/components/ProfileProvider';
+import { routing } from '@/i18n/routing';
+import { getProfile } from '@/lib/getProfile';
+import { titleTemplate } from '@/lib/metadata';
+import type { AppLocale } from '@/lib/profile';
 import { DEFAULT_FLAVOR, themeScript } from '@/lib/theme';
+
+/** The request's locale, or the default for paths the proxy skips. */
+async function resolveLocale(): Promise<AppLocale> {
+  const locale = await getLocale();
+  return (routing.locales as readonly string[]).includes(locale)
+    ? (locale as AppLocale)
+    : routing.defaultLocale;
+}
 
 /*
   Every URL that matches no page lands here, and Next answers it with a real
@@ -20,19 +33,21 @@ import { DEFAULT_FLAVOR, themeScript } from '@/lib/theme';
 */
 
 export async function generateMetadata(): Promise<Metadata> {
-  const locale = await getLocale();
-  const t = await getTranslations({ locale, namespace: 'notFound' });
-  const meta = await getTranslations({ locale, namespace: 'meta' });
+  const locale = await resolveLocale();
+  const [t, profile] = await Promise.all([
+    getTranslations({ locale, namespace: 'notFound' }),
+    getProfile(locale),
+  ]);
 
   return {
-    title: meta('titleTemplate').replace('%s', t('title')),
+    title: titleTemplate(profile).replace('%s', t('title')),
     description: t('description'),
   };
 }
 
 export default async function GlobalNotFound() {
-  const locale = await getLocale();
-  const messages = await getMessages();
+  const locale = await resolveLocale();
+  const [messages, profile] = await Promise.all([getMessages(), getProfile(locale)]);
 
   // The same document shell as [locale]/layout.tsx, minus the JSON-LD.
   return (
@@ -48,9 +63,11 @@ export default async function GlobalNotFound() {
       </head>
       <body>
         <NextIntlClientProvider messages={messages}>
-          <Layout>
-            <NotFound />
-          </Layout>
+          <ProfileProvider profile={profile}>
+            <Layout>
+              <NotFound />
+            </Layout>
+          </ProfileProvider>
         </NextIntlClientProvider>
       </body>
     </html>
