@@ -3,7 +3,7 @@
 import { ArrowsPointingOutIcon } from '@heroicons/react/24/outline';
 import { useTranslations } from 'next-intl';
 import { useRef, useState } from 'react';
-import { flushSync } from 'react-dom';
+import { createPortal, flushSync } from 'react-dom';
 import TiltCard from '@/components/TiltCard';
 import { type Skill, SkillCardBack, SkillCardFront, useCardLook } from './SkillCardFaces';
 import { type Face, SkillViewer } from './SkillViewer';
@@ -132,37 +132,42 @@ const SkillItem: React.FC<{ skill: Skill }> = ({ skill }) => {
         </div>
       </TiltCard>
 
-      {open && (
-        // biome-ignore lint/a11y/useKeyWithClickEvents: the click handles the backdrop; Esc (onCancel) is the keyboard path
-        <dialog
-          ref={dialogRef}
-          aria-label={name}
-          className="skill-dialog"
-          onCancel={(event) => {
-            // Esc: close through the same animated path as the button.
-            event.preventDefault();
-            closeViewer();
-          }}
-          onClick={(event) => {
-            // The dialog fills the viewport; a click on it (not on its
-            // content) is a click on the backdrop — unless it's the end of
-            // a drag that wandered off the card.
-            if (event.target === event.currentTarget && !dragGuard.current) closeViewer();
-          }}
-        >
-          <SkillViewer
-            skill={skill}
-            tier={tier}
-            style={style}
-            initialFace={viewerFace.current}
-            onFaceChange={(face) => {
-              viewerFace.current = face;
+      {/* Portaled to <body>: in the DOM the dialog would otherwise sit inside
+          the carousel, whose native pointer listeners would take a drag on
+          the card for a swipe and scroll the cards behind it. */}
+      {open &&
+        createPortal(
+          // biome-ignore lint/a11y/useKeyWithClickEvents: the click handles the backdrop; Esc (onCancel) is the keyboard path
+          <dialog
+            ref={dialogRef}
+            aria-label={name}
+            className="skill-dialog"
+            onCancel={(event) => {
+              // Esc: close through the same animated path as the button.
+              event.preventDefault();
+              closeViewer();
             }}
-            onClose={closeViewer}
-            dragGuard={dragGuard}
-          />
-        </dialog>
-      )}
+            onClick={(event) => {
+              // The dialog fills the viewport; a click on it (not on its
+              // content) is a click on the backdrop — unless it's the end of
+              // a drag that wandered off the card.
+              if (event.target === event.currentTarget && !dragGuard.current) closeViewer();
+            }}
+          >
+            <SkillViewer
+              skill={skill}
+              tier={tier}
+              style={style}
+              initialFace={viewerFace.current}
+              onFaceChange={(face) => {
+                viewerFace.current = face;
+              }}
+              onClose={closeViewer}
+              dragGuard={dragGuard}
+            />
+          </dialog>,
+          document.body
+        )}
     </>
   );
 };
