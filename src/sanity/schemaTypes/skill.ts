@@ -1,12 +1,14 @@
 import { defineField, defineType } from 'sanity';
 
 /**
- * Soft limits for what fits on the compact skill card. Longer content still
- * renders (the card fades the description and ellipsizes tags, and the full
- * text shows when the card is opened); these only warn in the Studio.
+ * Soft limits for what fits on the compact two-sided skill card. Longer
+ * content still renders (the back clamps the description with an ellipsis,
+ * the front ellipsizes tags, and the opened card shows everything); these
+ * only warn in the Studio.
  */
 const CARD_DESCRIPTION_CHARS = 180;
 const CARD_TAG_CHARS = 16;
+const CARD_FLAVOR_CHARS = 100;
 
 export const skill = defineType({
   name: 'skill',
@@ -23,7 +25,7 @@ export const skill = defineType({
       name: 'description',
       title: 'Description',
       type: 'internationalizedArrayString',
-      description: `Shown on the card; around ${CARD_DESCRIPTION_CHARS} characters fit before it fades out (the full text shows when the card is opened).`,
+      description: `The card's lore text: what the skill itself is and what defines it, written impersonally (Anderson's own take goes in the flavor text). Printed on the back of the card; keep it under ${CARD_DESCRIPTION_CHARS} characters so it fits the narrowest card.`,
       validation: (Rule) => [
         Rule.required(),
         Rule.custom((value?: { _key: string; value?: string }[]) => {
@@ -33,10 +35,27 @@ export const skill = defineType({
           return long.length
             ? `Longer than ${CARD_DESCRIPTION_CHARS} characters (${long
                 .map((item) => `${item._key}: ${item.value?.length}`)
-                .join(', ')}) — the card will fade it out.`
+                .join(', ')}) — the back of the card will cut it short.`
             : true;
         }).warning(),
       ],
+    }),
+    defineField({
+      name: 'flavorText',
+      title: 'Flavor Text',
+      type: 'internationalizedArrayString',
+      description: `The personal line, in italics on the front of the card: Anderson's real experience with the skill, or a joke. Keep it under ${CARD_FLAVOR_CHARS} characters so it fits the front.`,
+      validation: (Rule) =>
+        Rule.custom((value?: { _key: string; value?: string }[]) => {
+          const long = (value ?? []).filter(
+            (item) => (item.value?.length ?? 0) > CARD_FLAVOR_CHARS
+          );
+          return long.length
+            ? `Longer than ${CARD_FLAVOR_CHARS} characters (${long
+                .map((item) => `${item._key}: ${item.value?.length}`)
+                .join(', ')}) — it will crowd the front of the card.`
+            : true;
+        }).warning(),
     }),
     defineField({
       name: 'category',

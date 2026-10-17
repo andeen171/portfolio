@@ -1,7 +1,7 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Carousel,
   CarouselContent,
@@ -10,6 +10,7 @@ import {
   CarouselPrevious,
   CarouselProgress,
 } from '@/components/ui/carousel';
+import SectionHeading from '@/components/ui/SectionHeading';
 import { Link } from '@/i18n/routing';
 import type { ListSkillCategoriesQueryResult, ListSkillsQueryResult } from '@/sanity/types';
 import CategoryChips from './CategoryChips';
@@ -36,13 +37,39 @@ const SkillsSection: React.FC<Props> = ({ skills, categories }) => {
     return skills.filter((skill) => skill.category?._id === activeCategory);
   }, [skills, activeCategory]);
 
+  // The cards are dealt when the section scrolls into view, not on page load
+  // far above it, where the animation would play to nobody. A category
+  // change re-keys the carousel, so the new hand is dealt in turn.
+  //
+  // "Into view" is the section's top edge passing the lower 15% of the
+  // viewport, not a share of its height: a share of a section this tall may
+  // never fit on a short or zoomed-in screen. Focus arriving inside (a
+  // keyboard user tabbing ahead of the scroll) deals too.
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const [dealt, setDealt] = useState(false);
+  useEffect(() => {
+    const section = sectionRef.current;
+    if (!section) return;
+    const deal = () => setDealt(true);
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry?.isIntersecting) deal();
+      },
+      { rootMargin: '0px 0px -15% 0px' }
+    );
+    observer.observe(section);
+    section.addEventListener('focusin', deal);
+    return () => {
+      observer.disconnect();
+      section.removeEventListener('focusin', deal);
+    };
+  }, []);
+
   return (
-    <div className="py-24 sm:py-32">
+    <div ref={sectionRef} data-deal={dealt ? 'dealt' : 'waiting'} className="py-24 sm:py-32">
       <div className="mx-auto max-w-7xl px-6 text-center lg:px-8">
-        <div className="animated-gradient-text mx-auto max-w-2xl font-nf lg:text-center">
-          <h2 className="text-base font-semibold leading-7">{t('title')}</h2>
-          <p className="py-2 text-3xl font-bold tracking-tight sm:text-4xl">{t('subtitle')}</p>
-        </div>
+        <SectionHeading index="04" eyebrow={t('eyebrow')} title={t('subtitle')} />
+        <p className="mx-auto mt-4 max-w-2xl text-pretty text-ctp-subtext1">{t('lede')}</p>
 
         <CategoryChips
           categories={categories}
@@ -59,6 +86,8 @@ const SkillsSection: React.FC<Props> = ({ skills, categories }) => {
             the vertical padding leaves room for an active card's lift. */}
         <Carousel
           key={activeCategory ?? 'all'}
+          label={t('carouselLabel')}
+          roleDescription={t('carouselRole')}
           opts={{
             // Mobile centres one card at a time; sm+ keeps a start-aligned row.
             align: 'center',
@@ -78,9 +107,12 @@ const SkillsSection: React.FC<Props> = ({ skills, categories }) => {
           className="-mx-6 mt-12 px-6 sm:mt-14 lg:mt-16"
         >
           <CarouselContent className="py-10">
-            {filtered.map((skill) => (
+            {filtered.map((skill, i) => (
               <CarouselItem key={skill._id} className={SLIDE}>
-                <div className="flex justify-center">
+                <div
+                  className="skill-deal flex justify-center"
+                  style={{ '--i': i, '--deal-turn': i % 2 ? -1 : 1 } as React.CSSProperties}
+                >
                   <SkillItem skill={skill} />
                 </div>
               </CarouselItem>
@@ -95,9 +127,10 @@ const SkillsSection: React.FC<Props> = ({ skills, categories }) => {
               <CarouselNext label={t('nextSkills')} />
             </div>
             <CarouselProgress className="max-w-md" />
+            {/* Raw lavender is 2.8:1 on latte's base; its 900 shade reads. */}
             <Link
               href="/skills"
-              className="group col-span-2 inline-flex items-center gap-1.5 justify-self-center font-semibold text-ctp-lavender transition-colors hover:text-ctp-pink sm:col-span-1 sm:justify-self-end"
+              className="group col-span-2 inline-flex items-center gap-1.5 justify-self-center rounded-sm font-semibold text-ctp-lavender transition-colors hover:text-ctp-pink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ctp-lavender sm:col-span-1 sm:justify-self-end latte:text-ctp-lavender-900 latte:hover:text-ctp-pink-950"
             >
               {t('seeMore')}
               <span

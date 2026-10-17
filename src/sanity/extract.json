@@ -79,6 +79,14 @@
         },
         "optional": true
       },
+      "flavorText": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "inline",
+          "name": "internationalizedArrayString"
+        },
+        "optional": true
+      },
       "category": {
         "type": "objectAttribute",
         "value": {

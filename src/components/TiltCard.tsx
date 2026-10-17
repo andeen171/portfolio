@@ -20,23 +20,6 @@ type TouchState = { x: number; y: number; steering: boolean; timer: number };
 
 type TiltCardProps = HTMLAttributes<HTMLDivElement> & {
   ref?: Ref<HTMLDivElement>;
-  /** Hold the card lit regardless of the pointer (the detail view). */
-  active?: boolean;
-  /** Let the card sway on its own while nothing is steering it, so the foil
-   *  still moves untouched (see `[data-idle]` in skill-card.css). */
-  idle?: boolean;
-  /**
-   * How a finger steers the card.
-   * - `hold` — press and hold, then drag. A quick swipe stays a page scroll
-   *   or carousel swipe, and a tap stays a click. For cards in a scrolling
-   *   grid or carousel.
-   * - `drag` — any drag steers straight away. Pair it with `touch-action:
-   *   none` on the card; for the open card in the dialog, where nothing
-   *   behind it scrolls.
-   *
-   * Touches that start inside a `[data-no-tilt]` element never steer.
-   */
-  touch?: 'hold' | 'drag';
 };
 
 /**
@@ -47,23 +30,17 @@ type TiltCardProps = HTMLAttributes<HTMLDivElement> & {
  * - `--rotate-x` / `--rotate-y`   — the current tilt.
  *
  * It also owns `data-active`, the single switch the stylesheet keys every lit
- * visual off — on while a mouse hovers or a finger steers, or always with
- * `active` — and `data-tracking`, on while something is steering.
+ * visual off — on while a mouse hovers or a finger steers — and
+ * `data-tracking`, on while something is steering.
+ *
+ * A finger steers by pressing and holding, then dragging, so a quick swipe
+ * stays a page scroll or carousel swipe and a tap stays a click.
  *
  * Pointer moves are coalesced to one style write per frame, and the work is
  * all custom properties on this one element — nothing re-renders while the
  * pointer moves.
  */
-export const TiltCard = ({
-  ref,
-  active = false,
-  idle = false,
-  touch = 'hold',
-  className,
-  children,
-  onClickCapture,
-  ...props
-}: TiltCardProps) => {
+export const TiltCard = ({ ref, className, children, onClickCapture, ...props }: TiltCardProps) => {
   const element = useRef<HTMLDivElement | null>(null);
   const frame = useRef(0);
   const touchState = useRef<TouchState | null>(null);
@@ -149,9 +126,8 @@ export const TiltCard = ({
   return (
     <div
       ref={setRefs}
-      data-active={steering || active || undefined}
+      data-active={steering || undefined}
       data-tracking={steering || undefined}
-      data-idle={idle || undefined}
       className={className}
       onPointerEnter={(event) => {
         if (event.pointerType === 'touch') return;
@@ -163,16 +139,7 @@ export const TiltCard = ({
       }}
       onPointerDown={(event) => {
         if (event.pointerType !== 'touch' || !event.isPrimary) return;
-        // Regions that scroll by touch (the open card's description) opt out.
-        if ((event.target as Element).closest('[data-no-tilt]')) return;
         const { clientX: x, clientY: y } = event;
-
-        if (touch === 'drag') {
-          touchState.current = { x, y, steering: true, timer: 0 };
-          setSteering(true);
-          track(x, y);
-          return;
-        }
 
         const state: TouchState = { x, y, steering: false, timer: 0 };
         state.timer = window.setTimeout(() => {

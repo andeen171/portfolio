@@ -5,11 +5,16 @@
 
   Inputs, all custom properties:
   - `--accent` / `--tint`  set inline by SkillItem (category accent, logo colour)
+  - `--accent-ink`         the accent's 950 shade, also set by SkillItem; the
+                           name's colour on latte
   - `--pointer-x` / `-y`, `--rotate-x` / `-y`
-                           written by TiltCard as the pointer moves
-  - `data-active`          on the card while hovered, and always on the open
-                           detail card
+                           written by TiltCard as the pointer moves, and by
+                           the viewer (SkillViewer) as the card turns
+  - `data-active`          on the card while hovered, and always on the card
+                           in the viewer
   - `data-rarity`          uncommon | holo | radiant | secret, from proficiency
+  - `data-flipped`         on a grid card while its back (the description)
+                           faces the viewer
 
   Theme: colours come from the Catppuccin flavor tokens and are mixed into the
   flavor's own surfaces with `color-mix`, so the same rules hold on every
@@ -24,9 +29,9 @@
   - secret    + the whole card is foil, and the frame shimmers at rest
 */
 
-/* Registered so the detail card's idle sway can animate them; TiltCard writes
-   the same names inline while a mouse steers. Inherited, like any custom
-   property, because the foil layers read them. */
+/* Typed, so a stray value falls back to the initial one instead of breaking
+   the card's transform. TiltCard and the viewer write them inline; inherited,
+   like any custom property, because the foil layers read them. */
 @property --pointer-x {
   syntax: "<percentage>";
   inherits: true;
@@ -82,13 +87,15 @@
   transform: perspective(900px) rotateX(var(--rotate-x)) rotateY(var(--rotate-y))
     scale(var(--scale));
   transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+  /* The flipper turns inside the card's own tilt, in the same 3D space. */
+  transform-style: preserve-3d;
   -webkit-tap-highlight-color: transparent;
 }
 
-/* On grid cards touch steering is press-and-hold then drag (TiltCard): keep
-   the long press from selecting text or opening the callout. The open detail
-   card stays selectable. */
-.skill-card:not([data-variant="detail"]) {
+/* Touch steering is press-and-hold then drag (TiltCard), and the viewer's
+   card is dragged around: keep a long press from selecting text or opening
+   the callout. */
+.skill-card {
   -webkit-touch-callout: none;
   user-select: none;
 }
@@ -101,6 +108,48 @@
 /* While a mouse is steering, follow it closely instead of easing behind it. */
 .skill-card[data-tracking] {
   transition-duration: 0.12s;
+}
+
+/* ── Two sides (grid cards) ───────────────────────────────────────────────── */
+
+/* The flipper turns half a revolution to show the back. The easing overshoots
+   a touch, so the card lands like something with weight rather than a slide
+   transition. Each side hides its own reverse, and every visual below hangs
+   off the face inside its side, so the foils and the glare turn with it. */
+.skill-card__flipper {
+  position: relative;
+  height: 100%;
+  border-radius: inherit;
+  transform-style: preserve-3d;
+  transition: transform 0.75s cubic-bezier(0.3, 1.3, 0.45, 1);
+  /* The turned back lies in the flipper's own plane, and coplanar 3D layers
+     hit-test unpredictably: a click on the back's buttons could land on the
+     flipper instead. Only the sides take pointer events. */
+  pointer-events: none;
+}
+
+.skill-card[data-flipped] .skill-card__flipper {
+  transform: rotateY(180deg);
+}
+
+/* Each side sits half a pixel off the flipper's plane, toward its own
+   viewer, for the same reason: nothing coplanar left to fight over. */
+.skill-card__side {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: auto;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  transform: translateZ(0.5px);
+  /* Grid tracks and the carousel size the card from 14rem up; the back reads
+     its own width to fit the description (see `@container` under Back). A
+     side is a leaf of the 3D scene, so its containment flattens nothing. */
+  container-type: inline-size;
+}
+
+.skill-card__side--back {
+  transform: rotateY(180deg) translateZ(0.5px);
 }
 
 /* ── Face ─────────────────────────────────────────────────────────────────── */
@@ -168,6 +217,14 @@
   color: var(--accent);
 }
 
+/* The front only carries the short flavor text, so the art window
+   grows into whatever room is left instead of holding a fixed ratio. */
+.skill-card__side .skill-card__art {
+  flex: 1;
+  min-height: 4.5rem;
+  aspect-ratio: auto;
+}
+
 .skill-card__art .skill-svg-container {
   display: flex;
   align-items: center;
@@ -178,8 +235,10 @@
   transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
+/* Lit, the logo lifts slightly but holds still; the card's tilt and foil
+   carry the motion. */
 .skill-card[data-active] .skill-svg-container {
-  transform: scale(1.08);
+  transform: scale(1.06);
 }
 
 .skill-card__art + ul {
@@ -201,13 +260,202 @@
   margin-bottom: 0.75rem;
 }
 
-/* Compact card: the text fills the box and fades out over its last line, so
-   a long description ends softly instead of being cut mid-line. Short text
-   never reaches the fade. */
-.skill-card__rules-fit {
-  height: 100%;
+/* Flavor text, alone in the front's text box. Subtext0 keeps it a step
+   quieter than the name on the dark flavors; latte needs subtext1 to hold AA
+   (below). */
+.skill-card__flavor {
+  font-size: 0.75rem;
+  font-style: italic;
+  line-height: 1.55;
+  text-align: left;
+  text-wrap: pretty;
+  color: var(--catppuccin-color-subtext0);
+}
+
+/* The front's text box holds only the flavor text: sized to it, not
+   stretched, and never cut — the field is capped short in Sanity. */
+.skill-card__rules--flavor {
+  flex: none;
+  display: grid;
+  place-items: center start;
+  /* Three lines' worth, whatever the line count, so the art windows and tag
+     rows of neighbouring cards stay level. */
+  min-height: 4.625rem;
+}
+
+.skill-card__rules--flavor .skill-card__flavor {
+  font-size: 0.71875rem;
+  line-height: 1.5;
+  /* A single long token (AbstractSingletonProxyFactoryBean) wraps instead of
+     running out of the box. */
+  overflow-wrap: anywhere;
+}
+
+/* ── Back ─────────────────────────────────────────────────────────────────── */
+
+/* The rules side: a quieter frame around the description at reading size. A
+   fine diagonal hatch in the accent and the logo's 戦 printed large and faint
+   make it read as the back of the same card, not a tooltip. */
+.skill-card__back {
+  background:
+    repeating-linear-gradient(
+      -45deg,
+      color-mix(in oklab, var(--accent) 7%, transparent) 0 1px,
+      transparent 1px 9px
+    ),
+    linear-gradient(
+      200deg,
+      color-mix(in oklab, var(--tint) var(--face-mix), var(--catppuccin-color-mantle)) 0%,
+      var(--catppuccin-color-mantle) 45%,
+      var(--catppuccin-color-crust) 100%
+    );
+}
+
+.skill-card__face > .skill-card__watermark {
+  position: absolute;
+  right: -0.75rem;
+  bottom: 0.5rem;
+  z-index: 0;
+  font-size: 9rem;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--accent);
+  opacity: 0.07;
+  rotate: -12deg;
+  pointer-events: none;
+  user-select: none;
+}
+
+.skill-card__back-header {
+  /* Room on the right for the inspect button. */
+  padding: 0.75rem 2.75rem 0.5rem 0.875rem;
+  color: var(--accent);
+  background: var(--panel);
+  border-bottom: 1px solid color-mix(in oklab, var(--accent) 30%, transparent);
+}
+
+.skill-card__back-body {
+  flex: 0 1 auto;
+  min-height: 0;
+  margin: 0.625rem 0.75rem 0;
+  padding: 0.75rem 0.875rem;
   overflow: hidden;
-  mask-image: linear-gradient(to bottom, #000 calc(100% - 1.25rem), transparent);
+  border-radius: 0.5rem;
+  border: 1px solid color-mix(in oklab, var(--accent) 22%, transparent);
+  background: var(--panel);
+}
+
+/* Sanity caps descriptions at a length that fits in about seven lines at
+   either card width below; the clamp is a backstop that ends a longer one
+   with an ellipsis (the full text is one click away, in the dialog) instead
+   of hiding its end without a trace. */
+.skill-card__back-body p {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 8;
+  line-clamp: 8;
+  overflow: hidden;
+}
+
+/* The narrowest cards (a 14rem grid track): smaller text, and the stats lose
+   the tags row, which the front already shows. */
+@container (width < 16rem) {
+  .skill-card__back-body {
+    padding: 0.625rem 0.75rem;
+  }
+
+  .skill-card__back-body p {
+    font-size: 0.75rem;
+    line-height: 1.45;
+  }
+
+  .skill-card__stats [data-stat="tags"] {
+    display: none;
+  }
+}
+
+/* The card's stats as a terminal readout, pinned to the bottom edge; whatever
+   room the description leaves shows the watermark between the two. */
+.skill-card__stats {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: baseline;
+  gap: 0.375rem 0.75rem;
+  margin: auto 0.75rem 0.75rem;
+  padding: 0.625rem 0.75rem;
+  border-radius: 0.5rem;
+  border: 1px solid color-mix(in oklab, var(--catppuccin-color-surface0) 80%, transparent);
+  background: var(--panel);
+  font-family: var(--font-nf);
+  font-size: 0.625rem;
+  line-height: 1.4;
+  /* The carousel's wrapper centres its text; a label/value table reads left. */
+  text-align: left;
+}
+
+.skill-card__stats dt {
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--catppuccin-color-subtext0);
+}
+
+.skill-card__stats dd {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  color: var(--catppuccin-color-text);
+}
+
+.skill-card__pips {
+  display: inline-flex;
+  gap: 0.1875rem;
+  margin-right: 0.5rem;
+  vertical-align: -0.0625rem;
+}
+
+.skill-card__pip {
+  width: 0.5rem;
+  height: 0.5rem;
+  rotate: 45deg;
+  border-radius: 1px;
+  border: 1px solid color-mix(in oklab, var(--accent) 70%, transparent);
+}
+
+.skill-card__pip[data-on] {
+  border-color: var(--accent);
+  background: var(--accent);
+}
+
+/* Above the back's flip button, so it opens the dialog instead of turning the
+   card over again. */
+.skill-card__inspect {
+  position: absolute;
+  top: 0.625rem;
+  right: 0.625rem;
+  z-index: 4;
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 9999px;
+  border: 1px solid color-mix(in oklab, var(--accent) 45%, transparent);
+  background: color-mix(in oklab, var(--catppuccin-color-crust) 70%, transparent);
+  color: var(--accent);
+  cursor: zoom-in;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    scale 0.2s ease;
+}
+
+.skill-card__inspect:hover {
+  border-color: var(--accent);
+  background: color-mix(in oklab, var(--accent) 18%, var(--catppuccin-color-crust));
+  scale: 1.08;
+}
+
+.skill-card__inspect:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
 
 /* ── Open affordance ─────────────────────────────────────────────────────── */
@@ -227,8 +475,9 @@
   outline-offset: 3px;
 }
 
-/* A small "expand" mark in the header corner, shown when the card is lit or
-   focused, and always (dimmer) on touch screens, which have no hover. */
+/* A small "turn over" mark in the front's header corner, shown when the card
+   is lit or focused, and always (dimmer) on touch screens, which have no
+   hover. */
 .skill-card__hint {
   position: absolute;
   top: 0.625rem;
@@ -490,6 +739,36 @@
   --shadow: 0 12px 28px -16px rgb(76 79 105 / 0.45);
 }
 
+/* The raw accents are 2.3-3.3:1 on latte's pale panel, too faint for the
+   name. Only the text darkens: `--accent` itself still drives the frame,
+   rules, rarity symbol and `currentColor` logos at full strength. */
+.latte .skill-card__header,
+.latte .skill-card__back-header,
+.latte .skill-card__inspect {
+  color: var(--accent-ink);
+}
+
+.latte .skill-card__stats dt {
+  color: var(--catppuccin-color-subtext1);
+}
+
+/* Subtext0 sits around 4:1 on latte's pale panels and face, under AA for
+   this small text; one step darker clears it. */
+.latte .skill-card__flavor,
+.latte .skill-card__footer,
+.latte .skill-card__header p,
+.latte .skill-card__back-header p {
+  color: var(--catppuccin-color-subtext1);
+}
+
+.latte .skill-card__inspect {
+  background: color-mix(in oklab, var(--catppuccin-color-base) 80%, transparent);
+}
+
+.latte .skill-card__face > .skill-card__watermark {
+  opacity: 0.09;
+}
+
 .latte .skill-card__art {
   background:
     radial-gradient(
@@ -524,60 +803,12 @@
   mix-blend-mode: soft-light;
 }
 
-/* ── Detail card ──────────────────────────────────────────────────────────── */
+/* ── Viewer ───────────────────────────────────────────────────────────────── */
 
-/* The card opened in the dialog: the same 5:7 trading-card frame, just
-   larger — as large as fits the viewport (with room for the close button),
-   up to 24rem wide. The art window is a little shorter than on the compact
-   card to give the text more room, and a description longer than its box
-   scrolls inside it. */
-.skill-card[data-variant="detail"] {
-  --scale: 1;
-  width: min(24rem, calc(100vw - 2rem), calc((100dvh - 7rem) * 5 / 7));
-  max-width: none;
-  /* Touch drags tilt the card (TiltCard `touch="drag"`)… */
-  touch-action: none;
-}
-
-.skill-card[data-variant="detail"] .skill-card__header {
-  padding: 0.875rem 1rem 0.75rem;
-}
-
-.skill-card[data-variant="detail"] .skill-card__art {
-  aspect-ratio: 2.4 / 1;
-}
-
-.skill-card[data-variant="detail"] .skill-card__rules {
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  padding: 0.75rem 0.875rem;
-  /* …except in the text box, which keeps vertical scrolling. */
-  touch-action: pan-y;
-}
-
-/* With no mouse steering it, the detail card sways on its own so the foil
-   keeps moving — the only way to see it shimmer on a touch screen. */
-.skill-card[data-idle]:not([data-tracking]) {
-  animation: skill-card-idle 7s ease-in-out infinite;
-}
-
-@keyframes skill-card-idle {
-  0%,
-  100% {
-    --pointer-x: 28%;
-    --pointer-y: 22%;
-    --rotate-x: 4deg;
-    --rotate-y: -6deg;
-  }
-
-  50% {
-    --pointer-x: 72%;
-    --pointer-y: 78%;
-    --rotate-x: -4deg;
-    --rotate-y: 6deg;
-  }
-}
-
+/* The card picked up (SkillViewer): the grid card itself, zoomed to fit the
+   viewport (`--viewer-zoom`) so it lays out exactly the same, only closer.
+   A spring loop writes its `--rotate-x` / `--rotate-y` every frame, so it has
+   no transition of its own, and the stage under it takes the drag. */
 .skill-dialog {
   position: fixed;
   inset: 0;
@@ -586,7 +817,8 @@
   height: 100dvh;
   max-height: none;
   margin: 0;
-  padding: 1rem;
+  /* The top band is the close button's, so it never sits on the card. */
+  padding: 4.5rem 1rem 1rem;
   border: 0;
   background: transparent;
   color: inherit;
@@ -599,7 +831,7 @@
 }
 
 .skill-dialog::backdrop {
-  background: color-mix(in oklab, var(--catppuccin-color-crust) 70%, transparent);
+  background: color-mix(in oklab, var(--catppuccin-color-crust) 72%, transparent);
   backdrop-filter: blur(6px);
 }
 
@@ -608,28 +840,213 @@ html:has(.skill-dialog[open]) {
   overflow: hidden;
 }
 
-/* The card ↔ dialog morph (SkillItem's view transition). */
+/* The card ↔ viewer morph (SkillItem's view transition). */
 ::view-transition-group(skill-card) {
   animation-duration: 0.4s;
   animation-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
+.skill-viewer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.skill-viewer__stage {
+  position: relative;
+  display: grid;
+  place-items: center;
+  /* Room below for the shadow the card casts. SkillViewer leaves room at
+     the sides when it sizes the card. */
+  padding: 0.5rem 0 1.75rem;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  cursor: grab;
+}
+
+.skill-viewer__stage:active {
+  cursor: grabbing;
+}
+
+.skill-viewer__card {
+  display: grid;
+}
+
+.skill-viewer .skill-card {
+  --scale: 1;
+  width: 17rem;
+  max-width: none;
+  zoom: var(--viewer-zoom, 1);
+  transition: none;
+}
+
+.skill-viewer .skill-card__side {
+  pointer-events: none;
+}
+
+/* The card's edge: thin plates stacked between the two faces (SkillViewer
+   sets their depth). Face-on they hide behind the face; turned side-on they
+   read as the card's thickness, in its accent. */
+.skill-card__edge {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: color-mix(in oklab, var(--accent) 45%, var(--catppuccin-color-crust));
+}
+
+/* A soft shadow on the floor under the card, narrowing as it turns side-on
+   (`--facing` is |cos| of the turn, written with the rotation). */
+.skill-viewer__shadow {
+  position: absolute;
+  bottom: 0.375rem;
+  left: 50%;
+  width: calc(17rem * var(--viewer-zoom, 1) * 0.8);
+  height: 1.25rem;
+  translate: -50% 0;
+  scale: max(0.12, var(--facing, 1)) 1;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgb(0 0 0 / 0.5), transparent);
+  filter: blur(4px);
+  pointer-events: none;
+}
+
+.skill-viewer__close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  display: grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 9999px;
+  border: 1px solid var(--catppuccin-color-surface1);
+  background: color-mix(in oklab, var(--catppuccin-color-mantle) 80%, transparent);
+  color: var(--catppuccin-color-subtext1);
+  backdrop-filter: blur(4px);
+  transition:
+    border-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.skill-viewer__close:hover {
+  border-color: var(--accent);
+  color: var(--catppuccin-color-text);
+}
+
+.skill-viewer__close:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.skill-viewer__controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.625rem;
+}
+
+/* Front | Back, like a terminal toggle. The pressed side is the one facing
+   the viewer (or the one the card is turning to). */
+.skill-viewer__switch {
+  display: inline-flex;
+  margin: 0;
+  min-width: 0;
+  gap: 0.1875rem;
+  padding: 0.1875rem;
+  border-radius: 9999px;
+  border: 1px solid var(--catppuccin-color-surface1);
+  background: color-mix(in oklab, var(--catppuccin-color-mantle) 85%, transparent);
+  font-family: var(--font-nf);
+  font-size: 0.6875rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.skill-viewer__switch button {
+  min-width: 5.5rem;
+  padding: 0.375rem 0.875rem;
+  border-radius: 9999px;
+  color: var(--catppuccin-color-subtext1);
+  cursor: pointer;
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.skill-viewer__switch button:hover {
+  color: var(--catppuccin-color-text);
+}
+
+.skill-viewer__switch button[aria-pressed="true"] {
+  background: color-mix(in oklab, var(--accent) 20%, var(--catppuccin-color-crust));
+  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--accent) 55%, transparent);
+  color: var(--accent);
+}
+
+.skill-viewer__switch button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.skill-viewer__hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-family: var(--font-nf);
+  font-size: 0.6875rem;
+  color: var(--catppuccin-color-subtext0);
+}
+
+.latte .skill-viewer__shadow {
+  background: radial-gradient(closest-side, rgb(76 79 105 / 0.35), transparent);
+}
+
+.latte .skill-viewer__switch button[aria-pressed="true"] {
+  background: color-mix(in oklab, var(--accent) 22%, var(--catppuccin-color-base));
+  color: var(--accent-ink);
+}
+
+/* Subtext0 sits around 4:1 on latte; the hint is small, so a step darker. */
+.latte .skill-viewer__hint {
+  color: var(--catppuccin-color-subtext1);
+}
+
 /* ── Grid entrance ────────────────────────────────────────────────────────── */
 
-/* Cards deal in, staggered, when the /skills grid is (re)built: on load and
-   when the sort or category changes. The stagger caps out after a dozen
-   cards so a long grid doesn't take seconds to settle. */
+/* Cards are dealt in, staggered, whenever a set of them is (re)built: the
+   /skills grid on load and when the sort or category changes, the home
+   carousel when it scrolls into view and when its category changes. Each
+   card rises from below, turned a few degrees one way or the other, and
+   settles square. The stagger caps out after a dozen cards so a long grid
+   doesn't take seconds to settle. */
 .skill-deal {
+  /* Which way a card is turned as it lands; set inline per card, alternating. */
+  --deal-turn: 1;
   /* `backwards`, not `both`: a filled animation would leave every card in its
      own stacking context and trap the active card's z-index. */
-  animation: skill-deal 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
-  animation-delay: calc(min(var(--i, 0), 12) * 30ms);
+  animation: skill-deal 0.65s cubic-bezier(0.2, 0.9, 0.3, 1.08) backwards;
+  animation-delay: calc(min(var(--i, 0), 12) * 45ms);
 }
 
 @keyframes skill-deal {
   from {
     opacity: 0;
-    translate: 0 12px;
+    translate: 0 2.25rem;
+    rotate: calc(var(--deal-turn) * 5deg);
+    scale: 0.94;
+  }
+}
+
+/* The carousel waits to deal until it scrolls into view (SkillsSection sets
+   `data-deal` once it does). Only on screen and with scripting: without it
+   nothing would ever reveal the cards, and print has no scrolling. */
+@media screen and (scripting: enabled) {
+  [data-deal="waiting"] .skill-deal {
+    opacity: 0;
+    animation: none;
   }
 }
 
@@ -651,13 +1068,28 @@ html:has(.skill-dialog[open]) {
     transform: none;
   }
 
+  /* The card still turns over, just without the half-revolution. */
+  .skill-card__flipper,
+  .skill-card__inspect {
+    transition: none;
+  }
+
   .skill-card[data-rarity] .skill-card__face::after {
     transition: none;
     animation: none;
   }
 
-  .skill-deal,
-  .skill-card[data-idle]:not([data-tracking]) {
+  .skill-deal {
     animation: none;
+  }
+
+  /* The viewer's card still turns (a drag is the visitor's own motion); it
+     just lands on a face at once and doesn't sway. */
+  .skill-viewer .skill-card {
+    transform: perspective(900px) rotateX(var(--rotate-x)) rotateY(var(--rotate-y));
+  }
+
+  [data-deal="waiting"] .skill-deal {
+    opacity: 1;
   }
 }

@@ -14,7 +14,7 @@ const SkillList: React.FC<Props> = ({ skills }) => {
         <li
           key={skill._id}
           className="skill-deal flex w-full justify-center"
-          style={{ '--i': i } as React.CSSProperties}
+          style={{ '--i': i, '--deal-turn': i % 2 ? -1 : 1 } as React.CSSProperties}
         >
           <SkillItem skill={skill} />
         </li>
