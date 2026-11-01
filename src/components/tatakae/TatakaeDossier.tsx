@@ -61,6 +61,27 @@ function RepoLog({ seed }: { seed: string }) {
   );
 }
 
+/** A record value that opens in Japanese script (戦え …) gets it as a stamped seal. */
+const SEAL = /^([\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}]+)\s*(.*)$/u;
+
+function Seal({ glyphs, gloss }: { glyphs: string; gloss: string }) {
+  return (
+    <span className="flex items-center gap-3">
+      <span
+        lang="ja"
+        className="hanko shrink-0 rounded-[3px] border-2 border-ctp-red px-1 py-1.5 text-lg leading-none font-bold text-ctp-red latte:border-ctp-red-800 latte:text-ctp-red-800"
+      >
+        {glyphs}
+      </span>
+      {gloss && (
+        <span className="tracking-wide text-ctp-subtext1">
+          <ScrambleText text={gloss} />
+        </span>
+      )}
+    </span>
+  );
+}
+
 /** Keys compare without case or stray spaces: "ttk-0321 " opens TTK-0321. */
 const sameKey = (typed: string, key: string) =>
   typed.replace(/\s+/g, '').toUpperCase() === key.replace(/\s+/g, '').toUpperCase();
@@ -270,15 +291,22 @@ function RecordPage({
       </h2>
 
       {/* Two columns on wide screens, so the whole record fits without scrolling. */}
-      <div className="lg:grid lg:grid-cols-2 lg:items-start lg:gap-x-10">
+      <div className="lg:grid lg:grid-cols-[5fr_4fr] lg:items-start lg:gap-x-10">
         {tatakae.facts.length > 0 && (
           <Section numeral="I" title={t('identification')}>
             <dl className="md:grid md:grid-cols-2 md:gap-x-8 lg:block">
-              {tatakae.facts.map((fact) => (
-                <Field key={fact.label} name={fact.label}>
-                  <RedactedText text={fact.value} />
-                </Field>
-              ))}
+              {tatakae.facts.map((fact) => {
+                const seal = SEAL.exec(fact.value);
+                return (
+                  <Field key={fact.label} name={fact.label}>
+                    {seal ? (
+                      <Seal glyphs={seal[1] ?? ''} gloss={seal[2] ?? ''} />
+                    ) : (
+                      <RedactedText text={fact.value} />
+                    )}
+                  </Field>
+                );
+              })}
             </dl>
           </Section>
         )}

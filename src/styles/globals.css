@@ -349,6 +349,39 @@ body::-webkit-scrollbar {
   }
 }
 
+/*
+  A hanko: Japanese glyphs stamped in red ink, written top to bottom like a
+  real seal. A noise mask wears the ink; it lands on the page a beat after
+  the file opens.
+*/
+.hanko {
+  writing-mode: vertical-rl;
+  rotate: -7deg;
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.1' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -2.4 2.1'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .hanko {
+    animation: hanko-stamp 0.42s cubic-bezier(0.3, 1.5, 0.5, 1) 0.6s both;
+  }
+}
+
+@keyframes hanko-stamp {
+  0% {
+    opacity: 0;
+    scale: 2.4;
+    filter: blur(3px);
+  }
+  55% {
+    opacity: 1;
+    scale: 0.9;
+    filter: none;
+  }
+  100% {
+    scale: 1;
+  }
+}
+
 /* The dossier powers on like an old monitor. */
 @media (prefers-reduced-motion: no-preference) {
   .dossier[open] {
