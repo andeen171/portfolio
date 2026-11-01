@@ -51,6 +51,15 @@
     }
   },
   "tatakae": {
+    "channel": {
+      "note": "p.s.: gostou do que leu? existe um canal.",
+      "command": "./canal --seguro",
+      "title": "Canal seguro",
+      "established": "> conexão estabelecida · fim a fim",
+      "password": "senha de reconhecimento: mencione “{codename}” na mensagem.",
+      "newTab": "(abre em uma nova aba)",
+      "close": "Fechar canal"
+    },
     "gate": {
       "title": "Acesso ao arquivo {file}",
       "window": "tatakae — sessão remota",

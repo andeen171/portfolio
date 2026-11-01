@@ -10,6 +10,7 @@ import { cn } from '@/lib/utils';
 import { useDossier } from '@/store';
 import { RedactedText, TypedRedactedText, tapeLength } from './Redacted';
 import ScrambleText from './ScrambleText';
+import SecureChannel from './SecureChannel';
 
 const NOISE = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`;
 
@@ -26,7 +27,16 @@ const VISIBLE_SKILLS = 3;
  * refused and a log with every message taped over. Hashes and widths come
  * from the codename, so the server and the browser draw the same thing.
  */
-function RepoLog({ seed, delay }: { seed: string; delay?: number }) {
+function RepoLog({
+  seed,
+  delay,
+  onChannel,
+}: {
+  seed: string;
+  delay?: number;
+  /** Shows the hidden last line, which opens the secure channel. */
+  onChannel?: () => void;
+}) {
   const t = useTranslations('tatakae');
   let state = [...seed].reduce((acc, char) => (acc * 31 + char.charCodeAt(0)) >>> 0, 7);
   const next = () => {
@@ -63,6 +73,24 @@ function RepoLog({ seed, delay }: { seed: string; delay?: number }) {
       <p className="text-ctp-overlay1" {...print()}>
         <RedactedText text={`… ${t('omitted')}`} />
       </p>
+      {onChannel && (
+        // Dim on purpose: a note left for whoever reads to the end.
+        <div className="pt-3 text-ctp-overlay0 latte:text-ctp-overlay1" {...print()}>
+          <p># {t('channel.note')}</p>
+          <button
+            type="button"
+            onClick={onChannel}
+            className="group -mx-1 rounded px-1 text-left transition-colors hover:text-ctp-green focus-visible:text-ctp-green focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ctp-green"
+          >
+            <span className="text-ctp-red/70 group-hover:text-ctp-red">$ </span>
+            {t('channel.command')}
+            <span
+              aria-hidden="true"
+              className="caret-blink ml-1 inline-block h-[1em] w-[0.5ch] translate-y-[0.15em] bg-current"
+            />
+          </button>
+        </div>
+      )}
     </div>
   );
 }
@@ -483,6 +511,7 @@ function FilePage({
   locale: AppLocale;
 }) {
   const t = useTranslations('tatakae');
+  const [channel, setChannel] = useState(false);
   const since = file.since ? new Date(file.since) : null;
   const opened =
     since && !Number.isNaN(since.getTime())
@@ -580,9 +609,11 @@ function FilePage({
           )}
         </div>
         <Section numeral="IV" title={t('repo')} delay={after(0)}>
-          <RepoLog seed={file.codename} delay={after(0)} />
+          <RepoLog seed={file.codename} delay={after(0)} onChannel={() => setChannel(true)} />
         </Section>
       </div>
+
+      {channel && <SecureChannel codename={file.codename} onClose={() => setChannel(false)} />}
     </article>
   );
 }
