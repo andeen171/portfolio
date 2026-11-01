@@ -380,6 +380,30 @@ body::-webkit-scrollbar {
   }
 }
 
+/* A field of the dossier printing in, and the gate's decrypting bar. */
+@media (prefers-reduced-motion: no-preference) {
+  [data-print] {
+    animation: dossier-in 0.35s ease-out both;
+  }
+  .gate-fill {
+    animation: gate-fill 1.5s cubic-bezier(0.6, 0, 0.4, 1) both;
+  }
+}
+
+@keyframes dossier-in {
+  from {
+    opacity: 0;
+    translate: 0 4px;
+    filter: blur(2px);
+  }
+}
+
+@keyframes gate-fill {
+  from {
+    width: 0;
+  }
+}
+
 /* The dossier powers on like an old monitor. */
 @media (prefers-reduced-motion: no-preference) {
   .dossier[open] {

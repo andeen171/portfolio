@@ -51,6 +51,16 @@
     }
   },
   "tatakae": {
+    "gate": {
+      "title": "Acesso ao arquivo {file}",
+      "window": "tatakae — sessão remota",
+      "script": "$ ssh visitante@tatakae\nconectando a tatakae://{path} …\ncanal seguro estabelecido\ncredencial: visitante · nível 0\narquivo {file}: criptografado\nchave de acesso requerida",
+      "prompt": "chave",
+      "denied": "acesso negado · tentativa {count} registrada",
+      "granted": "chave aceita · descriptografando {file}",
+      "hint": "a memória guarda mais do que mostra. leia byte a byte.",
+      "close": "Encerrar conexão"
+    },
     "title": "Arquivos Tatakae",
     "close": "Fechar o arquivo",
     "pages": "Páginas do arquivo",

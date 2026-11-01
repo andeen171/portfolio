@@ -49,10 +49,14 @@ export const useCommandPalette = create<CommandPaletteState>()((set) => ({
 interface DossierState {
   /** Null when closed; `index` for the dossier's record page, else a file's codename. */
   view: string | null;
+  /** Codename of the locked file whose access gate is open, if any. */
+  gate: string | null;
   /** Codenames of the locked pages this visitor has opened with their key. */
   unlocked: string[];
   open: (view: string) => void;
   close: () => void;
+  openGate: (codename: string) => void;
+  closeGate: () => void;
   unlock: (codename: string) => void;
 }
 
@@ -64,9 +68,12 @@ export const useDossier = create<DossierState>()(
   persist(
     (set) => ({
       view: null,
+      gate: null,
       unlocked: [],
       open: (view) => set({ view }),
       close: () => set({ view: null }),
+      openGate: (codename) => set({ gate: codename }),
+      closeGate: () => set({ gate: null }),
       unlock: (codename) =>
         set((state) => ({ unlocked: [...new Set([...state.unlocked, codename])] })),
     }),

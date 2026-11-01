@@ -51,6 +51,16 @@
     }
   },
   "tatakae": {
+    "gate": {
+      "title": "Access to file {file}",
+      "window": "tatakae — remote session",
+      "script": "$ ssh visitor@tatakae\nconnecting to tatakae://{path} …\nsecure channel established\ncredentials: visitor · level 0\nfile {file}: encrypted\naccess key required",
+      "prompt": "key",
+      "denied": "access denied · attempt {count} logged",
+      "granted": "key accepted · decrypting {file}",
+      "hint": "memory keeps more than it shows. read it byte by byte.",
+      "close": "End session"
+    },
     "title": "The Tatakae files",
     "close": "Close the file",
     "pages": "File pages",

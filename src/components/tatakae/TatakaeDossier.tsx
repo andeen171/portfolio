@@ -8,7 +8,7 @@ import TechChips from '@/components/projects/TechChips';
 import type { AppLocale, ClassifiedFile } from '@/lib/profile';
 import { cn } from '@/lib/utils';
 import { useDossier } from '@/store';
-import { RedactedText } from './Redacted';
+import { RedactedText, TypedRedactedText, tapeLength } from './Redacted';
 import ScrambleText from './ScrambleText';
 
 const NOISE = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`;
@@ -26,7 +26,7 @@ const VISIBLE_SKILLS = 3;
  * refused and a log with every message taped over. Hashes and widths come
  * from the codename, so the server and the browser draw the same thing.
  */
-function RepoLog({ seed }: { seed: string }) {
+function RepoLog({ seed, delay }: { seed: string; delay?: number }) {
   const t = useTranslations('tatakae');
   let state = [...seed].reduce((acc, char) => (acc * 31 + char.charCodeAt(0)) >>> 0, 7);
   const next = () => {
@@ -38,23 +38,29 @@ function RepoLog({ seed }: { seed: string }) {
     width: 10 + (next() % 16),
   }));
 
+  // With a delay, the lines print one by one, like the session's output.
+  let line = 0;
+  const print = () => appear(delay === undefined ? undefined : delay + 220 * line++);
+
   return (
     <div className="space-y-0.5 overflow-hidden rounded-lg bg-ctp-crust p-4 font-nf text-xs leading-5 text-ctp-subtext0 ring-1 ring-ctp-surface0 latte:text-ctp-subtext1">
-      <p className="truncate">
+      <p className="truncate" {...print()}>
         <span className="text-ctp-red">$ </span>
         <RedactedText text="git clone [[#6]]:[[#10]].git" />
       </p>
-      <p className="text-ctp-red latte:text-ctp-red-800">{t('repoDenied')}</p>
-      <p className="pt-2">
+      <p className="text-ctp-red latte:text-ctp-red-800" {...print()}>
+        {t('repoDenied')}
+      </p>
+      <p className="pt-2" {...print()}>
         <span className="text-ctp-red">$ </span>git log --oneline
       </p>
       {commits.map((commit) => (
-        <p key={commit.hash} className="truncate">
+        <p key={commit.hash} className="truncate" {...print()}>
           <span className="text-ctp-yellow latte:text-ctp-yellow-900">{commit.hash}</span>{' '}
           <RedactedText text={`[[#${commit.width}]]`} />
         </p>
       ))}
-      <p className="text-ctp-overlay1">
+      <p className="text-ctp-overlay1" {...print()}>
         <RedactedText text={`… ${t('omitted')}`} />
       </p>
     </div>
@@ -83,20 +89,26 @@ function Seal({ glyphs, gloss }: { glyphs: string; gloss: string }) {
 }
 
 /** Keys compare without case or stray spaces: "ttk-0321 " opens TTK-0321. */
-const sameKey = (typed: string, key: string) =>
+export const sameKey = (typed: string, key: string) =>
   typed.replace(/\s+/g, '').toUpperCase() === key.replace(/\s+/g, '').toUpperCase();
+
+/** Props that fade an element in `delay` ms after it mounts (not under reduced motion). */
+const appear = (delay?: number) =>
+  delay === undefined ? {} : { 'data-print': '', style: { animationDelay: `${delay}ms` } };
 
 function Section({
   numeral,
   title,
+  delay,
   children,
 }: {
   numeral: string;
   title: string;
+  delay?: number;
   children: ReactNode;
 }) {
   return (
-    <section className="mt-6">
+    <section className="mt-6" {...appear(delay)}>
       <h3 className="flex items-center gap-3 font-nf text-xs font-bold tracking-[0.25em] text-ctp-subtext1 uppercase">
         <span className="text-ctp-red">{numeral}.</span>
         {title}
@@ -108,9 +120,12 @@ function Section({
 }
 
 /** A form field of the record: label on the left, a dotted rule under the value. */
-function Field({ name, children }: { name: string; children: ReactNode }) {
+function Field({ name, delay, children }: { name: string; delay?: number; children: ReactNode }) {
   return (
-    <div className="grid gap-x-6 gap-y-0.5 border-b border-dotted border-ctp-surface2 py-1 sm:grid-cols-[8rem_minmax(0,1fr)]">
+    <div
+      {...appear(delay)}
+      className="grid gap-x-6 gap-y-0.5 border-b border-dotted border-ctp-surface2 py-1 sm:grid-cols-[8rem_minmax(0,1fr)]"
+    >
       <dt className={label}>{name}</dt>
       <dd className="font-nf text-sm text-ctp-text">{children}</dd>
     </div>
@@ -471,6 +486,23 @@ function FilePage({
         )
       : '';
 
+  // The file prints itself: each field fades in after the one before, and
+  // its text types out with the tape going on as the words come in.
+  let clock = 700;
+  const after = (chars: number, msPerChar = 0) => {
+    const start = clock;
+    clock += chars * msPerChar + 140;
+    return start;
+  };
+  const typedField = (name: string, text: string) => {
+    const at = after(tapeLength(text), 22);
+    return (
+      <Field name={name} delay={at}>
+        <TypedRedactedText text={text} delay={at} msPerChar={22} />
+      </Field>
+    );
+  };
+
   return (
     <article>
       <p className={cn(label, 'mt-4')}>{t('page', { n: pad(page) })}</p>
@@ -481,16 +513,12 @@ function FilePage({
         <ScrambleText text={file.codename} />
       </h2>
 
-      <Section numeral="I" title={t('identification')}>
+      <Section numeral="I" title={t('identification')} delay={after(0)}>
         <dl className="md:grid md:grid-cols-2 md:gap-x-8">
-          <Field name={t('codename')}>{file.codename}</Field>
-          {file.name && (
-            <Field name={t('nature')}>
-              <RedactedText text={file.name} />
-            </Field>
-          )}
+          {typedField(t('codename'), file.codename)}
+          {file.name && typedField(t('nature'), file.name)}
           {file.status && (
-            <Field name={t('status')}>
+            <Field name={t('status')} delay={after(6, 22)}>
               <span className="flex items-center gap-2 text-ctp-red latte:text-ctp-red-800">
                 <span aria-hidden="true" className="relative flex size-2">
                   <span className="absolute inline-flex size-full rounded-full bg-ctp-red opacity-60 motion-safe:animate-ping" />
@@ -500,34 +528,41 @@ function FilePage({
               </span>
             </Field>
           )}
-          {opened && <Field name={t('since')}>{opened}</Field>}
+          {opened && typedField(t('since'), opened)}
         </dl>
       </Section>
 
       <div className="md:grid md:grid-cols-[3fr_2fr] md:gap-x-8">
         <div>
           {file.summary.length > 0 && (
-            <Section numeral="II" title={t('report')}>
+            <Section numeral="II" title={t('report')} delay={after(0)}>
               <div className="space-y-3 text-sm leading-relaxed text-pretty text-ctp-subtext1">
-                {file.summary.map((paragraph) => (
-                  <p key={paragraph}>
-                    <RedactedText text={paragraph} />
-                  </p>
-                ))}
+                {file.summary.map((paragraph) => {
+                  const at = after(tapeLength(paragraph), 9);
+                  return (
+                    <p key={paragraph}>
+                      <TypedRedactedText text={paragraph} delay={at} msPerChar={9} />
+                    </p>
+                  );
+                })}
               </div>
             </Section>
           )}
 
           {file.skills.length > 0 && (
-            <Section numeral="III" title={t('stack')}>
+            <Section numeral="III" title={t('stack')} delay={after(0)}>
               <div className="flex flex-wrap items-center gap-1.5">
                 <TechChips skills={file.skills.slice(0, VISIBLE_SKILLS)} label={t('stack')} />
-                {file.skills.slice(VISIBLE_SKILLS).map((skill) => (
+                {file.skills.slice(VISIBLE_SKILLS).map((skill, index) => (
                   <span
                     key={skill._id}
                     aria-hidden="true"
+                    data-print=""
                     className="redaction-bar inline-block h-6 rounded-md"
-                    style={{ width: `${2 + (skill._id.length % 3) * 0.75}rem` }}
+                    style={{
+                      width: `${2 + (skill._id.length % 3) * 0.75}rem`,
+                      animationDelay: `${after(0) + index * 60}ms`,
+                    }}
                   />
                 ))}
                 {file.skills.length > VISIBLE_SKILLS && (
@@ -539,8 +574,8 @@ function FilePage({
             </Section>
           )}
         </div>
-        <Section numeral="IV" title={t('repo')}>
-          <RepoLog seed={file.codename} />
+        <Section numeral="IV" title={t('repo')} delay={after(0)}>
+          <RepoLog seed={file.codename} delay={after(0)} />
         </Section>
       </div>
     </article>
