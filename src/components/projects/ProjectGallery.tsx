@@ -3,6 +3,7 @@
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/20/solid';
 import useEmblaCarousel from 'embla-carousel-react';
 import { useEffect, useState } from 'react';
+import { usePrefersReducedMotion } from '@/lib/usePrefersReducedMotion';
 import { cn } from '@/lib/utils';
 
 interface ProjectGalleryProps {
@@ -28,6 +29,8 @@ const arrow =
 export default function ProjectGallery({ slides, labels, className }: ProjectGalleryProps) {
   const [viewportRef, api] = useEmblaCarousel({ loop: true });
   const [selected, setSelected] = useState(0);
+  // Embla animates in JS, so CSS can't stop it: jump instead of sliding.
+  const jump = usePrefersReducedMotion();
 
   useEffect(() => {
     if (!api) return;
@@ -72,7 +75,7 @@ export default function ProjectGallery({ slides, labels, className }: ProjectGal
 
       <button
         type="button"
-        onClick={() => api?.scrollPrev()}
+        onClick={() => api?.scrollPrev(jump)}
         aria-label={labels.previous}
         className={cn(arrow, 'left-3')}
       >
@@ -80,7 +83,7 @@ export default function ProjectGallery({ slides, labels, className }: ProjectGal
       </button>
       <button
         type="button"
-        onClick={() => api?.scrollNext()}
+        onClick={() => api?.scrollNext(jump)}
         aria-label={labels.next}
         className={cn(arrow, 'right-3')}
       >
@@ -92,7 +95,7 @@ export default function ProjectGallery({ slides, labels, className }: ProjectGal
           <button
             key={slide.src}
             type="button"
-            onClick={() => api?.scrollTo(index)}
+            onClick={() => api?.scrollTo(index, jump)}
             aria-label={slide.label}
             aria-current={index === selected ? 'true' : undefined}
             className="group/dot flex h-6 items-center px-0.5 focus-visible:outline-none"

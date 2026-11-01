@@ -268,8 +268,9 @@ export const profile = defineType({
                   description:
                     'Locks the page until a visitor types this key. The classified project card with this codename hides it in its markup (an HTML comment) and its memory dump (as hex). Keep it short and ASCII, e.g. TTK-0321. Empty: the page is open.',
                   validation: (Rule) =>
-                    Rule.regex(/^[\x21-\x7e]{1,12}$/, {
-                      name: 'printable ASCII, up to 12 characters',
+                    // No "--": the key is printed inside an HTML comment.
+                    Rule.regex(/^(?!.*--)[\x21-\x7e]{1,12}$/, {
+                      name: 'printable ASCII, up to 12 characters, no "--"',
                     }),
                 }),
                 defineField({

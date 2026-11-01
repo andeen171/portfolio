@@ -71,10 +71,11 @@ export default function ClassifiedProjectCard({
 }: ClassifiedProjectCardProps) {
   const t = useTranslations('projects.classified');
   const { tatakae } = useProfile();
-  // Only printable ASCII survives: it ends up inside an HTML comment.
-  const accessKey = (
-    tatakae.files.find((file) => file.codename === fileKey)?.accessKey ?? ''
-  ).replace(/[^\x21-\x7e]|-->/g, '');
+  // The key goes into an HTML comment and a hex dump as is; one that can't
+  // (not printable ASCII, or with a "--" that would end the comment) leaves
+  // no clue rather than a wrong one.
+  const rawKey = tatakae.files.find((file) => file.codename === fileKey)?.accessKey ?? '';
+  const accessKey = /^[\x21-\x7e]+$/.test(rawKey) && !rawKey.includes('--') ? rawKey : '';
   const openDossier = useDossier((state) => state.open);
   const hold = useHold(HOLD_MS, () => openDossier(fileKey));
   const [nudged, setNudged] = useState(false);

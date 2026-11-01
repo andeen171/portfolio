@@ -433,7 +433,8 @@ const CommandPalette: React.FC = () => {
         id: 'dossier',
         group: 'actions',
         label: t('commands.dossier'),
-        keywords: SECRET_WORDS.join(' '),
+        // Whole words: the query has to match them in full, the prefixes above only reveal it.
+        keywords: 'tatakae 戦え passe dossie dossier classificado classified sigilo',
         icon: iconTile(LockClosedIcon),
         hint: '戦え',
         secret: true,

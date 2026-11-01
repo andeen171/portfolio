@@ -235,6 +235,8 @@ body::-webkit-scrollbar {
   .glitch::before,
   .glitch::after {
     content: attr(data-text);
+    /* Empty alt text: screen readers announce the title once, not three times. */
+    content: attr(data-text) / "";
     position: absolute;
     inset: 0;
     pointer-events: none;

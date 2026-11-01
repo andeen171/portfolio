@@ -30,8 +30,10 @@ export function RedactedText({ text }: { text: string }) {
       <span
         // biome-ignore lint/suspicious/noArrayIndexKey: a fixed split of one string
         key={index}
+        // biome-ignore lint/a11y/noNoninteractiveTabindex: focus lifts the tape like hover does, so keyboard users can read it too
+        tabIndex={0}
         title={t('redacted')}
-        className="redaction-bar cursor-help rounded-[2px] px-0.5 text-transparent box-decoration-clone transition-colors duration-200 select-none hover:bg-none hover:bg-ctp-red/15 hover:text-ctp-text hover:shadow-none motion-reduce:transition-none"
+        className="redaction-bar cursor-help rounded-[2px] px-0.5 text-transparent box-decoration-clone transition-colors duration-200 select-none hover:bg-none hover:bg-ctp-red/15 hover:text-ctp-text hover:shadow-none focus-visible:bg-none focus-visible:bg-ctp-red/15 focus-visible:text-ctp-text focus-visible:shadow-none focus-visible:outline-1 focus-visible:outline-ctp-red motion-reduce:transition-none"
       >
         {part}
       </span>
