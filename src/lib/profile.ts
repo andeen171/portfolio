@@ -6,6 +6,19 @@ export type AppLocale = (typeof routing.locales)[number];
 export type SocialPlatform = 'github' | 'linkedin' | 'x' | 'instagram';
 export type IntroSection = 'projects' | 'experiences' | 'skills';
 
+/** A closed-source project in the Tatakae dossier. */
+export interface ClassifiedFile {
+  key: string;
+  codename: string;
+  name: string;
+  status: string;
+  /** YYYY-MM-DD, or empty. */
+  since: string;
+  /** Paragraphs; `[[words]]` are blacked out. */
+  summary: string[];
+  skills: { _id: string; name: string }[];
+}
+
 export interface SocialProfile {
   platform: SocialPlatform;
   url: string;
@@ -39,6 +52,12 @@ export interface Profile {
   roles: string[];
   bio: string[];
   cardFlavor: string;
+  tatakae: {
+    title: string;
+    lede: string[];
+    facts: { label: string; value: string }[];
+    files: ClassifiedFile[];
+  };
   contactTitle: string;
   contactInvite: string;
   socials: SocialProfile[];
@@ -118,6 +137,33 @@ export function resolveProfile(raw: ProfileQueryResult, locale: AppLocale): Prof
     roles: lines(text(raw?.roles)),
     bio: paragraphs(text(raw?.bio)),
     cardFlavor: text(raw?.cardFlavor),
+    tatakae: {
+      title: text(raw?.tatakae?.title),
+      lede: paragraphs(text(raw?.tatakae?.lede)),
+      facts: lines(text(raw?.tatakae?.facts)).flatMap((line) => {
+        const at = line.indexOf(':');
+        const label = line.slice(0, at).trim();
+        const value = line.slice(at + 1).trim();
+        return at > 0 && value ? [{ label, value }] : [];
+      }),
+      files: (raw?.tatakae?.files ?? []).flatMap((file) =>
+        file.codename?.trim()
+          ? [
+              {
+                key: file._key,
+                codename: file.codename.trim(),
+                name: text(file.name),
+                status: text(file.status),
+                since: file.since ?? '',
+                summary: paragraphs(text(file.summary)),
+                skills: (file.skills ?? []).flatMap((skill) =>
+                  skill?.name ? [{ _id: skill._id, name: skill.name }] : []
+                ),
+              },
+            ]
+          : []
+      ),
+    },
     contactTitle: text(raw?.contactTitle),
     contactInvite: text(raw?.contactInvite),
     socials: (raw?.socials ?? []).flatMap((social) =>

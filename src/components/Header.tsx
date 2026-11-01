@@ -12,18 +12,46 @@ import ThemeSelector, { FlavorSwatch } from '@/components/ThemeSelector';
 import { Link, usePathname } from '@/i18n/routing';
 import { isActivePath, NAV_ITEMS } from '@/lib/navigation';
 import { FLAVOR_NAMES, FLAVORS } from '@/lib/theme';
+import { useHold } from '@/lib/useHold';
 import { usePrefersReducedMotion } from '@/lib/usePrefersReducedMotion';
 import { cn } from '@/lib/utils';
-import { useCommandPalette, useCtpStore } from '@/store';
+import { useCommandPalette, useCtpStore, useDossier } from '@/store';
 
 const focusRing = 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ctp-lavender';
 
-/** Logo: the wordmark plus a blinking terminal caret. */
+/** Rest the pointer (or press) this long on the logo's 戦え to open the dossier. */
+const DOSSIER_HOLD_MS = 2000;
+
+/**
+ * Logo: the wordmark plus a blinking terminal caret. Its 戦え is an easter
+ * egg: rested on long enough it glows red, shakes and opens the Tatakae
+ * dossier, and the click that ends a long press doesn't follow the link.
+ */
 function Wordmark({ className }: { className?: string }) {
-  const { nickname, shortName } = useProfile();
+  const { nickname, shortName, tatakae } = useProfile();
+  const openDossier = useDossier((state) => state.open);
+  const hold = useHold(DOSSIER_HOLD_MS, () => openDossier('index'), { hover: true });
+  const armed = tatakae.title !== '' || tatakae.files.length > 0;
+
   return (
     <span className={cn('inline-flex items-baseline font-extrabold', className)}>
-      <span className="animated-gradient-text">戦え {nickname || shortName}</span>
+      <span className="animated-gradient-text">
+        <span
+          {...(armed ? hold.handlers : {})}
+          onClickCapture={(event) => {
+            if (!hold.consumeClick()) return;
+            event.preventDefault();
+            event.stopPropagation();
+          }}
+          className={cn(
+            'inline-block select-none [-webkit-touch-callout:none]',
+            hold.charging && 'dossier-charging'
+          )}
+        >
+          戦え
+        </span>{' '}
+        {nickname || shortName}
+      </span>
       <span
         aria-hidden="true"
         className="caret-blink ml-0.5 inline-block h-[0.85em] w-[0.45em] translate-y-[0.1em] rounded-[1px] bg-ctp-lavender/80"

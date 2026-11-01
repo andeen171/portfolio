@@ -14,6 +14,7 @@ import {
   ChatBubbleLeftRightIcon,
   CommandLineIcon,
   LinkIcon,
+  LockClosedIcon,
   UserCircleIcon,
 } from '@heroicons/react/24/outline';
 import { useRouter as useNextRouter } from 'next/navigation';
@@ -38,7 +39,7 @@ import { NAV_ITEMS, type NavKey } from '@/lib/navigation';
 import { SOCIAL_NETWORKS } from '@/lib/social';
 import { FLAVOR_NAMES, FLAVORS } from '@/lib/theme';
 import { cn } from '@/lib/utils';
-import { useCommandPalette, useCtpStore } from '@/store';
+import { useCommandPalette, useCtpStore, useDossier } from '@/store';
 
 /* ── Shortcut label ────────────────────────────────────────────────────── */
 
@@ -185,6 +186,8 @@ interface Command {
   label: string;
   /** Extra search terms in both languages, never shown. */
   keywords: string;
+  /** Listed only once the query names it outright: an easter egg. */
+  secret?: boolean;
   icon: ReactNode;
   /** Right-aligned mono detail, e.g. the path or handle. */
   hint?: string;
@@ -211,6 +214,9 @@ const NAV_KEYWORDS: Record<NavKey, string> = {
   projects: 'projects projetos work trabalhos portfolio',
   experiences: 'experiences experiencias career carreira jobs work trabalho',
 };
+
+/** What has to be typed for the hidden dossier command to show up. */
+const SECRET_WORDS = ['tatakae', '戦', 'passe', 'dossie', 'classifi', 'sigilo'];
 
 const SECTIONS = {
   about: { icon: UserCircleIcon, keywords: 'about sobre bio me whoami' },
@@ -264,6 +270,7 @@ const CommandPalette: React.FC = () => {
   const open = useCommandPalette((state) => state.open);
   const setOpen = useCommandPalette((state) => state.setOpen);
   const toggle = useCommandPalette((state) => state.toggle);
+  const openDossier = useDossier((state) => state.open);
 
   const [query, setQuery] = useState('');
   const [activeIndex, setActiveIndex] = useState(0);
@@ -422,6 +429,17 @@ const CommandPalette: React.FC = () => {
         timing: 'now',
         perform: () => void copyLink(),
       },
+      {
+        id: 'dossier',
+        group: 'actions',
+        label: t('commands.dossier'),
+        keywords: SECRET_WORDS.join(' '),
+        icon: iconTile(LockClosedIcon),
+        hint: '戦え',
+        secret: true,
+        timing: 'afterClose',
+        perform: () => openDossier('index'),
+      },
     ];
 
     return [...pages, ...sections, ...themes, ...languages, ...socials, ...actions];
@@ -436,6 +454,7 @@ const CommandPalette: React.FC = () => {
     locale,
     switchLocale,
     copyLink,
+    openDossier,
     profile.socials,
   ]);
 
@@ -443,6 +462,8 @@ const CommandPalette: React.FC = () => {
   // `index` is the row's place in the flat list the arrow keys walk.
   const { groups, flat } = useMemo(() => {
     const scored = commands.flatMap((command) => {
+      if (command.secret && !SECRET_WORDS.some((word) => normalize(query).includes(word)))
+        return [];
       const match = matchCommand(query, command.label, command.keywords);
       return match ? [{ command, match }] : [];
     });

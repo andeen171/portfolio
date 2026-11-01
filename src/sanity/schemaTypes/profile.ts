@@ -40,6 +40,7 @@ export const profile = defineType({
     { name: 'identity', title: 'Identity', default: true },
     { name: 'hero', title: 'Hero' },
     { name: 'about', title: 'About' },
+    { name: 'tatakae', title: 'Tatakae' },
     { name: 'contact', title: 'Contact & socials' },
     { name: 'sections', title: 'Section intros' },
     { name: 'seo', title: 'SEO & sharing' },
@@ -160,7 +161,7 @@ export const profile = defineType({
       type: 'internationalizedArrayString',
       group: 'hero',
       description:
-        'The big line under the name. Wrap the words to light up in asterisks: I build backend systems that *move money*.',
+        'The big line under the name. Wrap the words to light up in asterisks, and words the hero should retype in braces, options split by |: I build {systems|apps|platforms} that *move {money|people}*. The first braces cycle through every option; each time they come back round, the next braces move on once.',
     }),
     defineField({
       name: 'lead',
@@ -204,6 +205,79 @@ export const profile = defineType({
             ? 'Longer than 60 characters: it will wrap to several lines on the card.'
             : true
         ).warning(),
+    }),
+
+    // Tatakae
+    defineField({
+      name: 'tatakae',
+      title: 'Tatakae',
+      type: 'object',
+      group: 'tatakae',
+      description:
+        'The home page section on your own company and its closed-source work, dressed as a classified dossier.',
+      options: { collapsible: true, collapsed: false },
+      fields: [
+        defineField({ name: 'title', title: 'Heading', type: 'internationalizedArrayString' }),
+        defineField({
+          name: 'lede',
+          title: 'Briefing',
+          type: 'internationalizedArrayText',
+          description:
+            'Separate paragraphs with a blank line. Wrap words in double brackets to black them out until hovered: [[restaurants]].',
+        }),
+        defineField({
+          name: 'facts',
+          title: 'Dossier facts',
+          type: 'internationalizedArrayText',
+          description: 'One per line, label and value split by the first colon: "Legal form: ME".',
+        }),
+        defineField({
+          name: 'files',
+          title: 'Files',
+          type: 'array',
+          description: 'The closed-source projects, one file each, in display order.',
+          of: [
+            defineArrayMember({
+              type: 'object',
+              name: 'classifiedFile',
+              fields: [
+                defineField({
+                  name: 'codename',
+                  title: 'Codename',
+                  type: 'string',
+                  description: 'Decrypted on screen as the file comes into view.',
+                  validation: (Rule) => Rule.required(),
+                }),
+                defineField({
+                  name: 'name',
+                  title: 'What it is',
+                  type: 'internationalizedArrayString',
+                }),
+                defineField({
+                  name: 'status',
+                  title: 'Status',
+                  type: 'internationalizedArrayString',
+                  description: 'A few words next to the pulsing dot: "In active development".',
+                }),
+                defineField({ name: 'since', title: 'Started', type: 'date' }),
+                defineField({
+                  name: 'summary',
+                  title: 'Summary',
+                  type: 'internationalizedArrayText',
+                  description: 'Paragraphs split by a blank line; [[double brackets]] black out.',
+                }),
+                defineField({
+                  name: 'skills',
+                  title: 'Stack',
+                  type: 'array',
+                  of: [defineArrayMember({ type: 'reference', to: [{ type: 'skill' }] })],
+                }),
+              ],
+              preview: { select: { title: 'codename', subtitle: 'name.0.value' } },
+            }),
+          ],
+        }),
+      ],
     }),
 
     // Contact

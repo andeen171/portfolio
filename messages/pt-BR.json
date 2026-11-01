@@ -50,6 +50,25 @@
       "photoAlt": "Retrato ilustrado de {name}"
     }
   },
+  "tatakae": {
+    "title": "Arquivos Tatakae",
+    "dossier": "Dossiê",
+    "classified": "Sigiloso",
+    "confidential": "Confidencial",
+    "file": "Arquivo {number}",
+    "codename": "Codinome",
+    "since": "aberto em {date}",
+    "stack": "Stack",
+    "private": "Repositório privado · código fechado",
+    "sealed": "Selado",
+    "sealedBody": "Selado. Abre quando for a hora.",
+    "redacted": "Censurado: passe o mouse para espiar, clique para revelar",
+    "close": "Fechar o dossiê",
+    "access": "acesso concedido · nível: visitante",
+    "files": "Arquivos",
+    "openFile": "abrir",
+    "back": "Voltar ao índice"
+  },
   "skills": {
     "title": "Habilidades",
     "seeMore": "Ver o deck completo",
@@ -122,7 +141,24 @@
     "stack": "Tecnologias",
     "coverAlt": "Prévia de {name}",
     "count": "{count, plural, one {# projeto} other {# projetos}}",
-    "empty": "Nenhum projeto por aqui ainda."
+    "empty": "Nenhum projeto por aqui ainda.",
+    "gallery": {
+      "region": "Capturas de tela de {name}",
+      "roleDescription": "carrossel",
+      "previous": "Captura anterior",
+      "next": "Próxima captura",
+      "slideLabel": "Imagem {n} de {total}"
+    },
+    "classified": {
+      "status": "Arquivo classificado",
+      "restricted": "Restrito",
+      "hold": "Segure para descriptografar",
+      "decrypting": "Descriptografando…",
+      "nudge": "Segure, não clique",
+      "open": "Abrir o arquivo classificado {name}",
+      "stack": "Tecnologias",
+      "closed": "Código fechado · Tatakae"
+    }
   },
   "experiences": {
     "title": "Experiência",
@@ -178,7 +214,8 @@
       "contact": "Contato",
       "theme": "Tema {name}",
       "social": "Abrir {name}",
-      "copyLink": "Copiar link desta página"
+      "copyLink": "Copiar link desta página",
+      "dossier": "Abrir os arquivos Tatakae"
     },
     "current": "atual",
     "newTab": "abre em nova aba",

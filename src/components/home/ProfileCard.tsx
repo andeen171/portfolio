@@ -7,8 +7,8 @@ interface ProfileCardProps {
   name: string;
   /** The type line, trading-card style: "Human — Backend Developer". */
   type: string;
-  /** Where he is right now, read from the open-ended experience in Sanity. */
-  status?: { label: string; company: string; since?: string };
+  /** Where he is right now, read from the open-ended experiences in Sanity. */
+  statuses: { key: string; label: string; company: string; since?: string }[];
   flavor: string;
   origin: string;
   handle?: string;
@@ -26,7 +26,7 @@ interface ProfileCardProps {
 export default function ProfileCard({
   name,
   type,
-  status,
+  statuses,
   flavor,
   origin,
   handle,
@@ -90,10 +90,13 @@ export default function ProfileCard({
           </p>
         )}
 
-        {status && (
+        {statuses.map((status) => (
           // The company comes first and never truncates for the date: the
           // date drops to its own line under it.
-          <p className="grid grid-cols-[auto_auto_minmax(0,1fr)] items-center gap-x-2.5 gap-y-0.5 rounded-md bg-ctp-crust/70 px-3 py-2 font-nf text-[0.6875rem] ring-1 ring-ctp-surface0 latte:bg-ctp-base">
+          <p
+            key={status.key}
+            className="grid grid-cols-[auto_auto_minmax(0,1fr)] items-center gap-x-2.5 gap-y-0.5 rounded-md bg-ctp-crust/70 px-3 py-2 font-nf text-[0.6875rem] ring-1 ring-ctp-surface0 latte:bg-ctp-base"
+          >
             <span aria-hidden="true" className="relative flex size-2">
               <span className="absolute inline-flex size-full rounded-full bg-ctp-green opacity-60 motion-safe:animate-ping" />
               <span className="relative inline-flex size-2 rounded-full bg-ctp-green" />
@@ -110,7 +113,7 @@ export default function ProfileCard({
               </span>
             )}
           </p>
-        )}
+        ))}
 
         {flavor && (
           <div className="rounded-lg bg-ctp-base/60 px-3 py-3 ring-1 ring-ctp-surface0 latte:bg-ctp-crust/40">

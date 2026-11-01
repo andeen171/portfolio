@@ -45,3 +45,17 @@ export const useCommandPalette = create<CommandPaletteState>()((set) => ({
   setOpen: (open) => set({ open }),
   toggle: () => set((state) => ({ open: !state.open })),
 }));
+
+interface DossierState {
+  /** Null when closed; `index` for the Tatakae dossier's front page, else a file's codename. */
+  view: string | null;
+  open: (view: string) => void;
+  close: () => void;
+}
+
+/** The hidden Tatakae dossier: opened by easter eggs anywhere on the site. */
+export const useDossier = create<DossierState>()((set) => ({
+  view: null,
+  open: (view) => set({ view }),
+  close: () => set({ view: null }),
+}));

@@ -50,6 +50,25 @@
       "photoAlt": "Illustrated portrait of {name}"
     }
   },
+  "tatakae": {
+    "title": "The Tatakae files",
+    "dossier": "Dossier",
+    "classified": "Classified",
+    "confidential": "Confidential",
+    "file": "File {number}",
+    "codename": "Codename",
+    "since": "opened {date}",
+    "stack": "Stack",
+    "private": "Private repository · closed source",
+    "sealed": "Sealed",
+    "sealedBody": "Sealed. It opens when it's time.",
+    "redacted": "Redacted: hover to peek, click to declassify",
+    "close": "Close the dossier",
+    "access": "access granted · clearance: visitor",
+    "files": "Files",
+    "openFile": "open",
+    "back": "Back to the index"
+  },
   "skills": {
     "title": "Skills",
     "seeMore": "Browse the full deck",
@@ -122,7 +141,24 @@
     "stack": "Tech stack",
     "coverAlt": "Preview of {name}",
     "count": "{count, plural, one {# project} other {# projects}}",
-    "empty": "No projects here yet."
+    "empty": "No projects here yet.",
+    "gallery": {
+      "region": "Screenshots of {name}",
+      "roleDescription": "carousel",
+      "previous": "Previous screenshot",
+      "next": "Next screenshot",
+      "slideLabel": "Image {n} of {total}"
+    },
+    "classified": {
+      "status": "Classified file",
+      "restricted": "Restricted",
+      "hold": "Hold to decrypt",
+      "decrypting": "Decrypting…",
+      "nudge": "Hold it, don't click",
+      "open": "Open the classified file {name}",
+      "stack": "Stack",
+      "closed": "Closed source · Tatakae"
+    }
   },
   "experiences": {
     "title": "Experience",
@@ -178,7 +214,8 @@
       "contact": "Contact",
       "theme": "{name} theme",
       "social": "Open {name}",
-      "copyLink": "Copy link to this page"
+      "copyLink": "Copy link to this page",
+      "dossier": "Open the Tatakae files"
     },
     "current": "current",
     "newTab": "opens in a new tab",

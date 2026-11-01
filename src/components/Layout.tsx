@@ -7,6 +7,7 @@ import Footer from '@/components/Footer';
 import Header from '@/components/Header';
 import ShootingStars from '@/components/ShootingStars';
 import StarsBackground from '@/components/StarsBackground';
+import TatakaeDossier from '@/components/tatakae/TatakaeDossier';
 import { applyFlavor } from '@/lib/theme';
 import { useCtpStore } from '@/store';
 
@@ -70,6 +71,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       </div>
 
       <CommandPalette />
+      <TatakaeDossier />
     </div>
   );
 };
