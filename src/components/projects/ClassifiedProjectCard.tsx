@@ -4,6 +4,7 @@ import { CalendarIcon, LockClosedIcon } from '@heroicons/react/20/solid';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { useProfile } from '@/components/ProfileProvider';
+import ClassifiedCover, { COVER, clueKey } from '@/components/tatakae/ClassifiedCover';
 import { RedactedText } from '@/components/tatakae/Redacted';
 import { useHold } from '@/lib/useHold';
 import { cn } from '@/lib/utils';
@@ -12,36 +13,6 @@ import TechChips from './TechChips';
 
 /** How long the cover has to be held down to decrypt the file. */
 const HOLD_MS = 1400;
-
-const NOISE = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`;
-
-const SCANLINES: React.CSSProperties = {
-  backgroundImage:
-    'repeating-linear-gradient(to bottom, color-mix(in oklab, var(--catppuccin-color-text) 6%, transparent) 0 1px, transparent 1px 3px)',
-};
-
-const hex = (byte: number) => byte.toString(16).padStart(2, '0').toUpperCase();
-
-/**
- * A few lines of fake memory dump, the same for a name on every render. The
- * third line isn't noise: it's the dossier page's access key, byte by byte
- * in ASCII, for whoever thinks to decode it.
- */
-function dump(seed: string, key: string): string[] {
-  let state = [...seed].reduce((acc, char) => (acc * 31 + char.charCodeAt(0)) >>> 0, 7);
-  const next = () => {
-    state = (Math.imul(state, 1664525) + 1013904223) >>> 0;
-    return state;
-  };
-  return Array.from({ length: 5 }, (_, line) => {
-    const address = `0x${(0x3f20 + line * 16).toString(16).toUpperCase()}`;
-    const bytes =
-      line === 2 && key
-        ? [...key].map((char) => hex(char.charCodeAt(0)))
-        : Array.from({ length: 8 }, () => (next() % 5 === 0 ? '██' : hex(next() % 256)));
-    return `${address}  ${bytes.join(' ')}`;
-  });
-}
 
 interface ClassifiedProjectCardProps {
   name: string;
@@ -71,13 +42,14 @@ export default function ClassifiedProjectCard({
 }: ClassifiedProjectCardProps) {
   const t = useTranslations('projects.classified');
   const { tatakae } = useProfile();
-  // The key goes into an HTML comment and a hex dump as is; one that can't
-  // (not printable ASCII, or with a "--" that would end the comment) leaves
-  // no clue rather than a wrong one.
   const rawKey = tatakae.files.find((file) => file.codename === fileKey)?.accessKey ?? '';
-  const accessKey = /^[\x21-\x7e]+$/.test(rawKey) && !rawKey.includes('--') ? rawKey : '';
+  const accessKey = clueKey(rawKey);
   const openDossier = useDossier((state) => state.open);
-  const hold = useHold(HOLD_MS, () => openDossier(fileKey));
+  const openGate = useDossier((state) => state.openGate);
+  const unlocked = useDossier((state) => state.unlocked.includes(fileKey));
+  // A locked file asks for its key at the gate first, without showing the dossier.
+  const openFile = () => (rawKey && !unlocked ? openGate(fileKey) : openDossier(fileKey));
+  const hold = useHold(HOLD_MS, openFile);
   const [nudged, setNudged] = useState(false);
 
   return (
@@ -109,52 +81,18 @@ export default function ClassifiedProjectCard({
             if (hold.consumeClick()) return;
             // Enter or Space: no pointer to hold, so the file opens at once.
             if (event.detail === 0) {
-              openDossier(fileKey);
+              openFile();
               return;
             }
             setNudged(true);
             setTimeout(() => setNudged(false), 1600);
           }}
-          className="relative isolate flex min-h-64 cursor-pointer flex-col justify-between overflow-hidden bg-ctp-crust p-5 text-left select-none [-webkit-touch-callout:none] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ctp-red focus-visible:ring-inset sm:p-6 lg:h-full"
+          className={cn(
+            COVER,
+            'cursor-pointer select-none [-webkit-touch-callout:none] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ctp-red focus-visible:ring-inset rounded-t-2xl lg:h-full lg:rounded-r-none lg:rounded-l-2xl'
+          )}
         >
-          <span
-            aria-hidden="true"
-            className="absolute inset-0 -z-10 bg-[radial-gradient(70%_80%_at_30%_20%,color-mix(in_oklab,var(--catppuccin-color-red)_28%,transparent),transparent_70%)]"
-          />
-          <span
-            aria-hidden="true"
-            className="absolute inset-0 -z-10 opacity-20 mix-blend-overlay"
-            style={{ backgroundImage: NOISE }}
-          />
-          <span aria-hidden="true" className="flicker absolute inset-0 -z-10" style={SCANLINES} />
-
-          <span
-            aria-hidden="true"
-            className="flex items-center gap-2 font-nf text-[0.6875rem] text-ctp-subtext0"
-          >
-            <LockClosedIcon className="size-3.5 text-ctp-red" />
-            <span className="text-ctp-red">~/tatakae/</span>
-            {name.toLowerCase()}
-            <span className="ml-auto rounded-sm px-1.5 py-0.5 text-[0.5625rem] font-bold tracking-[0.25em] text-ctp-red uppercase ring-1 ring-ctp-red/60">
-              {t('restricted')}
-            </span>
-          </span>
-
-          <span aria-hidden="true" className="my-4 block">
-            <span
-              data-text={name}
-              className="glitch font-nf text-4xl font-bold tracking-[0.2em] text-ctp-text sm:text-5xl"
-            >
-              {name}
-            </span>
-            <span className="mt-3 block space-y-0.5 font-nf text-[0.625rem] leading-tight text-ctp-overlay1">
-              {dump(name, accessKey).map((line) => (
-                <span key={line} className="block truncate">
-                  {line}
-                </span>
-              ))}
-            </span>
-          </span>
+          <ClassifiedCover name={name} accessKey={accessKey} />
 
           <span aria-hidden="true" className="block">
             <span className="block h-1 overflow-hidden rounded-full bg-ctp-surface0">
@@ -210,7 +148,9 @@ export default function ClassifiedProjectCard({
 
           <p className="mt-auto flex items-center gap-2 pt-5 font-nf text-[0.6875rem] text-ctp-overlay1 latte:text-ctp-subtext1">
             <LockClosedIcon aria-hidden="true" className="size-3.5" />
-            {t('closed')}
+            <span>
+              <RedactedText text={t('closed')} />
+            </span>
           </p>
         </div>
       </div>

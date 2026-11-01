@@ -6,6 +6,7 @@ import { useEffect, useId, useRef, useState } from 'react';
 import ProfileCard from '@/components/home/ProfileCard';
 import TypedText from '@/components/home/TypedText';
 import { useProfile } from '@/components/ProfileProvider';
+import { RedactedText } from '@/components/tatakae/Redacted';
 import SectionHeading from '@/components/ui/SectionHeading';
 import { cn } from '@/lib/utils';
 import type { HeroQueryResult } from '@/sanity/types';
@@ -40,7 +41,7 @@ const AboutSection: React.FC<AboutSectionProps> = ({ current }) => {
 
   // The helper falls back to the first entry's value, which Sanity may leave
   // unset, so it can hand back undefined despite its type. The type line is
-  // the longest-running current role; every current one gets a status row.
+  // the most recent current role (the day job, not the side company); every current one gets a status row.
   const role =
     (getLocalizedValue(current?.[0]?.title ?? undefined, locale) ?? '').trim() || profile.jobTitle;
   const statuses = (current ?? []).flatMap(({ _id, company, startDate }) => {
@@ -170,7 +171,7 @@ const AboutSection: React.FC<AboutSectionProps> = ({ current }) => {
                     index === 0 ? 'text-ctp-text' : 'text-ctp-subtext1'
                   )}
                 >
-                  {paragraph}
+                  <RedactedText text={paragraph} />
                 </p>
               ))}
             </div>

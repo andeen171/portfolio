@@ -51,6 +51,25 @@
     }
   },
   "tatakae": {
+    "channel": {
+      "note": "p.s.: gostou do que leu? existe um canal.",
+      "command": "./canal --seguro",
+      "title": "Canal seguro",
+      "established": "> conexão estabelecida · fim a fim",
+      "password": "senha de reconhecimento: mencione “{codename}” na mensagem.",
+      "newTab": "(abre em uma nova aba)",
+      "close": "Fechar canal"
+    },
+    "gate": {
+      "title": "Acesso ao arquivo {file}",
+      "window": "tatakae — sessão remota",
+      "script": "$ ssh visitante@tatakae\nconectando a tatakae://{path} …\ncanal seguro estabelecido\ncredencial: visitante · nível 0\narquivo {file}: criptografado\nchave de acesso requerida",
+      "prompt": "chave",
+      "denied": "acesso negado · tentativa {count} registrada",
+      "granted": "chave aceita · descriptografando {file}",
+      "hint": "a memória guarda mais do que mostra. leia byte a byte.",
+      "close": "Encerrar conexão"
+    },
     "title": "Arquivos Tatakae",
     "close": "Fechar o arquivo",
     "pages": "Páginas do arquivo",
@@ -174,7 +193,7 @@
       "nudge": "Segure, não clique",
       "open": "Abrir o arquivo classificado {name}",
       "stack": "Tecnologias",
-      "closed": "Código fechado · Tatakae"
+      "closed": "Código fechado · [[Tatakae]]"
     }
   },
   "experiences": {

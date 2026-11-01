@@ -36,6 +36,9 @@ function Wordmark({ className }: { className?: string }) {
   return (
     <span className={cn('inline-flex items-baseline font-extrabold', className)}>
       <span className="animated-gradient-text">
+        {/* The pointer is tracked on a still wrapper: the glitch clips the glyphs
+            with clip-path, which would otherwise move the hit area out from under
+            the cursor and cancel the hold. */}
         <span
           {...(armed ? hold.handlers : {})}
           onClickCapture={(event) => {
@@ -43,12 +46,9 @@ function Wordmark({ className }: { className?: string }) {
             event.preventDefault();
             event.stopPropagation();
           }}
-          className={cn(
-            'inline-block select-none [-webkit-touch-callout:none]',
-            hold.charging && 'dossier-charging'
-          )}
+          className="inline-block select-none [-webkit-touch-callout:none]"
         >
-          戦え
+          <span className={cn('inline-block', hold.charging && 'dossier-charging')}>戦え</span>
         </span>{' '}
         {nickname || shortName}
       </span>

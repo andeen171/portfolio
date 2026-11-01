@@ -5,6 +5,7 @@ import HeroStats, { type HeroStat } from '@/components/home/HeroStats';
 import TypedTagline from '@/components/home/TypedTagline';
 import TypedText from '@/components/home/TypedText';
 import ProgrammingSVG from '@/components/SVG/ProgrammingSVG';
+import { RedactedText } from '@/components/tatakae/Redacted';
 import type { Profile } from '@/lib/profile';
 import { SOCIAL_NETWORKS } from '@/lib/social';
 import { cn } from '@/lib/utils';
@@ -122,7 +123,7 @@ export default function HeroSection({ hero, profile }: HeroSectionProps) {
               'mt-4 max-w-xl text-base leading-relaxed text-pretty text-ctp-subtext0 delay-300 sm:text-lg latte:text-ctp-subtext1'
             )}
           >
-            {profile.lead}
+            <RedactedText text={profile.lead} />
           </p>
 
           <div className={cn(reveal, 'mt-8 flex flex-wrap items-center gap-3 delay-[400ms]')}>
