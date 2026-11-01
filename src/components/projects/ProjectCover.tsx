@@ -3,6 +3,7 @@ import type React from 'react';
 import { rgbToHsl } from '@/lib/logoColor';
 import { cn } from '@/lib/utils';
 import { urlFor } from '@/sanity/lib/image';
+import ProjectGallery from './ProjectGallery';
 
 type CoverSkill = { _id: string; svgCode?: string | null } | null;
 
@@ -12,8 +13,17 @@ interface ProjectCoverProps {
   name: string;
   /** Shown as the cover's terminal path, e.g. "~/room". */
   slug: string;
-  image?: SanityImageSource | null;
+  /** Screenshots; several become a gallery. */
+  images?: SanityImageSource[] | null;
   imageAlt: string;
+  gallery: {
+    region: string;
+    roleDescription: string;
+    previous: string;
+    next: string;
+    /** "Image {n} of {total}", filled in per slide. */
+    slideLabel: (n: number, total: number) => string;
+  };
   skills?: CoverSkill[] | null;
   className?: string;
 }
@@ -149,8 +159,9 @@ export default function ProjectCover({
   seed,
   name,
   slug,
-  image,
+  images,
   imageAlt,
+  gallery,
   skills,
   className,
 }: ProjectCoverProps) {
@@ -169,8 +180,27 @@ export default function ProjectCover({
     className
   );
 
-  if (image) {
-    const src = urlFor(image).width(960).height(540).fit('crop').auto('format').url();
+  const srcs = (images ?? []).map((image) =>
+    urlFor(image).width(960).height(540).fit('crop').auto('format').url()
+  );
+
+  if (srcs.length > 1) {
+    const { slideLabel, ...labels } = gallery;
+    return (
+      <ProjectGallery
+        className={frame}
+        labels={labels}
+        slides={srcs.map((src, index) => ({
+          src,
+          alt: `${imageAlt} (${slideLabel(index + 1, srcs.length)})`,
+          label: slideLabel(index + 1, srcs.length),
+        }))}
+      />
+    );
+  }
+
+  const src = srcs[0];
+  if (src) {
     return (
       <div className={frame}>
         {/* biome-ignore lint/performance/noImgElement: the Sanity CDN already resizes and re-encodes it */}

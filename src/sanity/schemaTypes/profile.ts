@@ -40,6 +40,7 @@ export const profile = defineType({
     { name: 'identity', title: 'Identity', default: true },
     { name: 'hero', title: 'Hero' },
     { name: 'about', title: 'About' },
+    { name: 'tatakae', title: 'Tatakae' },
     { name: 'contact', title: 'Contact & socials' },
     { name: 'sections', title: 'Section intros' },
     { name: 'seo', title: 'SEO & sharing' },
@@ -160,7 +161,7 @@ export const profile = defineType({
       type: 'internationalizedArrayString',
       group: 'hero',
       description:
-        'The big line under the name. Wrap the words to light up in asterisks: I build backend systems that *move money*.',
+        'The big line under the name. Wrap the words to light up in asterisks, and words the hero should retype in braces, options split by |: I build {systems|apps|platforms} that *move {money|people}*. The first braces cycle through every option; each time they come back round, the next braces move on once.',
     }),
     defineField({
       name: 'lead',
@@ -204,6 +205,93 @@ export const profile = defineType({
             ? 'Longer than 60 characters: it will wrap to several lines on the card.'
             : true
         ).warning(),
+    }),
+
+    // Tatakae
+    defineField({
+      name: 'tatakae',
+      title: 'Tatakae',
+      type: 'object',
+      group: 'tatakae',
+      description:
+        'The home page section on your own company and its closed-source work, dressed as a classified dossier.',
+      options: { collapsible: true, collapsed: false },
+      fields: [
+        defineField({ name: 'title', title: 'Heading', type: 'internationalizedArrayString' }),
+        defineField({
+          name: 'lede',
+          title: 'Notes',
+          type: 'internationalizedArrayText',
+          description:
+            'The "Notes" section. Separate paragraphs with a blank line. [[words]] are taped over until hovered; [[#18]] is a permanent 18-character bar with nothing behind it.',
+        }),
+        defineField({
+          name: 'facts',
+          title: 'Identification',
+          type: 'internationalizedArrayText',
+          description:
+            'The record\'s form fields, one per line, label and value split by the first colon. Same tape as the notes: "Size: [[#14]]".',
+        }),
+        defineField({
+          name: 'files',
+          title: 'Files',
+          type: 'array',
+          description: 'The closed-source projects, one file each, in display order.',
+          of: [
+            defineArrayMember({
+              type: 'object',
+              name: 'classifiedFile',
+              fields: [
+                defineField({
+                  name: 'codename',
+                  title: 'Codename',
+                  type: 'string',
+                  description: 'Decrypted on screen as the file comes into view.',
+                  validation: (Rule) => Rule.required(),
+                }),
+                defineField({
+                  name: 'name',
+                  title: 'What it is',
+                  type: 'internationalizedArrayString',
+                }),
+                defineField({
+                  name: 'status',
+                  title: 'Status',
+                  type: 'internationalizedArrayString',
+                  description: 'A few words next to the pulsing dot: "In active development".',
+                }),
+                defineField({ name: 'since', title: 'Started', type: 'date' }),
+                defineField({
+                  name: 'accessKey',
+                  title: 'Access key',
+                  type: 'string',
+                  description:
+                    'Locks the page until a visitor types this key. The classified project card with this codename hides it in its markup (an HTML comment) and its memory dump (as hex). Keep it short and ASCII, e.g. TTK-0321. Empty: the page is open.',
+                  validation: (Rule) =>
+                    // No "--": the key is printed inside an HTML comment.
+                    Rule.regex(/^(?!.*--)[\x21-\x7e]{1,12}$/, {
+                      name: 'printable ASCII, up to 12 characters, no "--"',
+                    }),
+                }),
+                defineField({
+                  name: 'summary',
+                  title: 'Summary',
+                  type: 'internationalizedArrayText',
+                  description:
+                    'The report. Paragraphs split by a blank line; [[peek]] and [[#12]] tape as in the notes.',
+                }),
+                defineField({
+                  name: 'skills',
+                  title: 'Stack',
+                  type: 'array',
+                  of: [defineArrayMember({ type: 'reference', to: [{ type: 'skill' }] })],
+                }),
+              ],
+              preview: { select: { title: 'codename', subtitle: 'name.0.value' } },
+            }),
+          ],
+        }),
+      ],
     }),
 
     // Contact

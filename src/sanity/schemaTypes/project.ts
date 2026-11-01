@@ -29,7 +29,12 @@ export const project = defineType({
           },
         },
       ],
-      validation: (Rule) => Rule.min(1).error('At least one image is required'),
+      validation: (Rule) =>
+        Rule.custom((images: unknown[] | undefined, { document }) =>
+          document?.classified || (images?.length ?? 0) > 0
+            ? true
+            : 'At least one image is required'
+        ),
     }),
     defineField({
       name: 'url',
@@ -40,7 +45,25 @@ export const project = defineType({
       name: 'repo',
       title: 'Repository URL',
       type: 'url',
-      validation: (Rule) => Rule.required(),
+      validation: (Rule) =>
+        Rule.custom((repo: string | undefined, { document }) =>
+          document?.classified || repo ? true : 'Required unless the project is classified'
+        ),
+    }),
+    defineField({
+      name: 'classified',
+      title: 'Classified',
+      type: 'boolean',
+      initialValue: false,
+      description:
+        'Closed source: the card glitches, wraps [[words]] in the description in censor tape and, held down, opens a Tatakae dossier file instead of linking out. No images or repository needed.',
+    }),
+    defineField({
+      name: 'dossierFile',
+      title: 'Dossier file',
+      type: 'string',
+      description: 'The codename of the file in Profile → Tatakae that the card opens.',
+      hidden: ({ document }) => !document?.classified,
     }),
     defineField({
       name: 'date',

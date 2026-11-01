@@ -12,7 +12,7 @@ export const previewProjectsQuery = defineQuery(`
   *[_type == "project"] {
     ...,
     skills[]->
-  } | order(date desc)[0..1]
+  } | order(date desc)[0..2]
 `);
 
 // Experiences
@@ -30,10 +30,11 @@ export const previewExperiencesQuery = defineQuery(`
   } | order(endDate desc)[0..2]
 `);
 
-// Home hero: the current role and a few headline numbers.
+// Home hero: the current roles (oldest first) and a few headline numbers.
 export const heroQuery = defineQuery(`
   {
-    "current": *[_type == "experience" && !defined(endDate)] | order(startDate desc)[0] {
+    "current": *[_type == "experience" && !defined(endDate)] | order(startDate asc) {
+      _id,
       title,
       company,
       startDate
@@ -82,6 +83,21 @@ export const profileQuery = defineQuery(`
     roles,
     bio,
     cardFlavor,
+    tatakae {
+      title,
+      lede,
+      facts,
+      files[] {
+        _key,
+        codename,
+        name,
+        status,
+        since,
+        accessKey,
+        summary,
+        "skills": skills[]->{ _id, name }
+      }
+    },
     contactTitle,
     contactInvite,
     socials[] { _key, platform, url, handle, blurb, inContact, inHero },

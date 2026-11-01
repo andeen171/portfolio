@@ -15,6 +15,7 @@ import {
 import { cn } from '@/lib/utils';
 import type { ListProjectsQueryResult } from '@/sanity/types';
 import { useLocalization } from '@/utils/localization';
+import ClassifiedProjectCard from './ClassifiedProjectCard';
 import ExpandableText from './ExpandableText';
 import ProjectCover from './ProjectCover';
 import TechChips from './TechChips';
@@ -101,9 +102,22 @@ export default function ProjectCard({ project, titleAs: Title = 'h3' }: ProjectC
   const name = (getLocalizedValue(project.name, locale) ?? '').trim();
   const paragraphs = toParagraphs(getLocalizedValue(project.description, locale));
   const date = parseYearMonth(project.date);
-  const image = project.images?.find((img) => img.asset) ?? null;
+  const images = project.images?.filter((img) => img.asset) ?? [];
   const demo = project.url || null;
   const repo = project.repo || null;
+
+  if (project.classified) {
+    return (
+      <ClassifiedProjectCard
+        name={name}
+        paragraphs={paragraphs}
+        date={date ? { label: formatMonthYear(locale, date), iso: isoYearMonth(date) } : undefined}
+        skills={project.skills}
+        fileKey={project.dossierFile?.trim() || name}
+        titleAs={Title}
+      />
+    );
+  }
 
   return (
     <article className="group relative overflow-hidden rounded-2xl bg-ctp-mantle/60 shadow-xl shadow-ctp-crust/20 ring-1 ring-ctp-surface1/60 backdrop-blur-md transition-[box-shadow] duration-300 hover:ring-ctp-lavender/40">
@@ -118,8 +132,15 @@ export default function ProjectCard({ project, titleAs: Title = 'h3' }: ProjectC
           seed={project._id}
           name={name}
           slug={projectSlug(project, name)}
-          image={image}
+          images={images}
           imageAlt={t('coverAlt', { name })}
+          gallery={{
+            region: t('gallery.region', { name }),
+            roleDescription: t('gallery.roleDescription'),
+            previous: t('gallery.previous'),
+            next: t('gallery.next'),
+            slideLabel: (n, total) => t('gallery.slideLabel', { n, total }),
+          }}
           skills={project.skills}
         />
 

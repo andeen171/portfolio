@@ -18,7 +18,7 @@ const KEEP_DESKTOP = 2;
 type Heights = { collapsed: number; full: number };
 
 interface AboutSectionProps {
-  /** The open-ended experience in Sanity, printed on the profile card. */
+  /** The open-ended experiences in Sanity, printed on the profile card. */
   current?: HeroQueryResult['current'];
 }
 
@@ -39,23 +39,28 @@ const AboutSection: React.FC<AboutSectionProps> = ({ current }) => {
   )?.handle;
 
   // The helper falls back to the first entry's value, which Sanity may leave
-  // unset, so it can hand back undefined despite its type.
+  // unset, so it can hand back undefined despite its type. The type line is
+  // the longest-running current role; every current one gets a status row.
   const role =
-    (getLocalizedValue(current?.title ?? undefined, locale) ?? '').trim() || profile.jobTitle;
-  const company = current?.company?.trim();
-  // A plain YYYY-MM-DD date: formatted in UTC so the server and the browser
-  // land on the same month whatever their time zones.
-  const startedAt = current?.startDate ? new Date(current.startDate) : null;
-  const since =
-    startedAt && !Number.isNaN(startedAt.getTime())
-      ? t('card.since', {
-          date: new Intl.DateTimeFormat(locale, {
-            month: 'short',
-            year: 'numeric',
-            timeZone: 'UTC',
-          }).format(startedAt),
-        })
-      : undefined;
+    (getLocalizedValue(current?.[0]?.title ?? undefined, locale) ?? '').trim() || profile.jobTitle;
+  const statuses = (current ?? []).flatMap(({ _id, company, startDate }) => {
+    const name = company?.trim();
+    if (!name) return [];
+    // A plain YYYY-MM-DD date: formatted in UTC so the server and the browser
+    // land on the same month whatever their time zones.
+    const startedAt = startDate ? new Date(startDate) : null;
+    const since =
+      startedAt && !Number.isNaN(startedAt.getTime())
+        ? t('card.since', {
+            date: new Intl.DateTimeFormat(locale, {
+              month: 'short',
+              year: 'numeric',
+              timeZone: 'UTC',
+            }).format(startedAt),
+          })
+        : undefined;
+    return [{ key: _id, label: t('card.now'), company: name, since }];
+  });
 
   // Measure the live text rather than hidden copies: the inner wrapper is
   // never clamped, so its height is the full text, and the last paragraph we
@@ -103,7 +108,7 @@ const AboutSection: React.FC<AboutSectionProps> = ({ current }) => {
         <ProfileCard
           name={profile.shortName}
           type={role ? t('card.type', { role }) : ''}
-          status={company ? { label: t('card.now'), company, since } : undefined}
+          statuses={statuses}
           flavor={profile.cardFlavor}
           origin={profile.location.short || profile.location.label}
           handle={handle}

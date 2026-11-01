@@ -2,6 +2,7 @@ import { ArrowDownIcon, ChevronDownIcon } from '@heroicons/react/20/solid';
 import { useTranslations } from 'next-intl';
 import AnchorLink from '@/components/home/AnchorLink';
 import HeroStats, { type HeroStat } from '@/components/home/HeroStats';
+import TypedTagline from '@/components/home/TypedTagline';
 import TypedText from '@/components/home/TypedText';
 import ProgrammingSVG from '@/components/SVG/ProgrammingSVG';
 import type { Profile } from '@/lib/profile';
@@ -22,20 +23,6 @@ const reveal =
 
 const iconButton =
   'inline-flex size-12 items-center justify-center rounded-full bg-ctp-mantle/60 text-ctp-subtext1 ring-1 ring-ctp-surface1 backdrop-blur-md transition hover:-translate-y-0.5 hover:text-ctp-text hover:ring-ctp-lavender/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ctp-lavender motion-reduce:hover:translate-y-0';
-
-/** The tagline with its `*starred*` words lit, as written in the Studio. */
-function highlight(text: string) {
-  return text.split(/\*([^*]+)\*/).map((part, index) =>
-    index % 2 ? (
-      // biome-ignore lint/suspicious/noArrayIndexKey: a fixed split of one string
-      <span key={index} className="animated-gradient-text">
-        {part}
-      </span>
-    ) : (
-      part
-    )
-  );
-}
 
 interface HeroSectionProps {
   hero: HeroQueryResult | null;
@@ -122,14 +109,13 @@ export default function HeroSection({ hero, profile }: HeroSectionProps) {
             )}
           </h1>
 
-          <p
+          <TypedTagline
+            source={profile.tagline}
             className={cn(
               reveal,
               'mt-6 max-w-xl text-2xl font-semibold leading-snug tracking-tight text-balance text-ctp-text delay-200 sm:text-3xl'
             )}
-          >
-            {highlight(profile.tagline)}
-          </p>
+          />
           <p
             className={cn(
               reveal,

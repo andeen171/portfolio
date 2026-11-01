@@ -206,3 +206,182 @@ body::-webkit-scrollbar {
 .skill-svg-container-modal polygon {
   fill: url(#skillGradientModal);
 }
+
+/* Censor tape for the Tatakae dossier: crust ink with a faint red hatch,
+   so a blacked-out phrase never reads as an empty input. Layered, so the
+   hover utilities can lift it. */
+@layer components {
+  .redaction-bar {
+    background-image: repeating-linear-gradient(
+      -45deg,
+      var(--catppuccin-color-crust) 0 6px,
+      color-mix(in oklab, var(--catppuccin-color-red) 22%, var(--catppuccin-color-crust)) 6px 8px
+    );
+    box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--catppuccin-color-red) 35%, transparent);
+  }
+}
+
+/*
+  Glitch text: two copies of the text (from `data-text`) in red and teal,
+  sliced and nudged sideways in steps, like a bad signal. Static (just the
+  text) under reduced motion.
+*/
+.glitch {
+  position: relative;
+  display: inline-block;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .glitch::before,
+  .glitch::after {
+    content: attr(data-text);
+    /* Empty alt text: screen readers announce the title once, not three times. */
+    content: attr(data-text) / "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+  .glitch::before {
+    color: var(--catppuccin-color-red);
+    animation: glitch-slice 2.8s steps(1, end) infinite;
+  }
+  .glitch::after {
+    color: var(--catppuccin-color-teal);
+    animation: glitch-slice 3.4s steps(1, end) infinite reverse;
+  }
+}
+
+@keyframes glitch-slice {
+  0%,
+  86%,
+  100% {
+    clip-path: inset(50% 0 50% 0);
+    transform: none;
+  }
+  88% {
+    clip-path: inset(12% 0 62% 0);
+    transform: translateX(-3px);
+  }
+  90% {
+    clip-path: inset(58% 0 18% 0);
+    transform: translateX(3px);
+  }
+  92% {
+    clip-path: inset(30% 0 44% 0);
+    transform: translateX(-2px);
+  }
+  94% {
+    clip-path: inset(74% 0 4% 0);
+    transform: translateX(2px);
+  }
+}
+
+/* A screen that flickers now and then, for the classified cover. */
+@media (prefers-reduced-motion: no-preference) {
+  .flicker {
+    animation: flicker 5s steps(1, end) infinite;
+  }
+}
+
+@keyframes flicker {
+  0%,
+  91%,
+  95%,
+  100% {
+    opacity: 1;
+  }
+  92% {
+    opacity: 0.55;
+  }
+  93% {
+    opacity: 0.9;
+  }
+  94% {
+    opacity: 0.4;
+  }
+}
+
+/*
+  The 戦え in the logo while the pointer rests on it (useHold, 5s). Nothing
+  for the first stretch, so a passing hover gives nothing away; then it bleeds
+  slowly into red, and the last stretch glitches before the dossier opens.
+  Reduced motion keeps the colour and skips the glitch.
+*/
+.dossier-charging {
+  animation: dossier-charge 5s linear forwards;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .dossier-charging {
+    animation:
+      dossier-charge 5s linear forwards,
+      dossier-glitch 0.16s steps(2, end) 3.6s infinite;
+  }
+}
+
+@keyframes dossier-charge {
+  0%,
+  22% {
+    color: transparent;
+    text-shadow: none;
+  }
+  70%,
+  100% {
+    color: var(--catppuccin-color-red);
+    text-shadow: 0 0 10px color-mix(in oklab, var(--catppuccin-color-red) 55%, transparent);
+  }
+}
+
+@keyframes dossier-glitch {
+  0% {
+    transform: translate(1px, -1px) skewX(-6deg);
+    text-shadow:
+      -2px 0 var(--catppuccin-color-teal),
+      2px 0 var(--catppuccin-color-red);
+    clip-path: inset(0 0 40% 0);
+  }
+  50% {
+    transform: translate(-1px, 1px) skewX(4deg);
+    text-shadow:
+      2px 0 var(--catppuccin-color-teal),
+      -2px 0 var(--catppuccin-color-red);
+    clip-path: inset(30% 0 0 0);
+  }
+}
+
+/* The dossier powers on like an old monitor. */
+@media (prefers-reduced-motion: no-preference) {
+  .dossier[open] {
+    animation: dossier-on 0.45s cubic-bezier(0.2, 0.9, 0.2, 1);
+  }
+  .dossier[open]::backdrop {
+    animation: dossier-fade 0.3s ease-out;
+  }
+}
+
+.dossier::backdrop {
+  background: color-mix(in oklab, var(--catppuccin-color-crust) 82%, transparent);
+  backdrop-filter: blur(6px);
+}
+
+@keyframes dossier-on {
+  0% {
+    opacity: 0;
+    transform: scaleY(0.02) scaleX(0.6);
+    filter: brightness(3);
+  }
+  45% {
+    opacity: 1;
+    transform: scaleY(0.04) scaleX(1);
+  }
+  100% {
+    transform: none;
+    filter: none;
+  }
+}
+
+@keyframes dossier-fade {
+  from {
+    opacity: 0;
+  }
+}

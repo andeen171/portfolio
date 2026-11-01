@@ -50,6 +50,42 @@
       "photoAlt": "Retrato ilustrado de {name}"
     }
   },
+  "tatakae": {
+    "title": "Arquivos Tatakae",
+    "close": "Fechar o arquivo",
+    "pages": "Páginas do arquivo",
+    "record": "Ficha",
+    "subject": "Assunto",
+    "access": "acesso concedido · nível: visitante",
+    "identification": "Identificação",
+    "notes": "Observações",
+    "attachments": "Anexos",
+    "report": "Relatório",
+    "page": "Pág. {n}",
+    "pageOf": "Pág. {n}/{total}",
+    "locked": "Bloqueada",
+    "released": "Liberada",
+    "sealed": "Selada",
+    "lockedTitle": "Acesso restrito",
+    "lockedBody": "Esta página está criptografada. Informe a chave de acesso para continuar.",
+    "keyLabel": "Chave de acesso",
+    "decrypt": "Abrir",
+    "wrongKey": "{count, plural, one {Chave inválida. Tentativa registrada.} other {Chave inválida. # tentativas registradas.}}",
+    "hint": "A chave da página bloqueada está escondida entre os projetos. Quem souber ler o código, acha.",
+    "codename": "Codinome",
+    "nature": "Natureza",
+    "status": "Situação",
+    "since": "Abertura",
+    "stack": "Tecnologias",
+    "repo": "Repositório",
+    "repoDenied": "ERRO: acesso negado · credencial de visitante",
+    "omitted": "[[#4]] registros omitidos",
+    "withheld": "{count, plural, one {# tecnologia omitida} other {# tecnologias omitidas}}",
+    "redacted": "Censurado: pare o mouse em cima para espiar",
+    "censored": "[censurado]",
+    "footer": "Documento parcialmente liberado",
+    "stamp": "Confidencial"
+  },
   "skills": {
     "title": "Habilidades",
     "seeMore": "Ver o deck completo",
@@ -122,7 +158,24 @@
     "stack": "Tecnologias",
     "coverAlt": "Prévia de {name}",
     "count": "{count, plural, one {# projeto} other {# projetos}}",
-    "empty": "Nenhum projeto por aqui ainda."
+    "empty": "Nenhum projeto por aqui ainda.",
+    "gallery": {
+      "region": "Capturas de tela de {name}",
+      "roleDescription": "carrossel",
+      "previous": "Captura anterior",
+      "next": "Próxima captura",
+      "slideLabel": "Imagem {n} de {total}"
+    },
+    "classified": {
+      "status": "Arquivo classificado",
+      "restricted": "Restrito",
+      "hold": "Segure para acessar o arquivo",
+      "decrypting": "Acessando…",
+      "nudge": "Segure, não clique",
+      "open": "Abrir o arquivo classificado {name}",
+      "stack": "Tecnologias",
+      "closed": "Código fechado · Tatakae"
+    }
   },
   "experiences": {
     "title": "Experiência",
@@ -178,7 +231,8 @@
       "contact": "Contato",
       "theme": "Tema {name}",
       "social": "Abrir {name}",
-      "copyLink": "Copiar link desta página"
+      "copyLink": "Copiar link desta página",
+      "dossier": "Abrir os arquivos Tatakae"
     },
     "current": "atual",
     "newTab": "abre em nova aba",
