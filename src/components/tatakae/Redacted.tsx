@@ -19,7 +19,7 @@ export function RedactedText({ text }: { text: string }) {
         <span key={index}>
           <span
             aria-hidden="true"
-            className="redaction-bar inline-block h-[1.05em] translate-y-[0.15em] rounded-[2px]"
+            className="redaction-bar inline-block h-[1.05em] max-w-full translate-y-[0.15em] rounded-[2px]"
             style={{ width: `${Math.max(2, Number(sealed[1]))}ch` }}
           />
           <span className="sr-only">{t('censored')}</span>

@@ -1,6 +1,6 @@
 'use client';
 
-import { EyeSlashIcon, LockClosedIcon, LockOpenIcon, XMarkIcon } from '@heroicons/react/20/solid';
+import { LockClosedIcon, LockOpenIcon, XMarkIcon } from '@heroicons/react/20/solid';
 import { useLocale, useTranslations } from 'next-intl';
 import { type FormEvent, type ReactNode, useEffect, useId, useRef, useState } from 'react';
 import { useProfile } from '@/components/ProfileProvider';
@@ -18,6 +18,49 @@ const label =
 
 const pad = (n: number) => String(n).padStart(2, '0');
 
+/** The file shows this many technologies; the rest are taped over. */
+const VISIBLE_SKILLS = 3;
+
+/**
+ * The private repository as a visitor sees it from a terminal: a clone that's
+ * refused and a log with every message taped over. Hashes and widths come
+ * from the codename, so the server and the browser draw the same thing.
+ */
+function RepoLog({ seed }: { seed: string }) {
+  const t = useTranslations('tatakae');
+  let state = [...seed].reduce((acc, char) => (acc * 31 + char.charCodeAt(0)) >>> 0, 7);
+  const next = () => {
+    state = (Math.imul(state, 1664525) + 1013904223) >>> 0;
+    return state;
+  };
+  const commits = Array.from({ length: 3 }, () => ({
+    hash: next().toString(16).padStart(8, '0').slice(0, 7),
+    width: 10 + (next() % 16),
+  }));
+
+  return (
+    <div className="space-y-0.5 overflow-hidden rounded-lg bg-ctp-crust p-4 font-nf text-xs leading-5 text-ctp-subtext0 ring-1 ring-ctp-surface0 latte:text-ctp-subtext1">
+      <p className="truncate">
+        <span className="text-ctp-red">$ </span>
+        <RedactedText text="git clone [[#6]]:[[#10]].git" />
+      </p>
+      <p className="text-ctp-red latte:text-ctp-red-800">{t('repoDenied')}</p>
+      <p className="pt-2">
+        <span className="text-ctp-red">$ </span>git log --oneline
+      </p>
+      {commits.map((commit) => (
+        <p key={commit.hash} className="truncate">
+          <span className="text-ctp-yellow latte:text-ctp-yellow-900">{commit.hash}</span>{' '}
+          <RedactedText text={`[[#${commit.width}]]`} />
+        </p>
+      ))}
+      <p className="text-ctp-overlay1">
+        <RedactedText text={`… ${t('omitted')}`} />
+      </p>
+    </div>
+  );
+}
+
 /** Keys compare without case or stray spaces: "ttk-0321 " opens TTK-0321. */
 const sameKey = (typed: string, key: string) =>
   typed.replace(/\s+/g, '').toUpperCase() === key.replace(/\s+/g, '').toUpperCase();
@@ -32,7 +75,7 @@ function Section({
   children: ReactNode;
 }) {
   return (
-    <section className="mt-8">
+    <section className="mt-6">
       <h3 className="flex items-center gap-3 font-nf text-xs font-bold tracking-[0.25em] text-ctp-subtext1 uppercase">
         <span className="text-ctp-red">{numeral}.</span>
         {title}
@@ -46,7 +89,7 @@ function Section({
 /** A form field of the record: label on the left, a dotted rule under the value. */
 function Field({ name, children }: { name: string; children: ReactNode }) {
   return (
-    <div className="grid gap-x-6 gap-y-0.5 border-b border-dotted border-ctp-surface2 py-2 sm:grid-cols-[10rem_minmax(0,1fr)]">
+    <div className="grid gap-x-6 gap-y-0.5 border-b border-dotted border-ctp-surface2 py-1.5 sm:grid-cols-[8rem_minmax(0,1fr)]">
       <dt className={label}>{name}</dt>
       <dd className="font-nf text-sm text-ctp-text">{children}</dd>
     </div>
@@ -103,7 +146,7 @@ export default function TatakaeDossier() {
     <dialog
       ref={dialogRef}
       aria-label={file ? `${title}: ${file.codename}` : title}
-      className="dossier m-auto max-h-[min(100dvh-2rem,56rem)] w-[min(100%-1.5rem,48rem)] overflow-y-auto rounded-2xl border-0 bg-ctp-mantle p-0 text-ctp-text shadow-2xl shadow-ctp-crust ring-1 ring-ctp-red/30"
+      className="dossier m-auto max-h-[min(100dvh-2rem,60rem)] w-[min(100%-1.5rem,60rem)] overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden rounded-2xl border-0 bg-ctp-mantle p-0 text-ctp-text shadow-2xl shadow-ctp-crust ring-1 ring-ctp-red/30"
       onClose={close}
       onClick={(event) => {
         // The content covers the dialog's own box, so a click that lands on
@@ -169,7 +212,7 @@ export default function TatakaeDossier() {
           </div>
 
           {/* The sheet of paper. */}
-          <div className="relative isolate overflow-hidden rounded-xl rounded-tl-none bg-ctp-base px-5 py-7 ring-1 ring-ctp-surface0 sm:px-10 sm:py-10">
+          <div className="relative isolate overflow-hidden rounded-xl rounded-tl-none bg-ctp-base px-5 py-7 ring-1 ring-ctp-surface0 sm:px-10 sm:py-8">
             <div
               aria-hidden="true"
               className="absolute inset-0 -z-10 opacity-[0.07] mix-blend-overlay"
@@ -192,7 +235,7 @@ export default function TatakaeDossier() {
             {file && isOpen(file) && <FilePage file={file} page={page} locale={locale} />}
             {file && !isOpen(file) && <LockedPage file={file} page={page} />}
 
-            <div className="mt-10 flex items-center justify-between gap-4 border-t border-ctp-surface1 pt-4 font-nf text-[0.625rem] tracking-[0.18em] text-ctp-overlay1 uppercase latte:text-ctp-subtext1">
+            <div className="mt-8 flex items-center justify-between gap-4 border-t border-ctp-surface1 pt-4 font-nf text-[0.625rem] tracking-[0.18em] text-ctp-overlay1 uppercase latte:text-ctp-subtext1">
               <span>{t('footer')}</span>
               <span className="shrink-0">{t('pageOf', { n: pad(page), total: pad(total) })}</span>
             </div>
@@ -218,7 +261,7 @@ function RecordPage({
 
   return (
     <>
-      <p className={cn(label, 'mt-6')}>{t('subject')}</p>
+      <p className={cn(label, 'mt-4')}>{t('subject')}</p>
       <h2
         data-text={title}
         className="glitch mt-1 max-w-[80%] font-nf text-3xl font-bold tracking-[0.08em] uppercase sm:text-4xl"
@@ -226,79 +269,84 @@ function RecordPage({
         {title}
       </h2>
 
-      {tatakae.facts.length > 0 && (
-        <Section numeral="I" title={t('identification')}>
-          <dl>
-            {tatakae.facts.map((fact) => (
-              <Field key={fact.label} name={fact.label}>
-                <RedactedText text={fact.value} />
-              </Field>
-            ))}
-          </dl>
-        </Section>
-      )}
-
-      {tatakae.lede.length > 0 && (
-        <Section numeral="II" title={t('notes')}>
-          <div className="space-y-4 text-[0.9375rem] leading-relaxed text-pretty text-ctp-subtext1">
-            {tatakae.lede.map((paragraph, index) => (
-              <p key={paragraph} className={cn(index === 0 && 'font-nf text-ctp-text')}>
-                <RedactedText text={paragraph} />
-              </p>
-            ))}
-          </div>
-        </Section>
-      )}
-
-      <Section numeral="III" title={t('attachments')}>
-        <ol className="space-y-2">
-          {tatakae.files.map((file, index) => (
-            <li key={file.key}>
-              <button
-                type="button"
-                onClick={() => onOpen(file.codename)}
-                className="group flex w-full items-center gap-4 rounded-lg border border-ctp-surface1 px-4 py-3 text-left font-nf text-sm transition-colors hover:border-ctp-red/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ctp-red"
-              >
-                <span className="text-xs text-ctp-overlay1">
-                  {t('page', { n: pad(index + 2) })}
-                </span>
-                <span className="font-bold tracking-[0.15em]">{file.codename}</span>
-                <span
-                  className={cn(
-                    'ml-auto flex items-center gap-1.5 text-[0.6875rem] tracking-wider uppercase',
-                    isOpen(file)
-                      ? 'text-ctp-green latte:text-ctp-green-900'
-                      : 'text-ctp-red latte:text-ctp-red-800'
-                  )}
-                >
-                  {isOpen(file) ? (
-                    <LockOpenIcon aria-hidden="true" className="size-3.5" />
-                  ) : (
-                    <LockClosedIcon aria-hidden="true" className="size-3.5" />
-                  )}
-                  {isOpen(file) ? t('released') : t('locked')}
-                </span>
-              </button>
-            </li>
-          ))}
-          <li className="flex items-center gap-4 rounded-lg border border-dashed border-ctp-surface1 px-4 py-3 font-nf text-sm text-ctp-overlay1">
-            <span className="text-xs">{t('page', { n: pad(tatakae.files.length + 2) })}</span>
-            <span
-              aria-hidden="true"
-              className="redaction-bar inline-block h-4 w-24 rounded-[2px]"
-            />
-            <span className="ml-auto flex items-center gap-1.5 text-[0.6875rem] tracking-wider uppercase">
-              <LockClosedIcon aria-hidden="true" className="size-3.5" />
-              {t('sealed')}
-            </span>
-          </li>
-        </ol>
-        {locked && (
-          <p className="mt-4 border-l-2 border-ctp-red/60 pl-3 font-nf text-xs leading-relaxed text-ctp-subtext0 italic latte:text-ctp-subtext1">
-            {t('hint')}
-          </p>
+      {/* Two columns on wide screens, so the whole record fits without scrolling. */}
+      <div className="lg:grid lg:grid-cols-2 lg:items-start lg:gap-x-10">
+        {tatakae.facts.length > 0 && (
+          <Section numeral="I" title={t('identification')}>
+            <dl className="md:grid md:grid-cols-2 md:gap-x-8 lg:block">
+              {tatakae.facts.map((fact) => (
+                <Field key={fact.label} name={fact.label}>
+                  <RedactedText text={fact.value} />
+                </Field>
+              ))}
+            </dl>
+          </Section>
         )}
-      </Section>
+
+        <div>
+          {tatakae.lede.length > 0 && (
+            <Section numeral="II" title={t('notes')}>
+              <div className="space-y-3 text-sm leading-relaxed text-pretty text-ctp-subtext1">
+                {tatakae.lede.map((paragraph, index) => (
+                  <p key={paragraph} className={cn(index === 0 && 'font-nf text-ctp-text')}>
+                    <RedactedText text={paragraph} />
+                  </p>
+                ))}
+              </div>
+            </Section>
+          )}
+
+          <Section numeral="III" title={t('attachments')}>
+            <ol className="space-y-2">
+              {tatakae.files.map((file, index) => (
+                <li key={file.key}>
+                  <button
+                    type="button"
+                    onClick={() => onOpen(file.codename)}
+                    className="group flex w-full items-center gap-4 rounded-lg border border-ctp-surface1 px-4 py-3 text-left font-nf text-sm transition-colors hover:border-ctp-red/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ctp-red"
+                  >
+                    <span className="text-xs text-ctp-overlay1">
+                      {t('page', { n: pad(index + 2) })}
+                    </span>
+                    <span className="font-bold tracking-[0.15em]">{file.codename}</span>
+                    <span
+                      className={cn(
+                        'ml-auto flex items-center gap-1.5 text-[0.6875rem] tracking-wider uppercase',
+                        isOpen(file)
+                          ? 'text-ctp-green latte:text-ctp-green-900'
+                          : 'text-ctp-red latte:text-ctp-red-800'
+                      )}
+                    >
+                      {isOpen(file) ? (
+                        <LockOpenIcon aria-hidden="true" className="size-3.5" />
+                      ) : (
+                        <LockClosedIcon aria-hidden="true" className="size-3.5" />
+                      )}
+                      {isOpen(file) ? t('released') : t('locked')}
+                    </span>
+                  </button>
+                </li>
+              ))}
+              <li className="flex items-center gap-4 rounded-lg border border-dashed border-ctp-surface1 px-4 py-3 font-nf text-sm text-ctp-overlay1">
+                <span className="text-xs">{t('page', { n: pad(tatakae.files.length + 2) })}</span>
+                <span
+                  aria-hidden="true"
+                  className="redaction-bar inline-block h-4 w-24 rounded-[2px]"
+                />
+                <span className="ml-auto flex items-center gap-1.5 text-[0.6875rem] tracking-wider uppercase">
+                  <LockClosedIcon aria-hidden="true" className="size-3.5" />
+                  {t('sealed')}
+                </span>
+              </li>
+            </ol>
+            {locked && (
+              <p className="mt-4 border-l-2 border-ctp-red/60 pl-3 font-nf text-xs leading-relaxed text-ctp-subtext0 italic latte:text-ctp-subtext1">
+                {t('hint')}
+              </p>
+            )}
+          </Section>
+        </div>
+      </div>
     </>
   );
 }
@@ -397,7 +445,7 @@ function FilePage({
 
   return (
     <article>
-      <p className={cn(label, 'mt-6')}>{t('page', { n: pad(page) })}</p>
+      <p className={cn(label, 'mt-4')}>{t('page', { n: pad(page) })}</p>
       <h2
         data-text={file.codename}
         className="glitch mt-1 font-nf text-4xl font-bold tracking-[0.2em] sm:text-5xl"
@@ -406,7 +454,7 @@ function FilePage({
       </h2>
 
       <Section numeral="I" title={t('identification')}>
-        <dl>
+        <dl className="md:grid md:grid-cols-2 md:gap-x-8">
           <Field name={t('codename')}>{file.codename}</Field>
           {file.name && (
             <Field name={t('nature')}>
@@ -428,28 +476,45 @@ function FilePage({
         </dl>
       </Section>
 
-      {file.summary.length > 0 && (
-        <Section numeral="II" title={t('report')}>
-          <div className="space-y-4 text-[0.9375rem] leading-relaxed text-pretty text-ctp-subtext1">
-            {file.summary.map((paragraph) => (
-              <p key={paragraph}>
-                <RedactedText text={paragraph} />
-              </p>
-            ))}
-          </div>
-        </Section>
-      )}
+      <div className="md:grid md:grid-cols-[3fr_2fr] md:gap-x-8">
+        <div>
+          {file.summary.length > 0 && (
+            <Section numeral="II" title={t('report')}>
+              <div className="space-y-3 text-sm leading-relaxed text-pretty text-ctp-subtext1">
+                {file.summary.map((paragraph) => (
+                  <p key={paragraph}>
+                    <RedactedText text={paragraph} />
+                  </p>
+                ))}
+              </div>
+            </Section>
+          )}
 
-      {file.skills.length > 0 && (
-        <Section numeral="III" title={t('stack')}>
-          <TechChips skills={file.skills} label={t('stack')} />
+          {file.skills.length > 0 && (
+            <Section numeral="III" title={t('stack')}>
+              <div className="flex flex-wrap items-center gap-1.5">
+                <TechChips skills={file.skills.slice(0, VISIBLE_SKILLS)} label={t('stack')} />
+                {file.skills.slice(VISIBLE_SKILLS).map((skill) => (
+                  <span
+                    key={skill._id}
+                    aria-hidden="true"
+                    className="redaction-bar inline-block h-6 rounded-md"
+                    style={{ width: `${2 + (skill._id.length % 3) * 0.75}rem` }}
+                  />
+                ))}
+                {file.skills.length > VISIBLE_SKILLS && (
+                  <span className="sr-only">
+                    {t('withheld', { count: file.skills.length - VISIBLE_SKILLS })}
+                  </span>
+                )}
+              </div>
+            </Section>
+          )}
+        </div>
+        <Section numeral="IV" title={t('repo')}>
+          <RepoLog seed={file.codename} />
         </Section>
-      )}
-
-      <p className="mt-8 flex items-center gap-2 font-nf text-[0.6875rem] text-ctp-overlay1 latte:text-ctp-subtext1">
-        <EyeSlashIcon aria-hidden="true" className="size-3.5" />
-        {t('private')}
-      </p>
+      </div>
     </article>
   );
 }
