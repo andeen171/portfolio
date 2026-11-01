@@ -93,6 +93,7 @@ export const profileQuery = defineQuery(`
         name,
         status,
         since,
+        accessKey,
         summary,
         "skills": skills[]->{ _id, name }
       }

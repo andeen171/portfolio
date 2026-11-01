@@ -14,6 +14,8 @@ export interface ClassifiedFile {
   status: string;
   /** YYYY-MM-DD, or empty. */
   since: string;
+  /** Typed to unlock the page; empty when it's open. */
+  accessKey: string;
   /** Paragraphs; `[[words]]` are blacked out. */
   summary: string[];
   skills: { _id: string; name: string }[];
@@ -155,6 +157,7 @@ export function resolveProfile(raw: ProfileQueryResult, locale: AppLocale): Prof
                 name: text(file.name),
                 status: text(file.status),
                 since: file.since ?? '',
+                accessKey: file.accessKey?.trim() ?? '',
                 summary: paragraphs(text(file.summary)),
                 skills: (file.skills ?? []).flatMap((skill) =>
                   skill?.name ? [{ _id: skill._id, name: skill.name }] : []

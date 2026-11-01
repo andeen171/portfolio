@@ -220,16 +220,17 @@ export const profile = defineType({
         defineField({ name: 'title', title: 'Heading', type: 'internationalizedArrayString' }),
         defineField({
           name: 'lede',
-          title: 'Briefing',
+          title: 'Notes',
           type: 'internationalizedArrayText',
           description:
-            'Separate paragraphs with a blank line. Wrap words in double brackets to black them out until hovered: [[restaurants]].',
+            'The "Notes" section. Separate paragraphs with a blank line. [[words]] are taped over until hovered; [[#18]] is a permanent 18-character bar with nothing behind it.',
         }),
         defineField({
           name: 'facts',
-          title: 'Dossier facts',
+          title: 'Identification',
           type: 'internationalizedArrayText',
-          description: 'One per line, label and value split by the first colon: "Legal form: ME".',
+          description:
+            'The record\'s form fields, one per line, label and value split by the first colon. Same tape as the notes: "Size: [[#14]]".',
         }),
         defineField({
           name: 'files',
@@ -261,10 +262,22 @@ export const profile = defineType({
                 }),
                 defineField({ name: 'since', title: 'Started', type: 'date' }),
                 defineField({
+                  name: 'accessKey',
+                  title: 'Access key',
+                  type: 'string',
+                  description:
+                    'Locks the page until a visitor types this key. The classified project card with this codename hides it in its markup (an HTML comment) and its memory dump (as hex). Keep it short and ASCII, e.g. TTK-0321. Empty: the page is open.',
+                  validation: (Rule) =>
+                    Rule.regex(/^[\x21-\x7e]{1,12}$/, {
+                      name: 'printable ASCII, up to 12 characters',
+                    }),
+                }),
+                defineField({
                   name: 'summary',
                   title: 'Summary',
                   type: 'internationalizedArrayText',
-                  description: 'Paragraphs split by a blank line; [[double brackets]] black out.',
+                  description:
+                    'The report. Paragraphs split by a blank line; [[peek]] and [[#12]] tape as in the notes.',
                 }),
                 defineField({
                   name: 'skills',

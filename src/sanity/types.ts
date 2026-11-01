@@ -185,6 +185,7 @@ export type Profile = {
       name?: InternationalizedArrayString;
       status?: InternationalizedArrayString;
       since?: string;
+      accessKey?: string;
       summary?: InternationalizedArrayText;
       skills?: Array<
         {
@@ -568,7 +569,7 @@ export type ListSkillCategoriesQueryResult = Array<{
 
 // Source: src/sanity/queries.ts
 // Variable: profileQuery
-// Query: *[_type == "profile" && _id == "profile"][0] {    fullName,    shortName,    nickname,    jobTitle,    headline,    location,    terminal,    photo {      alt,      crop,      hotspot,      asset->{ _id, metadata { lqip, dimensions { width, height } } }    },    nameVariants,    tagline,    lead,    aboutTitle,    roles,    bio,    cardFlavor,    tatakae {      title,      lede,      facts,      files[] {        _key,        codename,        name,        status,        since,        summary,        "skills": skills[]->{ _id, name }      }    },    contactTitle,    contactInvite,    socials[] { _key, platform, url, handle, blurb, inContact, inHero },    projectsIntro,    experiencesIntro,    skillsIntro,    seoDescription,    shareTagline,    pageDescriptions,    quote,    quoteCredit,    footerTagline,    "knowsAbout": *[_type == "skill" && proficiency in ["advanced", "expert"]] | order(name asc).name  }
+// Query: *[_type == "profile" && _id == "profile"][0] {    fullName,    shortName,    nickname,    jobTitle,    headline,    location,    terminal,    photo {      alt,      crop,      hotspot,      asset->{ _id, metadata { lqip, dimensions { width, height } } }    },    nameVariants,    tagline,    lead,    aboutTitle,    roles,    bio,    cardFlavor,    tatakae {      title,      lede,      facts,      files[] {        _key,        codename,        name,        status,        since,        accessKey,        summary,        "skills": skills[]->{ _id, name }      }    },    contactTitle,    contactInvite,    socials[] { _key, platform, url, handle, blurb, inContact, inHero },    projectsIntro,    experiencesIntro,    skillsIntro,    seoDescription,    shareTagline,    pageDescriptions,    quote,    quoteCredit,    footerTagline,    "knowsAbout": *[_type == "skill" && proficiency in ["advanced", "expert"]] | order(name asc).name  }
 export type ProfileQueryResult = {
   fullName: string | null;
   shortName: string | null;
@@ -618,6 +619,7 @@ export type ProfileQueryResult = {
       name: InternationalizedArrayString | null;
       status: InternationalizedArrayString | null;
       since: string | null;
+      accessKey: string | null;
       summary: InternationalizedArrayText | null;
       skills: Array<{
         _id: string;
@@ -672,6 +674,6 @@ declare module '@sanity/client' {
     '\n  {\n    "current": *[_type == "experience" && !defined(endDate)] | order(startDate asc) {\n      _id,\n      title,\n      company,\n      startDate\n    },\n    "careerStart": *[_type == "experience"] | order(startDate asc)[0].startDate,\n    "projectCount": count(*[_type == "project"]),\n    "skillCount": count(*[_type == "skill"]),\n    "companyCount": count(array::unique(*[_type == "experience"].company))\n  }\n': HeroQueryResult;
     '\n  *[ _type == "skill"] {\n    ...,\n    category->\n  } | order(category->order asc, name asc)\n': ListSkillsQueryResult;
     '\n  *[ _type == "skillCategory"] | order(order asc)\n': ListSkillCategoriesQueryResult;
-    '\n  *[_type == "profile" && _id == "profile"][0] {\n    fullName,\n    shortName,\n    nickname,\n    jobTitle,\n    headline,\n    location,\n    terminal,\n    photo {\n      alt,\n      crop,\n      hotspot,\n      asset->{ _id, metadata { lqip, dimensions { width, height } } }\n    },\n    nameVariants,\n    tagline,\n    lead,\n    aboutTitle,\n    roles,\n    bio,\n    cardFlavor,\n    tatakae {\n      title,\n      lede,\n      facts,\n      files[] {\n        _key,\n        codename,\n        name,\n        status,\n        since,\n        summary,\n        "skills": skills[]->{ _id, name }\n      }\n    },\n    contactTitle,\n    contactInvite,\n    socials[] { _key, platform, url, handle, blurb, inContact, inHero },\n    projectsIntro,\n    experiencesIntro,\n    skillsIntro,\n    seoDescription,\n    shareTagline,\n    pageDescriptions,\n    quote,\n    quoteCredit,\n    footerTagline,\n    "knowsAbout": *[_type == "skill" && proficiency in ["advanced", "expert"]] | order(name asc).name\n  }\n': ProfileQueryResult;
+    '\n  *[_type == "profile" && _id == "profile"][0] {\n    fullName,\n    shortName,\n    nickname,\n    jobTitle,\n    headline,\n    location,\n    terminal,\n    photo {\n      alt,\n      crop,\n      hotspot,\n      asset->{ _id, metadata { lqip, dimensions { width, height } } }\n    },\n    nameVariants,\n    tagline,\n    lead,\n    aboutTitle,\n    roles,\n    bio,\n    cardFlavor,\n    tatakae {\n      title,\n      lede,\n      facts,\n      files[] {\n        _key,\n        codename,\n        name,\n        status,\n        since,\n        accessKey,\n        summary,\n        "skills": skills[]->{ _id, name }\n      }\n    },\n    contactTitle,\n    contactInvite,\n    socials[] { _key, platform, url, handle, blurb, inContact, inHero },\n    projectsIntro,\n    experiencesIntro,\n    skillsIntro,\n    seoDescription,\n    shareTagline,\n    pageDescriptions,\n    quote,\n    quoteCredit,\n    footerTagline,\n    "knowsAbout": *[_type == "skill" && proficiency in ["advanced", "expert"]] | order(name asc).name\n  }\n': ProfileQueryResult;
   }
 }

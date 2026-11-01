@@ -47,15 +47,29 @@ export const useCommandPalette = create<CommandPaletteState>()((set) => ({
 }));
 
 interface DossierState {
-  /** Null when closed; `index` for the Tatakae dossier's front page, else a file's codename. */
+  /** Null when closed; `index` for the dossier's record page, else a file's codename. */
   view: string | null;
+  /** Codenames of the locked pages this visitor has opened with their key. */
+  unlocked: string[];
   open: (view: string) => void;
   close: () => void;
+  unlock: (codename: string) => void;
 }
 
-/** The hidden Tatakae dossier: opened by easter eggs anywhere on the site. */
-export const useDossier = create<DossierState>()((set) => ({
-  view: null,
-  open: (view) => set({ view }),
-  close: () => set({ view: null }),
-}));
+/**
+ * The hidden Tatakae dossier: opened by easter eggs anywhere on the site.
+ * Unlocked pages are remembered in this browser; the open page is not.
+ */
+export const useDossier = create<DossierState>()(
+  persist(
+    (set) => ({
+      view: null,
+      unlocked: [],
+      open: (view) => set({ view }),
+      close: () => set({ view: null }),
+      unlock: (codename) =>
+        set((state) => ({ unlocked: [...new Set([...state.unlocked, codename])] })),
+    }),
+    { name: 'tatakae-dossier', partialize: (state) => ({ unlocked: state.unlocked }) }
+  )
+);

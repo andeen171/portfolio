@@ -1,43 +1,40 @@
-'use client';
-
-import { useState } from 'react';
-import { cn } from '@/lib/utils';
+import { useTranslations } from 'next-intl';
 
 /**
- * A blacked-out phrase. Hover peeks at it, a click or tap keeps it
- * declassified. The words are always in the DOM, so screen readers read them
- * as plain text inside the button.
+ * A line of dossier text with its censor tape. `[[words]]` are taped over
+ * and only show while the pointer rests on them (nothing keeps them open);
+ * `[[#18]]` is a permanent bar 18 characters wide with nothing behind it,
+ * for what never leaves the file (a registry number, the company's size).
+ * Screen readers read peekable words as plain text and hear "redacted" for
+ * the permanent bars.
  */
-export default function Redacted({ children, label }: { children: string; label: string }) {
-  const [open, setOpen] = useState(false);
-  return (
-    <button
-      type="button"
-      aria-pressed={open}
-      title={label}
-      onClick={() => setOpen((value) => !value)}
-      className={cn(
-        'cursor-pointer rounded-[3px] px-1 box-decoration-clone transition-colors duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ctp-red motion-reduce:transition-none',
-        open
-          ? 'bg-ctp-red/15 text-ctp-text'
-          : 'redaction-bar text-transparent selection:text-transparent hover:bg-none hover:bg-ctp-red/15 hover:text-ctp-text hover:shadow-none'
-      )}
-    >
-      {children}
-    </button>
-  );
-}
-
-/** A paragraph with its `[[words]]` blacked out. */
-export function RedactedText({ text, label }: { text: string; label: string }) {
-  return text.split(/\[\[([^\]]+)\]\]/).map((part, index) =>
-    index % 2 ? (
-      // biome-ignore lint/suspicious/noArrayIndexKey: a fixed split of one string
-      <Redacted key={index} label={label}>
+export function RedactedText({ text }: { text: string }) {
+  const t = useTranslations('tatakae');
+  return text.split(/\[\[([^\]]+)\]\]/).map((part, index) => {
+    if (index % 2 === 0) return part;
+    const sealed = /^#(\d{1,2})$/.exec(part);
+    if (sealed) {
+      return (
+        // biome-ignore lint/suspicious/noArrayIndexKey: a fixed split of one string
+        <span key={index}>
+          <span
+            aria-hidden="true"
+            className="redaction-bar inline-block h-[1.05em] translate-y-[0.15em] rounded-[2px]"
+            style={{ width: `${Math.max(2, Number(sealed[1]))}ch` }}
+          />
+          <span className="sr-only">{t('censored')}</span>
+        </span>
+      );
+    }
+    return (
+      <span
+        // biome-ignore lint/suspicious/noArrayIndexKey: a fixed split of one string
+        key={index}
+        title={t('redacted')}
+        className="redaction-bar cursor-help rounded-[2px] px-0.5 text-transparent box-decoration-clone transition-colors duration-200 select-none hover:bg-none hover:bg-ctp-red/15 hover:text-ctp-text hover:shadow-none motion-reduce:transition-none"
+      >
         {part}
-      </Redacted>
-    ) : (
-      part
-    )
-  );
+      </span>
+    );
+  });
 }

@@ -20,7 +20,7 @@ import { useCommandPalette, useCtpStore, useDossier } from '@/store';
 const focusRing = 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ctp-lavender';
 
 /** Rest the pointer (or press) this long on the logo's 戦え to open the dossier. */
-const DOSSIER_HOLD_MS = 2000;
+const DOSSIER_HOLD_MS = 5000;
 
 /**
  * Logo: the wordmark plus a blinking terminal caret. Its 戦え is an easter

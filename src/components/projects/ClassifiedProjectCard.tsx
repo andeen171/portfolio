@@ -3,6 +3,7 @@
 import { CalendarIcon, LockClosedIcon } from '@heroicons/react/20/solid';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
+import { useProfile } from '@/components/ProfileProvider';
 import { RedactedText } from '@/components/tatakae/Redacted';
 import { useHold } from '@/lib/useHold';
 import { cn } from '@/lib/utils';
@@ -19,17 +20,25 @@ const SCANLINES: React.CSSProperties = {
     'repeating-linear-gradient(to bottom, color-mix(in oklab, var(--catppuccin-color-text) 6%, transparent) 0 1px, transparent 1px 3px)',
 };
 
-/** A few lines of fake memory dump, the same for a name on every render. */
-function dump(seed: string): string[] {
+const hex = (byte: number) => byte.toString(16).padStart(2, '0').toUpperCase();
+
+/**
+ * A few lines of fake memory dump, the same for a name on every render. The
+ * third line isn't noise: it's the dossier page's access key, byte by byte
+ * in ASCII, for whoever thinks to decode it.
+ */
+function dump(seed: string, key: string): string[] {
   let state = [...seed].reduce((acc, char) => (acc * 31 + char.charCodeAt(0)) >>> 0, 7);
   const next = () => {
     state = (Math.imul(state, 1664525) + 1013904223) >>> 0;
     return state;
   };
-  const byte = () => (next() % 256).toString(16).padStart(2, '0').toUpperCase();
   return Array.from({ length: 5 }, (_, line) => {
     const address = `0x${(0x3f20 + line * 16).toString(16).toUpperCase()}`;
-    const bytes = Array.from({ length: 6 }, () => (next() % 5 === 0 ? '██' : byte()));
+    const bytes =
+      line === 2 && key
+        ? [...key].map((char) => hex(char.charCodeAt(0)))
+        : Array.from({ length: 8 }, () => (next() % 5 === 0 ? '██' : hex(next() % 256)));
     return `${address}  ${bytes.join(' ')}`;
   });
 }
@@ -61,7 +70,11 @@ export default function ClassifiedProjectCard({
   titleAs: Title = 'h3',
 }: ClassifiedProjectCardProps) {
   const t = useTranslations('projects.classified');
-  const tRedacted = useTranslations('tatakae');
+  const { tatakae } = useProfile();
+  // Only printable ASCII survives: it ends up inside an HTML comment.
+  const accessKey = (
+    tatakae.files.find((file) => file.codename === fileKey)?.accessKey ?? ''
+  ).replace(/[^\x21-\x7e]|-->/g, '');
   const openDossier = useDossier((state) => state.open);
   const hold = useHold(HOLD_MS, () => openDossier(fileKey));
   const [nudged, setNudged] = useState(false);
@@ -72,6 +85,18 @@ export default function ClassifiedProjectCard({
         aria-hidden="true"
         className="pointer-events-none absolute inset-x-0 top-0 z-10 h-px bg-linear-to-r from-transparent via-ctp-red/80 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100"
       />
+
+      {/* The other place the key hides: a comment in the markup, for whoever
+          opens the dev tools or views the source. */}
+      {accessKey && (
+        <span
+          hidden
+          // biome-ignore lint/security/noDangerouslySetInnerHtml: a fixed comment around a key stripped to printable ASCII
+          dangerouslySetInnerHTML={{
+            __html: `<!-- 戦え :: tatakae://${fileKey.toLowerCase().replace(/[^\w-]/g, '')} :: key=${accessKey} -->`,
+          }}
+        />
+      )}
 
       <div className="grid lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
         <button
@@ -122,7 +147,7 @@ export default function ClassifiedProjectCard({
               {name}
             </span>
             <span className="mt-3 block space-y-0.5 font-nf text-[0.625rem] leading-tight text-ctp-overlay1">
-              {dump(name).map((line) => (
+              {dump(name, accessKey).map((line) => (
                 <span key={line} className="block truncate">
                   {line}
                 </span>
@@ -175,7 +200,7 @@ export default function ClassifiedProjectCard({
           <div className="mt-3 space-y-3 leading-relaxed text-pretty text-ctp-subtext1">
             {paragraphs.map((paragraph) => (
               <p key={paragraph}>
-                <RedactedText text={paragraph} label={tRedacted('redacted')} />
+                <RedactedText text={paragraph} />
               </p>
             ))}
           </div>

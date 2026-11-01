@@ -299,27 +299,51 @@ body::-webkit-scrollbar {
   }
 }
 
-/* The 戦え in the logo, warming up while the pointer rests on it. */
+/*
+  The 戦え in the logo while the pointer rests on it (useHold, 5s). Nothing
+  for the first stretch, so a passing hover gives nothing away; then it bleeds
+  slowly into red, and the last stretch glitches before the dossier opens.
+  Reduced motion keeps the colour and skips the glitch.
+*/
 .dossier-charging {
-  color: var(--catppuccin-color-red);
-  text-shadow: 0 0 12px color-mix(in oklab, var(--catppuccin-color-red) 70%, transparent);
-  transition:
-    color 1.6s ease-in,
-    text-shadow 1.6s ease-in;
+  animation: dossier-charge 5s linear forwards;
 }
 
 @media (prefers-reduced-motion: no-preference) {
   .dossier-charging {
-    animation: dossier-shake 0.12s steps(2, end) infinite 0.9s;
+    animation:
+      dossier-charge 5s linear forwards,
+      dossier-glitch 0.16s steps(2, end) 3.6s infinite;
   }
 }
 
-@keyframes dossier-shake {
+@keyframes dossier-charge {
+  0%,
+  22% {
+    color: transparent;
+    text-shadow: none;
+  }
+  70%,
+  100% {
+    color: var(--catppuccin-color-red);
+    text-shadow: 0 0 10px color-mix(in oklab, var(--catppuccin-color-red) 55%, transparent);
+  }
+}
+
+@keyframes dossier-glitch {
   0% {
-    transform: translate(0.5px, -0.5px);
+    transform: translate(1px, -1px) skewX(-6deg);
+    text-shadow:
+      -2px 0 var(--catppuccin-color-teal),
+      2px 0 var(--catppuccin-color-red);
+    clip-path: inset(0 0 40% 0);
   }
   50% {
-    transform: translate(-0.5px, 0.5px);
+    transform: translate(-1px, 1px) skewX(4deg);
+    text-shadow:
+      2px 0 var(--catppuccin-color-teal),
+      -2px 0 var(--catppuccin-color-red);
+    clip-path: inset(30% 0 0 0);
   }
 }
 
