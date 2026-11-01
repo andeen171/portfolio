@@ -69,12 +69,12 @@ function Seal({ glyphs, gloss }: { glyphs: string; gloss: string }) {
     <span className="flex items-center gap-3">
       <span
         lang="ja"
-        className="hanko shrink-0 rounded-[3px] border-2 border-ctp-red px-1 py-1.5 text-lg leading-none font-bold text-ctp-red latte:border-ctp-red-800 latte:text-ctp-red-800"
+        className="hanko shrink-0 rounded-[3px] border-2 border-ctp-red px-1.5 py-0.5 text-base leading-tight font-bold text-ctp-red latte:border-ctp-red-800 latte:text-ctp-red-800"
       >
         {glyphs}
       </span>
       {gloss && (
-        <span className="tracking-wide text-ctp-subtext1">
+        <span className="tracking-wide whitespace-nowrap text-ctp-subtext1">
           <ScrambleText text={gloss} />
         </span>
       )}
@@ -110,7 +110,7 @@ function Section({
 /** A form field of the record: label on the left, a dotted rule under the value. */
 function Field({ name, children }: { name: string; children: ReactNode }) {
   return (
-    <div className="grid gap-x-6 gap-y-0.5 border-b border-dotted border-ctp-surface2 py-1.5 sm:grid-cols-[8rem_minmax(0,1fr)]">
+    <div className="grid gap-x-6 gap-y-0.5 border-b border-dotted border-ctp-surface2 py-1 sm:grid-cols-[8rem_minmax(0,1fr)]">
       <dt className={label}>{name}</dt>
       <dd className="font-nf text-sm text-ctp-text">{children}</dd>
     </div>
@@ -256,7 +256,7 @@ export default function TatakaeDossier() {
             {file && isOpen(file) && <FilePage file={file} page={page} locale={locale} />}
             {file && !isOpen(file) && <LockedPage file={file} page={page} />}
 
-            <div className="mt-8 flex items-center justify-between gap-4 border-t border-ctp-surface1 pt-4 font-nf text-[0.625rem] tracking-[0.18em] text-ctp-overlay1 uppercase latte:text-ctp-subtext1">
+            <div className="mt-6 flex items-center justify-between gap-4 border-t border-ctp-surface1 pt-4 font-nf text-[0.625rem] tracking-[0.18em] text-ctp-overlay1 uppercase latte:text-ctp-subtext1">
               <span>{t('footer')}</span>
               <span className="shrink-0">{t('pageOf', { n: pad(page), total: pad(total) })}</span>
             </div>

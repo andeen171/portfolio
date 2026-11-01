@@ -30,10 +30,10 @@ export const previewExperiencesQuery = defineQuery(`
   } | order(endDate desc)[0..2]
 `);
 
-// Home hero: the current roles (oldest first) and a few headline numbers.
+// Home hero: the current roles (newest first) and a few headline numbers.
 export const heroQuery = defineQuery(`
   {
-    "current": *[_type == "experience" && !defined(endDate)] | order(startDate asc) {
+    "current": *[_type == "experience" && !defined(endDate)] | order(startDate desc) {
       _id,
       title,
       company,
