@@ -6,6 +6,7 @@ import { useEffect, useId, useRef, useState } from 'react';
 import ProfileCard from '@/components/home/ProfileCard';
 import TypedText from '@/components/home/TypedText';
 import { useProfile } from '@/components/ProfileProvider';
+import { RedactedText } from '@/components/tatakae/Redacted';
 import SectionHeading from '@/components/ui/SectionHeading';
 import { cn } from '@/lib/utils';
 import type { HeroQueryResult } from '@/sanity/types';
@@ -170,7 +171,7 @@ const AboutSection: React.FC<AboutSectionProps> = ({ current }) => {
                     index === 0 ? 'text-ctp-text' : 'text-ctp-subtext1'
                   )}
                 >
-                  {paragraph}
+                  <RedactedText text={paragraph} />
                 </p>
               ))}
             </div>

@@ -148,7 +148,9 @@ export default function ClassifiedProjectCard({
 
           <p className="mt-auto flex items-center gap-2 pt-5 font-nf text-[0.6875rem] text-ctp-overlay1 latte:text-ctp-subtext1">
             <LockClosedIcon aria-hidden="true" className="size-3.5" />
-            {t('closed')}
+            <span>
+              <RedactedText text={t('closed')} />
+            </span>
           </p>
         </div>
       </div>

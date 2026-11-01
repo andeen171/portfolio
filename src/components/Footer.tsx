@@ -6,6 +6,7 @@ import { useTranslations } from 'next-intl';
 import { type ReactNode, useId } from 'react';
 import { PaletteShortcut } from '@/components/CommandPalette';
 import { useProfile } from '@/components/ProfileProvider';
+import { RedactedText } from '@/components/tatakae/Redacted';
 import { Link } from '@/i18n/routing';
 import { NAV_ITEMS } from '@/lib/navigation';
 import { SOCIAL_NETWORKS } from '@/lib/social';
@@ -109,7 +110,7 @@ const Footer: React.FC = () => {
             </Link>
             {profile.footerTagline && (
               <p className="mt-3 max-w-sm text-sm leading-relaxed text-pretty text-ctp-subtext1">
-                {profile.footerTagline}
+                <RedactedText text={profile.footerTagline} />
               </p>
             )}
 

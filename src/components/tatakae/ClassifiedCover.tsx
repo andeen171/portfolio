@@ -2,6 +2,7 @@
 
 import { LockClosedIcon } from '@heroicons/react/20/solid';
 import { useTranslations } from 'next-intl';
+import { RedactedText } from './Redacted';
 
 const NOISE = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`;
 
@@ -79,7 +80,11 @@ export default function ClassifiedCover({
         className="flex items-center gap-2 font-nf text-[0.6875rem] text-ctp-subtext0"
       >
         <LockClosedIcon className="size-3.5 text-ctp-red" />
-        <span className="text-ctp-red">~/tatakae/</span>
+        <span className="text-ctp-red">
+          {/* A cut line can't take focus, which it mustn't inside the card's button. */}
+          ~/
+          <RedactedText text="[[tatakae]]" limit={Number.POSITIVE_INFINITY} />/
+        </span>
         {name.toLowerCase()}
         <span className="ml-auto rounded-sm px-1.5 py-0.5 text-[0.5625rem] font-bold tracking-[0.25em] text-ctp-red uppercase ring-1 ring-ctp-red/60">
           {t('restricted')}
