@@ -34,7 +34,11 @@ export default function AccessGate() {
   useEffect(() => {
     const dialog = dialogRef.current;
     if (!dialog) return;
-    if (gate && !dialog.open) dialog.showModal();
+    if (gate && !dialog.open) {
+      dialog.showModal();
+      // Focus the session, not the close button, until the key prompt takes it.
+      dialog.focus();
+    }
     if (!gate && dialog.open) dialog.close();
   }, [gate]);
 
@@ -42,7 +46,8 @@ export default function AccessGate() {
     <dialog
       ref={dialogRef}
       aria-label={file ? t('title', { file: file.codename }) : undefined}
-      className="dossier m-0 h-dvh max-h-none w-screen max-w-none overflow-y-auto bg-transparent p-0 text-ctp-text [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+      tabIndex={-1}
+      className="dossier m-0 outline-none h-dvh max-h-none w-screen max-w-none overflow-y-auto bg-transparent p-0 text-ctp-text [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       onClose={closeGate}
     >
       {file && <Session key={file.codename} file={file} />}

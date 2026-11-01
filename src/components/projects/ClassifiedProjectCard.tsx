@@ -89,7 +89,7 @@ export default function ClassifiedProjectCard({
           }}
           className={cn(
             COVER,
-            'cursor-pointer select-none [-webkit-touch-callout:none] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ctp-red focus-visible:ring-inset lg:h-full'
+            'cursor-pointer select-none [-webkit-touch-callout:none] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ctp-red focus-visible:ring-inset rounded-t-2xl lg:h-full lg:rounded-r-none lg:rounded-l-2xl'
           )}
         >
           <ClassifiedCover name={name} accessKey={accessKey} />

@@ -156,7 +156,11 @@ export default function TatakaeDossier() {
   useEffect(() => {
     const dialog = dialogRef.current;
     if (!dialog) return;
-    if (view && !dialog.open) dialog.showModal();
+    if (view && !dialog.open) {
+      dialog.showModal();
+      // Focus the sheet, not its first tab, so opening it doesn't light a focus ring.
+      dialog.focus();
+    }
     if (!view && dialog.open) dialog.close();
   }, [view]);
 
@@ -171,7 +175,7 @@ export default function TatakaeDossier() {
 
   const tab = (active: boolean) =>
     cn(
-      'flex shrink-0 items-center gap-1.5 rounded-t-lg px-3 py-2 font-nf text-[0.625rem] tracking-[0.18em] uppercase transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ctp-red',
+      'flex shrink-0 items-center gap-1.5 rounded-t-lg px-3 py-2 font-nf text-[0.625rem] tracking-[0.18em] uppercase transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ctp-red focus-visible:ring-inset',
       active
         ? 'bg-ctp-base text-ctp-text'
         : 'bg-ctp-crust/70 text-ctp-subtext0 hover:text-ctp-text latte:text-ctp-subtext1'
@@ -182,7 +186,8 @@ export default function TatakaeDossier() {
     <dialog
       ref={dialogRef}
       aria-label={file ? `${title}: ${file.codename}` : title}
-      className="dossier m-auto max-h-[min(100dvh-2rem,60rem)] w-[min(100%-1.5rem,60rem)] overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden rounded-2xl border-0 bg-ctp-mantle p-0 text-ctp-text shadow-2xl shadow-ctp-crust ring-1 ring-ctp-red/30"
+      tabIndex={-1}
+      className="dossier m-auto outline-none max-h-[min(100dvh-2rem,60rem)] w-[min(100%-1.5rem,60rem)] overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden rounded-2xl border-0 bg-ctp-mantle p-0 text-ctp-text shadow-2xl shadow-ctp-crust ring-1 ring-ctp-red/30"
       onClose={close}
       onClick={(event) => {
         // The content covers the dialog's own box, so a click that lands on
