@@ -106,13 +106,19 @@ export default function TypedTagline({ source, className }: TypedTaglineProps) {
             <Fragment key={pieceIndex}>{piece}</Fragment>
           ) : (
             <span key={`slot-${piece.slot}`} className={cn(!run.lit && 'animated-gradient-text')}>
-              {words[piece.slot]}
-              <span
-                className={cn(
-                  'ml-0.5 inline-block h-[0.9em] w-[3px] translate-y-[0.1em] rounded-full bg-ctp-lavender align-baseline',
-                  caret && piece.slot === active ? 'caret-blink' : 'invisible'
-                )}
-              />
+              {(words[piece.slot] ?? '').slice(0, -1)}
+              {/* The caret is an inline-block, which the browser may wrap
+                  onto its own line; binding it to the word's last letter
+                  keeps it at the end of the word on narrow screens. */}
+              <span className="whitespace-nowrap">
+                {(words[piece.slot] ?? '').slice(-1)}
+                <span
+                  className={cn(
+                    'ml-0.5 inline-block h-[0.9em] w-[3px] translate-y-[0.1em] rounded-full bg-ctp-lavender align-baseline',
+                    caret && piece.slot === active ? 'caret-blink' : 'invisible'
+                  )}
+                />
+              </span>
             </span>
           )
         )}
